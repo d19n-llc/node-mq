@@ -1,6 +1,11 @@
 # Nodejs Pub / Sub Message Queu For Microservices
 
-## !!! In Development !!!
+## In Development
+
+```
+This package is currently in development and will be ready on June 28, 2019.
+
+```
 
 A distributed messaging queue built for Node.js/express applications and designed
 for a horizontally scalling micro service architecture. You can have mutliple
