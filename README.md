@@ -76,7 +76,7 @@ module.exports = router;
 ```
 
 6.) Create a mq-scripts.js file in your project root directory and register
-all the scripts that you want to have the mq run on messages recieved in the queue.
+all the scripts that you want to have the mq run on messages received in the queue.
 the message queue will import this file to access all scripts registered.
 
 the key is the message "topic"
@@ -104,9 +104,7 @@ message: {
   source: "",
   topic: "", // provides context for the payload
   priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high
-  retryOnFail: false,
-  totalRetries: 3,
-  retriedCount: 0,
+  maxRetries: 3,
   payload: {}, // The data being processed
 }
 
