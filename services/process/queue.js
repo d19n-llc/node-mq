@@ -1,19 +1,30 @@
 const uuidv1 = require("uuid/v1");
+const fs = require("fs");
 const { seriesLoop } = require("../../helpers/functions");
 const { isPastQueueBuffer } = require("../../helpers/processing");
 const messageQueue = require("../../resources/message-queued");
 const messageInFlight = require("../../resources/message-inflight");
 const messageComplete = require("../../resources/message-processed");
 const messageFailedPermanent = require("../../resources/message-failed");
-const inflightRollBack = require("../../services/rollback/inflight-batch-failed");
+const inflightRollBack = require("../rollback/inflight-batch-failed");
+const { ProcessMessageTest } = require("../../scripts/test/process-a-message");
 
-const scriptRegistry = require(`${process.cwd()}/mq-scripts`);
+const pathToScripts = `${process.cwd()}/mq-scripts`;
+let scriptRegistry = null;
+try {
+	console.log("script registry exists", fs.existsSync(pathToScripts));
+	if (fs.existsSync(pathToScripts)) {
+		scriptRegistry = require(`${process.cwd()}/mq-scripts`);
+	}
+} catch (err) {
+	console.error(err);
+}
 
 console.log({ scriptRegistry });
 
 // Pass in user added scripts for processing custom messages
 
-module.exports = () => {
+module.exports = ({ removeBuffer = false }, callback) => {
 	const batchId = uuidv1();
 	const stepsCompleted = {};
 	let jobs = [];
@@ -46,17 +57,26 @@ module.exports = () => {
 	 *
 	 * @returns
 	 */
-	function processMessage(params) {
-		const { message } = params;
+	function processMessage({ message }) {
 		return new Promise((resolve, reject) => {
-			console.log({ message });
 			const topic = message.topic;
-			console.log("script", scriptRegistry[`${topic}`]);
-			scriptRegistry[`${topic}`]({ message }, (err, res) => {
-				console.log("processMessage", { err, res });
-				if (err) return reject(err);
-				return resolve(res);
-			});
+			if (topic === "internal-test") {
+				console.log({ topic });
+				ProcessMessageTest({ message }, (err, res) => {
+					console.log("processMessage", { err, res });
+					if (err) return reject(err);
+					return resolve(res);
+				});
+			}
+			if (scriptRegistry) {
+				console.log("script", scriptRegistry[`${topic}`]);
+				// Use the script with the key === to the message topic
+				scriptRegistry[`${topic}`]({ message }, (err, res) => {
+					console.log("processMessage", { err, res });
+					if (err) return reject(err);
+					return resolve(res);
+				});
+			}
 		});
 	}
 
@@ -65,7 +85,7 @@ module.exports = () => {
 	 *
 	 * @returns
 	 */
-	function removeFromQueue(params) {
+	function removeFromQueue() {
 		return new Promise((resolve, reject) => {
 			messageQueue.deleteOne({ id: currentMessage._id }, (err, res) => {
 				if (err) {
@@ -81,11 +101,12 @@ module.exports = () => {
 	 *
 	 * @returns
 	 */
-	function moveToInflight(params) {
+	function moveToInflight() {
 		return new Promise((resolve, reject) => {
+			currentMessage = Object.assign({}, currentMessage, { batchId });
 			messageInFlight.createOne(
 				{
-					body: Object.assign({}, currentMessage, { batchId })
+					body: currentMessage
 				},
 				(err, res) => {
 					if (err) {
@@ -102,7 +123,7 @@ module.exports = () => {
 	 *
 	 * @returns
 	 */
-	function removeFromInFlight(params) {
+	function removeFromInFlight() {
 		return new Promise((resolve, reject) => {
 			messageInFlight.deleteOne({ id: currentMessage._id }, (err, res) => {
 				if (err) {
@@ -118,7 +139,7 @@ module.exports = () => {
 	 *
 	 * @returns
 	 */
-	function moveToComplete(params) {
+	function moveToComplete() {
 		return new Promise((resolve, reject) => {
 			messageComplete.createOne(
 				{
@@ -145,11 +166,14 @@ module.exports = () => {
 	 *
 	 * @returns
 	 */
-	function permanentlyFail(fnParams) {
-		const { err } = fnParams;
+	function permanentlyFail({ error }) {
 		return new Promise((resolve, reject) => {
 			messageFailedPermanent.createOne(
-				{ body: Object.assign({}, currentMessage, { error: err }) },
+				{
+					body: Object.assign({}, currentMessage, {
+						error: { message: error.message }
+					})
+				},
 				(err, res) => {
 					if (err) {
 						return reject(err);
@@ -169,7 +193,8 @@ module.exports = () => {
 		await findQueuedMessages();
 		// Claim jobs
 		await seriesLoop(jobs, async (job) => {
-			if (isPastQueueBuffer({ jobCreatedAt: job.createTime })) {
+			if (isPastQueueBuffer({ jobCreatedAt: job.createTime }) || removeBuffer) {
+				console.log({ removeBuffer });
 				currentMessage = job;
 				await removeFromQueue();
 				await moveToInflight();
@@ -178,7 +203,8 @@ module.exports = () => {
 		// process jobs
 		await seriesLoop(jobs, async (job, index) => {
 			currentMessage = job;
-			if (isPastQueueBuffer({ jobCreatedAt: job.createTime })) {
+			if (isPastQueueBuffer({ jobCreatedAt: job.createTime }) || removeBuffer) {
+				console.log({ removeBuffer });
 				await processMessage({ message: job });
 				await removeFromInFlight();
 				await moveToComplete();
@@ -195,7 +221,7 @@ module.exports = () => {
 		const { err } = fnParams;
 		// This will process functions in parallel for anything that can be handled asynchronously
 		await removeFromInFlight();
-		await permanentlyFail({ err });
+		await permanentlyFail({ error: err });
 		// Rolback jobs unprocessed into the queue
 		await inflightRollBack({ batchId });
 		return { stepsCompleted };
@@ -205,6 +231,7 @@ module.exports = () => {
 	asyncFunctions()
 		.then((result) => {
 			console.log(result);
+			return callback(undefined, result);
 		})
 		.catch((err) => {
 			console.log({ err });
@@ -212,9 +239,11 @@ module.exports = () => {
 			asyncFunctionsOnError({ err })
 				.then((res) => {
 					console.log(res);
+					return callback(undefined, res);
 				})
 				.catch((err) => {
 					console.log(err);
+					return callback(err, undefined);
 				});
 		});
 };

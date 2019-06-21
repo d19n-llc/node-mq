@@ -18,8 +18,8 @@ module.exports = {
 		);
 	},
 	createOne: ({ body }, callback) => {
-		const job = constructor(body, { isUpdating: false });
-		validate({ data: job }, { isUpdating: false }, (err, res) => {
+		const subscriber = constructor(body, { isUpdating: false });
+		validate({ data: subscriber }, { isUpdating: false }, (err, res) => {
 			if (err) {
 				return callback(err, undefined);
 			}

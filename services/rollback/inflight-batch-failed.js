@@ -2,11 +2,10 @@ const messageInflight = require("../../resources/message-inflight");
 const messageQueued = require("../../resources/message-queued");
 const { seriesLoop } = require("../../helpers/functions");
 
-module.exports = (params) => {
+module.exports = (params, callback = () => {}) => {
 	const { batchId } = params;
-	console.log("rollback job queue", { batchId });
-	const stepsCompleted = {};
 	let jobsInflight = [];
+	console.log("rollback job queue", { batchId });
 	/**
 	 *
 	 *
@@ -17,9 +16,10 @@ module.exports = (params) => {
 			// custom logic here
 			messageInflight.findMany(
 				{
-					query: { batchId }
+					query: [{ $match: { batchId } }]
 				},
 				(err, res) => {
+					console.log({ err, res });
 					jobsInflight = res;
 					return resolve();
 				}
@@ -57,19 +57,21 @@ module.exports = (params) => {
 	async function asyncFunctions() {
 		// Uncomment to use a database connection
 		await findInFlightJobs();
+		console.log({ jobsInflight });
 		if (jobsInflight.length > 0) {
 			await seriesLoop(jobsInflight, async (doc, index) => {
 				await moveJobToQueue({ job: doc });
 			});
 		}
 
-		return { stepsCompleted };
+		return { status: "jobs moved from inflight to queued" };
 	}
 
 	// Invoke our async function to process the script
 	asyncFunctions()
 		.then((result) => {
 			console.log(result);
+			return callback(undefined, result);
 		})
 		.catch((err) => {
 			console.log(err);

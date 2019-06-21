@@ -10,15 +10,15 @@ module.exports.constructor = (params, options) => {
 		  {
 				userAccountId: "",
 				_id: ObjectID().toString(),
+				batchId: "", // added at the time the message is processed from the queue
 				name: "", // a unique identifier for the message
 				source: "",
 				topic: "", // provides context for the payload
 				priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high
-				retryOnFail: false,
-				totalRetries: 3,
+				maxRetries: 3,
 				retriedCount: 0,
 				payload: {}, // The data being processed
-				batchId: "" // added at the time the message is processed from the queue
+				error: {}
 		  };
 
 	// Merge values being passed in the params object with the defaults

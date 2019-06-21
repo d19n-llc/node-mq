@@ -1,6 +1,7 @@
 const schedule = require("node-schedule");
 const deduplicateQueue = require("../services/deduplicate");
-const processMessages = require("../services/process/messages");
+const processQueuedMessages = require("../services/process/queue");
+const retryFailedMessages = require("../services/retry-failed");
 const { offsetJobStart } = require("../helpers/processing");
 
 // *    *    *    *    *    *
@@ -16,13 +17,17 @@ const { offsetJobStart } = require("../helpers/processing");
 function Scheduler() {
 	console.log("cron scheduler running");
 
-	schedule.scheduleJob("10 * * * * *", () => {
+	schedule.scheduleJob("5 * * * * *", () => {
 		deduplicateQueue({}, (err, res) => {});
 	});
-
-	schedule.scheduleJob("30 * * * * *", async () => {
+	schedule.scheduleJob("15 * * * * *", async () => {
 		await offsetJobStart();
-		processMessages({}, (err, res) => {});
+		retryFailedMessages({}, (err, res) => {});
+	});
+
+	schedule.scheduleJob("15 * * * * *", async () => {
+		await offsetJobStart();
+		processQueuedMessages({}, (err, res) => {});
 	});
 }
 

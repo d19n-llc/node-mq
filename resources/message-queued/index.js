@@ -1,4 +1,9 @@
-const { aggregate, findOneAndUpdate, deleteOne } = require("../mongo-methods");
+const {
+	aggregate,
+	findOneAndUpdate,
+	deleteOne,
+	deleteMany
+} = require("../mongo-methods");
 const { constructor } = require("../../models/message/constructor");
 const { validate } = require("../../models/message/validator");
 
@@ -18,8 +23,8 @@ module.exports = {
 		);
 	},
 	createOne: ({ body }, callback) => {
-		const job = constructor(body, { isUpdating: false });
-		validate({ data: job }, { isUpdating: false }, (err, res) => {
+		const message = constructor(body, { isUpdating: false });
+		validate({ data: message }, { isUpdating: false }, (err, res) => {
 			if (err) {
 				return callback(err, undefined);
 			}
@@ -42,13 +47,27 @@ module.exports = {
 			);
 		});
 	},
-	deleteOne: ({ jobId }, callback) => {
+	deleteOne: ({ id }, callback) => {
 		deleteOne(
 			{
 				collName: "mq_messages_queued",
 				query: {
-					_id: jobId
+					_id: id
 				}
+			},
+			(err, res) => {
+				if (err) {
+					return callback(err, undefined);
+				}
+				return callback(undefined, res);
+			}
+		);
+	},
+	deleteMany: ({ query }, callback) => {
+		deleteMany(
+			{
+				collName: "mq_messages_queued",
+				query
 			},
 			(err, res) => {
 				if (err) {

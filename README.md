@@ -1,19 +1,21 @@
-# Microserive Messaging
+# Nodejs Pub / Sub Message Queu For Microservices
 
 !!! In Development !!!
 
-A distributed messaging queue built for Node.js/express applications designed for
-a micro service first architecture. You can have mutliple applications working
-to satisfy the demands of the job queue, scale your apps horizontally and the
-node-mq handles deduplication and batch processing to avoid cases where a message
-is processed by two applications.
+A distributed messaging queue built for Node.js/express applications and designed
+for a horizontally scalling micro service architecture. You can have mutliple
+applications working to satisfy the queued messages, scale your apps horizontally
+and the node-mq handles deduplication and batch processing to prevent processing
+a message more than once.
 
-very micro service you deploy into your network can use the node-mq package,
-subscribe to other micro services to recieve messages and process messages.
+Each new micro service you deploy into your network can use the node-mq package,
+subscribe to other micro services to begin a publishing and subscribing to
+events sent between microservices.
 
-In addition the message queue will allow for each micro service to process events
-from third party webhooks and inject custom scripts you want to run on those events.
-The message queue will process the message, handle failures, retries and roll backs.
+In addition, the message queue will allow for each micro service to process events
+from third party webhooks and inject custom scripts you want to run to process
+messages by topic. The message queue will process the message, handle failures,
+retries and roll backs.
 
 ## Getting Started
 
@@ -35,8 +37,8 @@ MQ_MESSAGES_URL=
 
 ```
 
-4.) from your terminal cd into your project directory and run the following command to create
-all the collections used by node-mq.
+4.) from your terminal cd into your project directory and run the following
+command to create all the collections used by node-mq.
 
 ```
 node -e 'require("@d19n/node-mq").CreateCollections()'

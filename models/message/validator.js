@@ -13,25 +13,23 @@ const jobSchema = Joi.object()
 			then: Joi.strip(),
 			otherwise: Joi.string().required()
 		}),
+		batchId: Joi.string()
+			.optional()
+			.allow(""),
 		name: Joi.string().required(),
 		source: Joi.string().required(),
 		topic: Joi.string().required(),
 		priority: Joi.number()
 			.valid(0, 1, 2)
 			.required(),
-		retryOnFail: Joi.boolean()
-			.optional()
-			.default(false),
-		totalRetries: Joi.number()
+		maxRetries: Joi.number()
 			.optional()
 			.default(0),
 		retriedCount: Joi.number()
 			.optional()
 			.default(0),
 		payload: Joi.object().required(),
-		batchId: Joi.string()
-			.optional()
-			.allow(""),
+		error: Joi.object().optional(),
 		updateTime: Joi.string().required(),
 		createTime: Joi.string().required()
 	})

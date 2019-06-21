@@ -1,9 +1,12 @@
 // eslint-disable-next-line global-require
 
-// const module = require("path/to/script");
-// const module2 = require("path/to/script2");
+// const orderMessageScript = require("path/to/script");
+// const customJobScript = require("path/to/script");
+// const customJobTwoScript = require("path/to/script");
 
+// [topic]: script function()
 module.exports = {
-	// topic: module,
-	// topic2: module2,
+	// order: orderMessageScript,
+	// customJob1: customJobScript,
+	// customJob2: customJobTwoScript,
 };
