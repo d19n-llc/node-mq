@@ -1,6 +1,6 @@
 # Nodejs Pub / Sub Message Queu For Microservices
 
-!!! In Development !!!
+## !!! In Development !!!
 
 A distributed messaging queue built for Node.js/express applications and designed
 for a horizontally scalling micro service architecture. You can have mutliple
@@ -83,13 +83,17 @@ the key is the message "topic"
 the value is the module.export = ({message}) =>
 
 ```
-const testModule = require("./api/scripts/mq-test");
-// const module2 = require("path/to/script2");
+const orderMessageScript = require("path/to/script");
+const customJobScript = require("path/to/script");
+const customJobTwoScript = require("path/to/script");
 
+// [topic]: function()
 module.exports = {
-	test: testModule,
-	// topic2: module2,
+	order: orderMessageScript,
+	customJob1: customJobScript,
+	customJob2: customJobTwoScript,
 };
+
 
 ```
 
@@ -116,5 +120,32 @@ module.exports = ({ message }, callback = () => {}) => {
   // Your custom code here to process a message
 	return callback(undefined, { message });
 };
+
+```
+
+## Processing scripts with the message Queue
+
+1.) Create a message with a "topic" for a script you want to run i.e "customJob1".
+Then publish the message to the queue when you want the script processed.
+
+```
+const { Message, PublishRequest } = require("@d19n/node-mq");
+
+Message.constructor(
+    {
+      userAccountId: "5cf1a9f8b79aa40017af4c46",
+      name: `custom-job-one`,
+      topic: "customJob1",
+      source: "api",
+      payload: {
+        description: "Running a custom job script",
+      },
+      priority: 1
+    },
+    { isUpdating: false }
+  )
+);
+
+PublishRequest({body: message});
 
 ```
