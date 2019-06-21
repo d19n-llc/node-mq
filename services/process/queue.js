@@ -168,6 +168,7 @@ module.exports = ({ removeBuffer = false }, callback) => {
 	 */
 	function permanentlyFail({ error }) {
 		return new Promise((resolve, reject) => {
+			console.log("permanentlyFail", { currentMessage });
 			messageFailedPermanent.createOne(
 				{
 					body: Object.assign({}, currentMessage, {

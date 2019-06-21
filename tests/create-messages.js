@@ -5,7 +5,7 @@ const { seriesLoop } = require("../helpers/functions");
 
 module.exports.script = () => {
 	const messagesNoRetry = [];
-	for (let index = 0; index < 100; index++) {
+	for (let index = 0; index < 0; index++) {
 		messagesNoRetry.push(
 			Message.constructor(
 				{
@@ -26,7 +26,7 @@ module.exports.script = () => {
 	}
 
 	const failedMessagesRetriable = [];
-	for (let index = 0; index < 100; index++) {
+	for (let index = 0; index < 4; index++) {
 		failedMessagesRetriable.push(
 			Message.constructor(
 				{
@@ -48,7 +48,7 @@ module.exports.script = () => {
 	}
 
 	const failedMessagesNoRetry = [];
-	for (let index = 0; index < 100; index++) {
+	for (let index = 0; index < 0; index++) {
 		failedMessagesNoRetry.push(
 			Message.constructor(
 				{

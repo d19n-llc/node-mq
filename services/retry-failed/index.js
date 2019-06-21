@@ -35,6 +35,12 @@ module.exports = (params, callback = () => {}) => {
 	 */
 	function moveMessageToQueue({ message }) {
 		return new Promise((resolve, reject) => {
+			console.log({
+				body: Object.assign({}, message, {
+					batchId: "",
+					retriedCount: message.retriedCount + 1
+				})
+			});
 			messageQueued.createOne(
 				{
 					body: Object.assign({}, message, {

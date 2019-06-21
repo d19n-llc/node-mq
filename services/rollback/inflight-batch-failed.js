@@ -49,6 +49,25 @@ module.exports = (params, callback = () => {}) => {
 		});
 	}
 
+	/**
+	 *
+	 *
+	 * @returns
+	 */
+	function deleteManyFromInflight() {
+		return new Promise((resolve, reject) => {
+			// custom logic here
+			messageInflight.deleteMany(
+				{
+					query: { batchId }
+				},
+				(err, res) => {
+					return resolve();
+				}
+			);
+		});
+	}
+
 	// Add all your functions to be processed sync / async
 	/**
 	 * Process functions
@@ -62,6 +81,8 @@ module.exports = (params, callback = () => {}) => {
 			await seriesLoop(jobsInflight, async (doc, index) => {
 				await moveJobToQueue({ job: doc });
 			});
+			console.log("delete maybe inflight");
+			await deleteManyFromInflight();
 		}
 
 		return { status: "jobs moved from inflight to queued" };

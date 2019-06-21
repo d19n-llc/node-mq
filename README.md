@@ -3,7 +3,8 @@
 ## In Development
 
 ```
-This package is currently in development and will be ready on June 28, 2019.
+This package is currently in development and will be ready
+on June 28, 2019.
 
 ```
 
