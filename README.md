@@ -15,13 +15,11 @@ and the node-mq handles deduplication and batch processing to prevent processing
 a message more than once.
 
 Each new micro service you deploy into your network can use the node-mq package,
-subscribe to other micro services to begin a publishing and subscribing to
-events sent between microservices.
+subscribe to other micro services and begin a pub /sub relationship to messages sent between microservices.
 
-In addition, the message queue will allow for each micro service to process events
-from third party webhooks and inject custom scripts you want to run to process
-messages by topic. The message queue will process the message, handle failures,
-retries and roll backs.
+In addition, the message queue will allow for each micro service to process messages
+from third party webhooks and inject custom scripts you want to run on those messages name each sctipt by topic. The message queue will process the message, handle failures,
+retries and rollbacks.
 
 ## Getting Started
 
