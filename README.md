@@ -137,20 +137,42 @@ Then publish the message to the queue when you want the script processed.
 const { Message, AddMessageToQueue } = require("@d19n/node-mq");
 
 Message.constructor(
-    {
-      userAccountId: "5cf1a9f8b79aa40017af4c46",
-      name: `custom-job-one`,
-      topic: "customJob1",
-      source: "api",
-      payload: {
-        description: "Running a custom job script",
-      },
-      priority: 1
+  {
+    userAccountId: "5cf1a9f8b79aa40017af4c46",
+    name: `custom-job-one`,
+    topic: "customJob1",
+    source: "api",
+    payload: {
+      description: "Running a custom job script",
     },
-    { isUpdating: false }
-  )
+    priority: 1
+  },
+  { isUpdating: false }
 );
 
 AddMessageToQueue({body: message});
+
+```
+
+2.) Adding a message that should be published to all subscribers.
+
+```
+const { Message, AddMessageToQueue } = require("@d19n/node-mq");
+
+const message = Message.constructor(
+  {
+    userAccountId: "5cf1a9f8b79aa40017af4c46",
+    name: `updated: <some value> - <Timestamp>`,
+    topic: <some value>,
+    source: "self", // Set the source to "self"
+    payload: value,
+    priority: 1
+  },
+  { isUpdating: false }
+);
+
+AddMessageToQueue({ body: message }, (err, res) => {
+  console.log({ err, res });
+});
 
 ```

@@ -7,7 +7,7 @@ const messageInFlight = require("../../resources/message-inflight");
 const messageComplete = require("../../resources/message-processed");
 const messageFailedPermanent = require("../../resources/message-failed");
 const inflightRollBack = require("../rollback/inflight-batch-failed");
-const publishMessage = require("../../services/publish/message");
+const { PublishMessage } = require("../../services/publish/message");
 const { ProcessMessageTest } = require("../../scripts/test/process-a-message");
 
 const pathToScripts = `${process.cwd()}/mq-scripts`;
@@ -61,7 +61,7 @@ module.exports = ({ removeBuffer = false }, callback) => {
 			// If the source is self that means this message has been published
 			// to the queue and should be sent to subscribers.
 			if (source === "self") {
-				publishMessage({ message }, (err, res) => {
+				PublishMessage({ message }, (err, res) => {
 					if (err) return reject(err);
 					return resolve(res);
 				});

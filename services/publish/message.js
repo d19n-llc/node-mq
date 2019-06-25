@@ -2,7 +2,7 @@ const internalHttp = require("../../http/requests");
 const { seriesLoop } = require("../../helpers/functions");
 const subsriberResource = require("../../resources/message-subscriber");
 
-module.exports = (params, callback = () => {}) => {
+module.exports.PublishMessage = (params, callback = () => {}) => {
 	const { message } = params;
 	let subscribers = [];
 	let lastUpdateError = {};
