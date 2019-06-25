@@ -16,7 +16,6 @@ module.exports.PublishMessage = (params, callback = () => {}) => {
 			subsriberResource.findMany(
 				{ query: [{ $match: { topics: { $in: [message.topic] } } }] },
 				(err, res) => {
-					console.log(err, res);
 					if (err) return reject(err);
 					subscribers = res;
 					return resolve();
@@ -71,6 +70,7 @@ module.exports.PublishMessage = (params, callback = () => {}) => {
 		await findSubscribers();
 		console.log({ subscribers });
 		await seriesLoop(subscribers, async (doc, index) => {
+			console.log({ doc });
 			await sendMessageToSubscriber({ subscriberUrl: doc.subscriberUrl });
 			await updateSubscriberStatus({ subscriberId: doc._id });
 		});
