@@ -9,13 +9,11 @@ module.exports = {
 	 */
 	aggregate(params, callback) {
 		const { collName, query } = params;
-		console.log("calling aggregate method", query);
 		useDb({ dbName: process.env.MQ_MONGODB_NAME }).then((res) =>
 			res
 				.collection(collName)
 				.aggregate(query)
 				.toArray((err, result) => {
-					console.log("mongo methods", { err, result });
 					if (err) {
 						return callback(err, undefined);
 					}

@@ -1,6 +1,6 @@
 const retryFailedMessages = require("../services/retry-failed/index");
 
-module.exports.script = () => {
+module.exports = (params, callback = () => {}) => {
 	/**
 	 * This function will run the message queu processing service
 	 *
@@ -19,20 +19,18 @@ module.exports.script = () => {
 	 *
 	 */
 	async function asyncFunctions() {
-		await processFailedMessages();
-		return { status: "process failed jobs test complete" };
+		const res = await processFailedMessages();
+		console.log("failed message res", { res });
+		return { status: "retry failed messages test complete" };
 	}
 
 	// Invoke our async function to process the script
 	asyncFunctions()
-		.then((result) => {
-			console.log(result);
-			return "done";
+		.then((res) => {
+			return callback(undefined, res);
 		})
 		.catch((err) => {
 			console.log(err);
-			return "done";
+			return callback(err, undefined);
 		});
 };
-
-this.script();

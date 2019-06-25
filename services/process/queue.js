@@ -7,20 +7,18 @@ const messageInFlight = require("../../resources/message-inflight");
 const messageComplete = require("../../resources/message-processed");
 const messageFailedPermanent = require("../../resources/message-failed");
 const inflightRollBack = require("../rollback/inflight-batch-failed");
+const publishMessage = require("../../");
 const { ProcessMessageTest } = require("../../scripts/test/process-a-message");
 
 const pathToScripts = `${process.cwd()}/mq-scripts`;
 let scriptRegistry = null;
 try {
-	console.log("script registry exists", fs.existsSync(pathToScripts));
 	if (fs.existsSync(pathToScripts)) {
 		scriptRegistry = require(`${process.cwd()}/mq-scripts`);
 	}
 } catch (err) {
 	console.error(err);
 }
-
-console.log({ scriptRegistry });
 
 // Pass in user added scripts for processing custom messages
 
@@ -59,20 +57,25 @@ module.exports = ({ removeBuffer = false }, callback) => {
 	 */
 	function processMessage({ message }) {
 		return new Promise((resolve, reject) => {
-			const topic = message.topic;
+			const { source, topic } = message;
+			// If the source is self that means this message has been published
+			// to the queue and should be sent to subscribers.
+			if (source === "self") {
+				publishMessage({ message }, (err, res) => {
+					if (err) return reject(err);
+					return resolve(res);
+				});
+			}
+
 			if (topic === "internal-test") {
-				console.log({ topic });
 				ProcessMessageTest({ message }, (err, res) => {
-					console.log("processMessage", { err, res });
 					if (err) return reject(err);
 					return resolve(res);
 				});
 			}
 			if (scriptRegistry) {
-				console.log("script", scriptRegistry[`${topic}`]);
 				// Use the script with the key === to the message topic
 				scriptRegistry[`${topic}`]({ message }, (err, res) => {
-					console.log("processMessage", { err, res });
 					if (err) return reject(err);
 					return resolve(res);
 				});
@@ -168,7 +171,6 @@ module.exports = ({ removeBuffer = false }, callback) => {
 	 */
 	function permanentlyFail({ error }) {
 		return new Promise((resolve, reject) => {
-			console.log("permanentlyFail", { currentMessage });
 			messageFailedPermanent.createOne(
 				{
 					body: Object.assign({}, currentMessage, {
@@ -195,7 +197,6 @@ module.exports = ({ removeBuffer = false }, callback) => {
 		// Claim jobs
 		await seriesLoop(jobs, async (job) => {
 			if (isPastQueueBuffer({ jobCreatedAt: job.createTime }) || removeBuffer) {
-				console.log({ removeBuffer });
 				currentMessage = job;
 				await removeFromQueue();
 				await moveToInflight();
@@ -205,7 +206,6 @@ module.exports = ({ removeBuffer = false }, callback) => {
 		await seriesLoop(jobs, async (job, index) => {
 			currentMessage = job;
 			if (isPastQueueBuffer({ jobCreatedAt: job.createTime }) || removeBuffer) {
-				console.log({ removeBuffer });
 				await processMessage({ message: job });
 				await removeFromInFlight();
 				await moveToComplete();

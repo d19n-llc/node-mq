@@ -15,7 +15,6 @@ module.exports = {
 				query
 			},
 			(err, res) => {
-				console.log("resource", { err, res });
 				if (err) {
 					return callback(err, undefined);
 				}

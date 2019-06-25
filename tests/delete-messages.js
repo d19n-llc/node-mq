@@ -3,7 +3,7 @@ const messageFailed = require("../resources/message-failed/index");
 const messageInflight = require("../resources/message-inflight/index");
 const messageProcessed = require("../resources/message-processed/index");
 
-module.exports.script = () => {
+module.exports = (params, callback = () => {}) => {
 	/**
 	 *
 	 *
@@ -90,14 +90,11 @@ module.exports.script = () => {
 
 	// Invoke our async function to process the script
 	asyncFunctions()
-		.then((result) => {
-			console.log(result);
-			return "done";
+		.then((res) => {
+			return callback(undefined, res);
 		})
 		.catch((err) => {
 			console.log(err);
-			return "done";
+			return callback(err, undefined);
 		});
 };
-
-this.script();

@@ -4,6 +4,7 @@ const subscriberSchema = Joi.object().keys({
 	userAccountId: Joi.string().optional(),
 	subscriberUrl: Joi.string().required(),
 	topics: Joi.array().required(),
+	lastUpdateError: Joi.object().optional(),
 	updateTime: Joi.string().required(),
 	createTime: Joi.string().required()
 });
@@ -16,10 +17,8 @@ const subscriberSchema = Joi.object().keys({
  * @param {Object} options
  */
 module.exports.validate = (params, options, callback) => {
-	console.log({ callback, params, options });
 	const { data } = params;
 	const { isUpdating } = options;
-	console.log({ isUpdating });
 	// Set the validation schema for a single object or an array of objects
 	const schema = subscriberSchema;
 	// validate the data against the schema

@@ -10,6 +10,7 @@ module.exports.constructor = (params, options) => {
 		  {
 				userAccountId: "",
 				subscriberUrl: "",
+				lastUpdateError: {},
 				topics: []
 		  };
 
@@ -20,7 +21,6 @@ module.exports.constructor = (params, options) => {
 		params,
 		addTimestamps({ isUpdating: false })
 	);
-	console.log({ merged });
 	// Freeze the object
 	return Object.freeze({
 		...merged

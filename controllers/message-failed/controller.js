@@ -1,9 +1,10 @@
 const { findMany } = require("../../resources/message-failed");
 
 module.exports = {
-	findMany: ({ params, body }, response, next) => {
+	findMany: (request, response, next) => {
+		const { params, body } = request;
 		findMany({ body }, (err, res) => {
-			console.log({ err, res });
+			if (err) return next(err);
 			response.status(200).json(res);
 		});
 	}

@@ -35,12 +35,6 @@ module.exports = (params, callback = () => {}) => {
 	 */
 	function moveMessageToQueue({ message }) {
 		return new Promise((resolve, reject) => {
-			console.log({
-				body: Object.assign({}, message, {
-					batchId: "",
-					retriedCount: message.retriedCount + 1
-				})
-			});
 			messageQueued.createOne(
 				{
 					body: Object.assign({}, message, {
@@ -82,10 +76,8 @@ module.exports = (params, callback = () => {}) => {
 	async function asyncFunctions() {
 		// Uncomment to use a database connection
 		await findFailedMessagesToRetry();
-		console.log({ messages: messages.length });
 		if (messages.length > 0) {
 			await seriesLoop(messages, async (doc, index) => {
-				console.log({ index });
 				await moveMessageToQueue({ message: doc });
 				await removeMessageFromFailed({ message: doc });
 			});
@@ -100,11 +92,9 @@ module.exports = (params, callback = () => {}) => {
 	// Invoke our async function to process the script
 	asyncFunctions()
 		.then((result) => {
-			console.log(result);
 			return callback(undefined, result);
 		})
 		.catch((err) => {
-			console.log(err);
 			return callback(err, undefined);
 		});
 };

@@ -18,42 +18,42 @@ module.exports.RemoveCollections = ({ deleteAll = "REJECT" }) => {
 					.collection("mq_publishers")
 					.drop();
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME })
 					.collection("mq_subscribers")
 					.drop();
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME })
 					.collection("mq_messages_queued")
 					.drop();
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME })
 					.collection("mq_messages_inflight")
 					.drop();
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME })
 					.collection("mq_messages_failed")
 					.drop();
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME })
 					.collection("mq_messages_processed")
 					.drop();
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			return resolve();
 		});

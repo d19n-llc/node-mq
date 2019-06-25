@@ -5,15 +5,17 @@ const {
 } = require("../../resources/message-subscriber");
 
 module.exports = {
-	findMany: ({ params, body }, response, next) => {
+	findMany: (request, response, next) => {
+		const { params, body } = request;
 		findMany({ body }, (err, res) => {
-			console.log({ err, res });
+			if (err) return next(err);
 			response.status(200).json(res);
 		});
 	},
-	createOne: ({ params, body }, response, next) => {
+	createOne: (request, response, next) => {
+		const { params, body } = request;
 		createOne({ body }, (err, res) => {
-			console.log({ err, res });
+			if (err) return next(err);
 			response.status(200).json(
 				Object.assign({}, res, {
 					publisherUrl: process.env.MQ_MESSAGES_URL
@@ -21,9 +23,10 @@ module.exports = {
 			);
 		});
 	},
-	deleteOne: ({ params, body }, response, next) => {
-		deleteOne({ body }, (err, res) => {
-			console.log({ err, res });
+	deleteOne: (request, response, next) => {
+		const { params } = request;
+		deleteOne({ params }, (err, res) => {
+			if (err) return next(err);
 			response.status(200).json(res);
 		});
 	}

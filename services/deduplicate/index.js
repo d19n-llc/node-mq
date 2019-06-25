@@ -2,7 +2,6 @@ const { aggregate, deleteOne } = require("../../resources/mongo-methods");
 const { seriesLoop } = require("../../helpers/functions");
 
 module.exports = () => {
-	let stepsCompleted = {};
 	let duplicates = [];
 	/**
 	 *
@@ -36,12 +35,9 @@ module.exports = () => {
 					]
 				},
 				(err, res) => {
-					console.log({ err, res });
+					if (err) return reject(err);
 					duplicates = res;
-					stepsCompleted = Object.assign({}, stepsCompleted, {
-						checkForDuplicates: "processed the first function"
-					});
-					return resolve();
+					return resolve(res);
 				}
 			);
 		});
@@ -62,11 +58,8 @@ module.exports = () => {
 					query: { _id: id }
 				},
 				(err, res) => {
-					console.log({ err, res });
-					stepsCompleted = Object.assign({}, stepsCompleted, {
-						removeDuplicates: "processed the second function"
-					});
-					return resolve();
+					if (err) return reject(err);
+					return resolve(res);
 				}
 			);
 		});
@@ -81,18 +74,15 @@ module.exports = () => {
 		await checkForDuplicates();
 		if (duplicates.length > 0) {
 			await seriesLoop(duplicates, async (doc, index) => {
-				console.log({ doc });
-				const name = doc._id.name;
 				const duplicatesLen = doc.count.length;
 				const duplicatesToRemove = doc.documentIds.slice(0, duplicatesLen - 1);
-				console.log({ name, duplicatesToRemove });
 				await seriesLoop(duplicatesToRemove, async (duplicate, index) => {
 					await removeDuplicate({ id: duplicate._id });
 				});
 			});
 		}
 
-		return { stepsCompleted };
+		return { duplicates };
 	}
 
 	// Invoke our async function to process the script

@@ -1,104 +1,88 @@
-// const internalHttp = require("../../../http/requests");
-// const { validate } = require("../../../models/publisher/validator");
-// const Publisher = require("../../../models/publisher/constructor");
+const internalHttp = require("../../http/requests");
+const { seriesLoop } = require("../../helpers/functions");
+const subsriberResource = require("../../resources/message-subscriber");
 
-// module.exports = (params, options) => {
-// 	const { message } = params;
-// 	let stepsCompleted = {};
-// 	/**
-// 	 *
-// 	 *
-// 	 * @returns
-// 	 */
-// 	function findSubscribers() {
-// 		return new Promise((resolve, reject) => {
-// 			collection("app_subscribers")
-// 				.aggregate([{ $match: {} }])
-// 				.toArray((error, result) => {
-// 					console.log(object);
-// 					return resolve();
-// 				});
-// 		});
-// 	}
+module.exports = (params, options) => {
+	const { message } = params;
+	let subscribers = [];
+	let lastUpdateError = {};
+	/**
+	 *
+	 *
+	 * @returns
+	 */
+	function findSubscribers() {
+		return new Promise((resolve, reject) => {
+			subsriberResource.findMany(
+				{ query: [{ $match: { topics: { $in: [message.topic] } } }] },
+				(err, res) => {
+					console.log(err, res);
+					if (err) return reject(err);
+					subscribers = res;
+					return resolve();
+				}
+			);
+		});
+	}
+	/**
+	 *
+	 *
+	 * @returns
+	 */
+	function sendMessageToSubscriber(params) {
+		const { subscriberUrl } = params;
+		console.log({ subscriberUrl });
+		return new Promise((resolve, reject) => {
+			internalHttp.POST(
+				{
+					url: `${subscriberUrl}`,
+					payload: message
+				},
+				(err, res) => {
+					console.log("message sent", { res });
+					lastUpdateError = { err };
+					return resolve();
+				}
+			);
+		});
+	}
 
-// 	/**
-// 	 *
-// 	 *
-// 	 * @returns
-// 	 */
-// 	function storeMessage(params) {
-// 		return new Promise((resolve, reject) => {
-// 			collection("app_messages")
-// 				.insertOne(message)
-// 				.then(() => resolve())
-// 				.catch((err) => reject(err));
-// 		});
-// 	}
+	/**
+	 *
+	 *
+	 * @returns
+	 */
+	function updateSubscriberStatus(params) {
+		const { subscriberId } = params;
+		return new Promise((resolve, reject) => {
+			subsriberResource.updateOne(
+				{ id: subscriberId, body: { lastUpdateError } },
+				(err, res) => {
+					if (err) return reject(err);
+					return resolve(res);
+				}
+			);
+		});
+	}
 
-// 	/**
-// 	 *
-// 	 *
-// 	 * @returns
-// 	 */
-// 	function sendMessageToSubscriber(params) {
-// 		const { subscriberUrl, message } = params;
-// 		return new Promise((resolve, reject) => {
-// 			internalHttp.POST(
-// 				{
-// 					url: `${subscriberUrl}`,
-// 					payload: message,
-// 				},
-// 				(err, res) => {
-// 					console.log("message sent", { res });
-// 					// Do not reject on error continue running and update the errors
-// 					// if (err) return reject(err);
-// 					stepsCompleted = Object.assign({}, stepsCompleted, {
-// 						sendMessageToSubscriber: Object.assign({}, res, {
-// 							userAccountId: "1234",
-// 						}),
-// 					});
-// 					return resolve();
-// 				},
-// 			);
-// 		});
-// 	}
+	/**
+	 * Process functions
+	 *
+	 */
+	async function asyncFunctions() {
+		await findSubscribers();
+		await seriesLoop(subscribers, async (doc, index) => {
+			await sendMessageToSubscriber();
+			await updateSubscriberStatus();
+		});
+		return { subscribers };
+	}
 
-// 	/**
-// 	 *
-// 	 *
-// 	 * @returns
-// 	 */
-// 	function updateSubscriberStatus(params) {
-// 		const { subscriberId } = params;
-// 		return new Promise((resolve, reject) => {
-// 			collection("app_subscribers")
-// 				.findOneAndUpdate({ _id: ObjectID(subscriberId) }, { $set: {} })
-// 				.then(() => resolve())
-// 				.catch((err) => reject(err));
-// 		});
-// 	}
-
-// 	// Add all your functions to be processed sync / async
-// 	/**
-// 	 * Process functions
-// 	 *
-// 	 */
-// 	async function asyncFunctions() {
-// 		await connectToDatabase();
-// 		await findSubscribers();
-// 		await seriesLoop(subscribers, async (doc, index) => {
-// 			await sendMessageToSubscriber();
-// 			await updateSubscriberStatus();
-// 		});
-// 		return { stepsCompleted };
-// 	}
-
-// 	// Invoke our async function to process the script
-// 	asyncFunctions()
-// 		.then((result) => {
-// 			console.log(result);
-// 		})
-// 		.catch((err) => {
-// 			console.log(err);
-// 		});
-// };
+	asyncFunctions()
+		.then((res) => {
+			console.log(res);
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+};

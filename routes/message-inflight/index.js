@@ -1,6 +1,10 @@
 const router = require("express").Router();
-const { findMany } = require("../../controllers/message-inflight/controller");
+const {
+	findMany,
+	batchRetry
+} = require("../../controllers/message-inflight/controller");
 
 router.get("/mq-message-inflight", findMany);
+router.post("/mq-message-inflight/retry", batchRetry);
 
 module.exports = router;

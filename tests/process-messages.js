@@ -2,7 +2,7 @@ const processQueuedMessages = require("../services/process/queue");
 const messageQueue = require("../resources/message-queued");
 const { asyncForLoop } = require("../helpers/functions");
 
-module.exports.script = () => {
+module.exports = (params, callback = () => {}) => {
 	let totalMessages = 0;
 	/**
 	 *
@@ -51,19 +51,16 @@ module.exports.script = () => {
 				await processMessagesInQueue();
 			}
 		);
-		return { status: "process messages queued test complete" };
+		return { status: "process messages test complete", totalMessages };
 	}
 
 	// Invoke our async function to process the script
 	asyncFunctions()
-		.then((result) => {
-			console.log(result);
-			return "done";
+		.then((res) => {
+			return callback(undefined, res);
 		})
 		.catch((err) => {
 			console.log(err);
-			return "done";
+			return callback(err, undefined);
 		});
 };
-
-this.script();

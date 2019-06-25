@@ -16,7 +16,7 @@ module.exports.CreateCollections = () => {
 						.createIndex({ userAccountId: 1, url: 1 });
 				});
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME }).then((res) => {
@@ -26,7 +26,7 @@ module.exports.CreateCollections = () => {
 						.createIndex({ userAccountId: 1, url: 1 });
 				});
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME }).then((res) => {
@@ -36,7 +36,7 @@ module.exports.CreateCollections = () => {
 						.createIndex({ createTime: 1, topic: 1, name: 1 });
 				});
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME }).then((res) => {
@@ -44,7 +44,7 @@ module.exports.CreateCollections = () => {
 					res.collection("mq_messages_inflight").createIndex({ name: 1 });
 				});
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME }).then((res) => {
@@ -52,7 +52,7 @@ module.exports.CreateCollections = () => {
 					res.collection("mq_messages_failed").createIndex({ name: 1 });
 				});
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME }).then((res) => {
@@ -60,7 +60,7 @@ module.exports.CreateCollections = () => {
 					res.collection("mq_messages_failed").createIndex({ name: 1 });
 				});
 			} catch (error) {
-				console.log({ error });
+				// Catch errors
 			}
 			return resolve();
 		});
@@ -111,6 +111,7 @@ module.exports.CreateCollections = () => {
 	asyncFunctions()
 		.then((result) => {
 			console.log(result);
+			process.exit();
 		})
 		.catch((err) => {
 			console.log(err);

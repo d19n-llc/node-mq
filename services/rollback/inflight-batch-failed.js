@@ -5,7 +5,6 @@ const { seriesLoop } = require("../../helpers/functions");
 module.exports = (params, callback = () => {}) => {
 	const { batchId } = params;
 	let jobsInflight = [];
-	console.log("rollback job queue", { batchId });
 	/**
 	 *
 	 *
@@ -19,7 +18,6 @@ module.exports = (params, callback = () => {}) => {
 					query: [{ $match: { batchId } }]
 				},
 				(err, res) => {
-					console.log({ err, res });
 					jobsInflight = res;
 					return resolve();
 				}
@@ -40,9 +38,7 @@ module.exports = (params, callback = () => {}) => {
 					body: Object.assign({}, job, { batchId: "" })
 				},
 				(err, res) => {
-					if (err) {
-						return reject(err);
-					}
+					if (err) return reject(err);
 					return resolve(res);
 				}
 			);
@@ -62,7 +58,8 @@ module.exports = (params, callback = () => {}) => {
 					query: { batchId }
 				},
 				(err, res) => {
-					return resolve();
+					if (err) return reject(err);
+					return resolve(res);
 				}
 			);
 		});
@@ -91,10 +88,9 @@ module.exports = (params, callback = () => {}) => {
 	// Invoke our async function to process the script
 	asyncFunctions()
 		.then((result) => {
-			console.log(result);
 			return callback(undefined, result);
 		})
 		.catch((err) => {
-			console.log(err);
+			return callback(err, undefined);
 		});
 };

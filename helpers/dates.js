@@ -22,7 +22,6 @@ exports.getDiffIndates = (dateA, dateB, interval) => {
 	const firstDate = moment.utc(dateA); // today or past date
 	const secondDate = moment.utc(dateB); // future date
 	const diffIn = interval || "days";
-	// console.log(dateA, dateB, diffType);
 	// OUTCOMES AND MEANING OF DIFFERENCE
 	// firstDate diff from secondDate == Negative then secondDate is in the future
 	// firstDate diff from secondDate == Positive then secondDate is in the past

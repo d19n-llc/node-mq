@@ -42,6 +42,31 @@ module.exports = {
 			);
 		});
 	},
+	updateOne: ({ id, body }, callback) => {
+		const subscriber = constructor(body, { isUpdating: true });
+		validate({ data: subscriber }, { isUpdating: true }, (err, res) => {
+			if (err) {
+				return callback(err, undefined);
+			}
+			findOneAndUpdate(
+				{
+					collName: "mq_subscribers",
+					query: {
+						source: res.source,
+						name: res.name
+					},
+					upsert: true,
+					data: res
+				},
+				(err, res) => {
+					if (err) {
+						return callback(err, undefined);
+					}
+					return callback(undefined, res);
+				}
+			);
+		});
+	},
 	deleteOne: ({ id }, callback) => {
 		deleteOne(
 			{

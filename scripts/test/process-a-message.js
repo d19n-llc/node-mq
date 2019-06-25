@@ -6,7 +6,6 @@ module.exports.ProcessMessageTest = ({ message }, callback) => {
 	 */
 	function processMessage() {
 		return new Promise((resolve, reject) => {
-			console.log("ProcessMessageTest", { message });
 			if (message.payload && message.payload.shouldFail) {
 				return reject(
 					new Error("This message was set to fail and was not processed.")
@@ -29,11 +28,9 @@ module.exports.ProcessMessageTest = ({ message }, callback) => {
 	// Invoke our async function to process the script
 	asyncFunctions()
 		.then((result) => {
-			console.log(result);
 			return callback(undefined, result);
 		})
 		.catch((err) => {
-			console.log(err);
 			return callback(err, undefined);
 		});
 };

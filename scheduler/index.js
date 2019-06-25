@@ -24,7 +24,6 @@ function Scheduler() {
 		await offsetJobStart();
 		retryFailedMessages({}, (err, res) => {});
 	});
-
 	schedule.scheduleJob("15 * * * * *", async () => {
 		await offsetJobStart();
 		processQueuedMessages({}, (err, res) => {});

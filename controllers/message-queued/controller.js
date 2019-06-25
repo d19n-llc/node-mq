@@ -1,15 +1,28 @@
-const { findMany, createOne } = require("../../resources/message-queued");
+const {
+	findMany,
+	createOne,
+	deleteOne
+} = require("../../resources/message-queued");
 
 module.exports = {
-	findMany: ({ params, body }, response, next) => {
+	findMany: (request, response, next) => {
+		const { params, body } = request;
 		findMany({ body }, (err, res) => {
-			console.log({ err, res });
+			if (err) return next(err);
 			response.status(200).json(res);
 		});
 	},
-	createOne: ({ body }, response, next) => {
+	createOne: (request, response, next) => {
+		const { params, body } = request;
 		createOne({ body }, (err, res) => {
-			console.log({ err, res });
+			if (err) return next(err);
+			response.status(200).json(res);
+		});
+	},
+	deleteOne: (request, response, next) => {
+		const { params } = request;
+		deleteOne({ params }, (err, res) => {
+			if (err) return next(err);
 			response.status(200).json(res);
 		});
 	}

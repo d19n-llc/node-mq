@@ -3,6 +3,7 @@ require("./scheduler");
 
 const { CreateCollections } = require("./config/setup/install");
 const { RemoveCollections } = require("./config/setup/uninstall");
+const { RunTests } = require("./tests");
 const messageQueue = require("./resources/message-queued");
 const messageConstructor = require("./models/message/constructor");
 const subscriberConstructor = require("./models/subscriber/constructor");
@@ -19,7 +20,8 @@ try {
 module.exports = {
 	Subscriber: subscriberConstructor,
 	Message: messageConstructor,
-	PublishRequest: messageQueue.createOne,
+	AddMessageToQueue: messageQueue.createOne,
 	CreateCollections,
-	RemoveCollections
+	RemoveCollections,
+	RunTests
 };

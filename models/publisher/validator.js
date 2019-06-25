@@ -21,7 +21,6 @@ const publisherSchema = Joi.object().keys({
  * @param {Object} options
  */
 module.exports.validate = (params, options, callback) => {
-	console.log({ callback, params, options });
 	const { data } = params;
 	const { isUpdating } = options;
 	// Set the validation schema for a single object or an array of objects

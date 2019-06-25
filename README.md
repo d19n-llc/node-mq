@@ -46,6 +46,7 @@ command to create all the collections used by node-mq.
 
 ```
 node -e 'require("@d19n/node-mq").CreateCollections()'
+node -e 'require("@d19n/node-mq").RunTests()'
 ```
 
 5.) import messaging routes into the routes/index.js file for the application
@@ -133,7 +134,7 @@ module.exports = ({ message }, callback = () => {}) => {
 Then publish the message to the queue when you want the script processed.
 
 ```
-const { Message, PublishRequest } = require("@d19n/node-mq");
+const { Message, AddMessageToQueue } = require("@d19n/node-mq");
 
 Message.constructor(
     {
@@ -150,6 +151,6 @@ Message.constructor(
   )
 );
 
-PublishRequest({body: message});
+AddMessageToQueue({body: message});
 
 ```

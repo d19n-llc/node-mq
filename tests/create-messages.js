@@ -3,9 +3,9 @@ const Message = require("../models/message/constructor");
 const messageResource = require("../resources/message-queued/index");
 const { seriesLoop } = require("../helpers/functions");
 
-module.exports.script = () => {
+module.exports = (params, callback = () => {}) => {
 	const messagesNoRetry = [];
-	for (let index = 0; index < 0; index++) {
+	for (let index = 0; index < 1; index++) {
 		messagesNoRetry.push(
 			Message.constructor(
 				{
@@ -26,7 +26,7 @@ module.exports.script = () => {
 	}
 
 	const failedMessagesRetriable = [];
-	for (let index = 0; index < 4; index++) {
+	for (let index = 0; index < 1; index++) {
 		failedMessagesRetriable.push(
 			Message.constructor(
 				{
@@ -48,7 +48,7 @@ module.exports.script = () => {
 	}
 
 	const failedMessagesNoRetry = [];
-	for (let index = 0; index < 0; index++) {
+	for (let index = 0; index < 1; index++) {
 		failedMessagesNoRetry.push(
 			Message.constructor(
 				{
@@ -73,23 +73,13 @@ module.exports.script = () => {
 	 *
 	 * @returns
 	 */
-	function createMessagesNoRetry({ message }) {
+	function createMessages({ message }) {
 		return new Promise((resolve, reject) => {
 			messageResource.createOne({ body: message }, (err, res) => {
-				console.log({ err, res });
 				if (err) return reject(err);
 				return resolve(res);
 			});
 		});
-	}
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function checkMessagesCreated() {
-		return new Promise((resolve, reject) => {});
 	}
 
 	// Add all your functions to be processed sync / async
@@ -105,22 +95,26 @@ module.exports.script = () => {
 				...failedMessagesRetriable
 			],
 			async (msg) => {
-				await createMessagesNoRetry({ message: msg });
+				await createMessages({ message: msg });
 			}
 		);
-		return { status: "create messages test complete" };
+		return {
+			status: "create messages test complete",
+			messagesCreated: [
+				...messagesNoRetry,
+				...failedMessagesNoRetry,
+				...failedMessagesRetriable
+			].length
+		};
 	}
 
 	// Invoke our async function to process the script
 	asyncFunctions()
-		.then((result) => {
-			console.log(result);
-			return "done";
+		.then((res) => {
+			return callback(undefined, res);
 		})
 		.catch((err) => {
 			console.log(err);
-			return "done";
+			return callback(err, undefined);
 		});
 };
-
-this.script();
