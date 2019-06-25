@@ -3,11 +3,6 @@ const Joi = require("@hapi/joi");
 const jobSchema = Joi.object()
 	.keys({
 		userAccountId: Joi.string().optional(),
-		// userAccountId: Joi.when("$update", {
-		// 	is: true,
-		// 	then: Joi.string().optional(),
-		// 	otherwise: Joi.string().required()
-		// }),
 		_id: Joi.when("$update", {
 			is: true,
 			then: Joi.strip(),

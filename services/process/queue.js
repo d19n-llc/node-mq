@@ -60,7 +60,7 @@ module.exports = ({ removeBuffer = false }, callback) => {
 			const { source, topic } = message;
 			// If the source is self that means this message has been published
 			// to the queue and should be sent to subscribers.
-			if (source === "self") {
+			if (source === process.env.APP_NAME) {
 				PublishMessage({ message }, (err, res) => {
 					if (err) return reject(err);
 					return resolve(res);

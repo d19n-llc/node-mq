@@ -2,6 +2,11 @@ const Joi = require("@hapi/joi");
 
 const publisherSchema = Joi.object().keys({
 	userAccountId: Joi.string().optional(),
+	_id: Joi.when("$update", {
+		is: true,
+		then: Joi.strip(),
+		otherwise: Joi.string().required()
+	}),
 	publisherUrl: Joi.string().required(),
 	lastMessageTime: Joi.string()
 		.allow("")

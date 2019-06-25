@@ -20,11 +20,11 @@ function Scheduler() {
 	schedule.scheduleJob("5 * * * * *", () => {
 		deduplicateQueue({}, (err, res) => {});
 	});
-	schedule.scheduleJob("15 * * * * *", async () => {
+	schedule.scheduleJob("10 * * * * *", async () => {
 		await offsetJobStart();
 		retryFailedMessages({}, (err, res) => {});
 	});
-	schedule.scheduleJob("15 * * * * *", async () => {
+	schedule.scheduleJob("10 * * * * *", async () => {
 		await offsetJobStart();
 		processQueuedMessages({}, (err, res) => {});
 	});

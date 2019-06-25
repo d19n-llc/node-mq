@@ -14,11 +14,30 @@ applications working to satisfy the queued messages, scale your apps horizontall
 and the node-mq handles deduplication and batch processing to prevent processing
 a message more than once.
 
-Each new micro service you deploy into your network can use the node-mq package,
-subscribe to other micro services and begin a pub /sub relationship to messages sent between microservices.
+Each new micro service you deploy into your network, install the node-mq package,
+then subscribe to other micro services by sending a POST requst to the /mq-subscriber
+endpoint and begin a pub /sub relationship to messages sent between microservices.
+
+```
+
+POST http://localhost:3000/api/mq-subscriber
+
+{
+"subscriberUrl": "http://requestbin.fullcontact.com/13oqj921",
+"topics":["job", "projects", "programs"]
+}
+
+```
+
+Any messages with a topiuc of ["job", "projects", "programs"] will be published
+to the subsciberUrl. If using the @d19n/node-mq package and the subscriber url
+is "http://localhost:3000/api/mq-message-queued" then the messages will be
+added to the queue and processed using your scripts to handle messages with a topic
+of ["job", "projects", "programs"].
 
 In addition, the message queue will allow for each micro service to process messages
-from third party webhooks and inject custom scripts you want to run on those messages name each sctipt by topic. The message queue will process the message, handle failures,
+from third party webhooks and inject custom scripts you want to run on those messages
+name each sctipt by topic. The message queue will process the message, handle failures,
 retries and rollbacks.
 
 ## Getting Started
@@ -35,9 +54,9 @@ require("@d19n/node-mq);
 3.) add the mongodb url and database name in your .env file
 
 ```
-MQ_MONGODB_URL=
-MQ_MONGODB_NAME=
-MQ_MESSAGES_URL=
+MQ_MONGODB_URL=mongodb+srv://<user></user>:<password></password>@test-nbfdp.mongodb.net/test?retryWrites=true&w=majority
+MQ_MONGODB_NAME=<db_name>
+MQ_MESSAGES_URL=http://localhost:3000/api/mq-message-processed
 
 ```
 
@@ -88,13 +107,17 @@ the key is the message "topic"
 the value is the module.export = ({message}) =>
 
 ```
-const orderMessageScript = require("path/to/script");
+const jobMessageScript = require("path/to/script");
+const projectMessageScript = require("path/to/script");
+const programMessageScript = require("path/to/script");
 const customJobScript = require("path/to/script");
 const customJobTwoScript = require("path/to/script");
 
 // [topic]: function()
 module.exports = {
-	order: orderMessageScript,
+	jobs: jobMessageScript,
+  projects: projectMessageScript,
+  programs: programMessageScript,
 	customJob1: customJobScript,
 	customJob2: customJobTwoScript,
 };
@@ -141,7 +164,7 @@ Message.constructor(
     userAccountId: "5cf1a9f8b79aa40017af4c46",
     name: `custom-job-one`,
     topic: "customJob1",
-    source: "api",
+    source: process.env.APP_NAME, // Set the source to the app name
     payload: {
       description: "Running a custom job script",
     },
@@ -164,8 +187,8 @@ const message = Message.constructor(
     userAccountId: "5cf1a9f8b79aa40017af4c46",
     name: `updated: <some value> - <Timestamp>`,
     topic: <some value>,
-    source: "self", // Set the source to "self"
-    payload: value,
+    source: process.env.APP_NAME, // Set the source to the app name
+    payload: {name: "John Smith", age: 35},
     priority: 1
   },
   { isUpdating: false }

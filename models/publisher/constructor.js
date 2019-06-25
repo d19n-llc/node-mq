@@ -1,3 +1,4 @@
+const ObjectID = require("mongodb").ObjectID;
 const { addTimestamps } = require("../../helpers/dates");
 
 module.exports.constructor = (params, options) => {
@@ -8,6 +9,7 @@ module.exports.constructor = (params, options) => {
 		  {}
 		: // isUpdating = false set default values
 		  {
+				_id: ObjectID().toString(),
 				userAccountId: "",
 				publisherUrl: "",
 				lastMessageTime: "",

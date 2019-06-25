@@ -28,8 +28,9 @@ module.exports.PublishMessage = (params, callback = () => {}) => {
 	 *
 	 * @returns
 	 */
-	function sendMessageToSubscriber({ subscriberUrl }) {
-		console.log({ subscriberUrl });
+	function sendMessageToSubscriber(params) {
+		const { subscriberUrl } = params;
+		console.log(subscriberUrl);
 		return new Promise((resolve, reject) => {
 			internalHttp.POST(
 				{
@@ -50,10 +51,10 @@ module.exports.PublishMessage = (params, callback = () => {}) => {
 	 *
 	 * @returns
 	 */
-	function updateSubscriberStatus({ subscriberId }) {
+	function updateSubscriberStatus({ subscriberUrl, subscriberId }) {
 		return new Promise((resolve, reject) => {
 			subsriberResource.updateOne(
-				{ id: subscriberId, body: { lastUpdateError } },
+				{ id: subscriberId, body: { subscriberUrl, lastUpdateError } },
 				(err, res) => {
 					if (err) return reject(err);
 					return resolve(res);
@@ -68,11 +69,12 @@ module.exports.PublishMessage = (params, callback = () => {}) => {
 	 */
 	async function asyncFunctions() {
 		await findSubscribers();
-		console.log({ subscribers });
 		await seriesLoop(subscribers, async (doc, index) => {
-			console.log({ doc });
 			await sendMessageToSubscriber({ subscriberUrl: doc.subscriberUrl });
-			await updateSubscriberStatus({ subscriberId: doc._id });
+			await updateSubscriberStatus({
+				subscriberId: doc._id,
+				subscriberUrl: doc.subscriberUrl
+			});
 		});
 		return { subscribers };
 	}
