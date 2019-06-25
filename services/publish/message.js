@@ -2,7 +2,7 @@ const internalHttp = require("../../http/requests");
 const { seriesLoop } = require("../../helpers/functions");
 const subsriberResource = require("../../resources/message-subscriber");
 
-module.exports = (params, options) => {
+module.exports = (params, callback = () => {}) => {
 	const { message } = params;
 	let subscribers = [];
 	let lastUpdateError = {};
@@ -81,8 +81,10 @@ module.exports = (params, options) => {
 	asyncFunctions()
 		.then((res) => {
 			console.log(res);
+			callback(undefined, res);
 		})
 		.catch((err) => {
 			console.log(err);
+			callback(err, undefined);
 		});
 };

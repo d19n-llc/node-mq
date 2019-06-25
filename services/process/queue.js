@@ -7,7 +7,7 @@ const messageInFlight = require("../../resources/message-inflight");
 const messageComplete = require("../../resources/message-processed");
 const messageFailedPermanent = require("../../resources/message-failed");
 const inflightRollBack = require("../rollback/inflight-batch-failed");
-const publishMessage = require("../../");
+const publishMessage = require("../../services/publish/message");
 const { ProcessMessageTest } = require("../../scripts/test/process-a-message");
 
 const pathToScripts = `${process.cwd()}/mq-scripts`;

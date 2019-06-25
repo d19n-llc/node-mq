@@ -73,7 +73,6 @@ module.exports = (params, callback = () => {}) => {
 	async function asyncFunctions() {
 		// Uncomment to use a database connection
 		await findInFlightJobs();
-		console.log({ jobsInflight });
 		if (jobsInflight.length > 0) {
 			await seriesLoop(jobsInflight, async (doc, index) => {
 				await moveJobToQueue({ job: doc });

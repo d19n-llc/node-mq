@@ -60,7 +60,6 @@ module.exports = (params, callback = () => {}) => {
 			return callback(undefined, res);
 		})
 		.catch((err) => {
-			console.log(err);
 			return callback(err, undefined);
 		});
 };
