@@ -131,11 +131,11 @@ const customJobTwoScript = require("path/to/script");
 
 // [topic]: function()
 module.exports = {
-	jobs: jobMessageScript,
+  jobs: jobMessageScript,
   projects: projectMessageScript,
   programs: programMessageScript,
-	customJob1: customJobScript,
-	customJob2: customJobTwoScript,
+  customJob1: customJobScript,
+  customJob2: customJobTwoScript,
 };
 
 
@@ -152,8 +152,9 @@ module.exports = ({ message }, callback = () => {}) => {
 	console.log("In your registered module", {
     message: {
       name: "", // a unique identifier for the message
-      source: "",
+      source: "", // Where the message is sent from
       topic: "", // provides context for the payload
+      action: "", // ["created", "updated", "deleted", "notification"]
       priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high
       maxRetries: 3,
       payload: {}, // The data being processed
@@ -171,7 +172,7 @@ module.exports = ({ message }, callback = () => {}) => {
 
 1.) To create a scheduled Job. Create a message with the "topic" for a script you
 want to run i.e "customJob1". This message will run a script registered with the key
-"customJob1".
+"customJob1". see #6 on registering a script.
 
 ```
 const { Message, AddMessageToQueue } = require("@d19n/node-mq");
@@ -182,6 +183,7 @@ Message.constructor(
     name: `custom-job-one`,
     topic: "customJob1",
     source: process.env.APP_NAME, // Set the source to the app name
+    action: "created",
     payload: {
       description: "Running a custom job script",
     },
@@ -207,6 +209,7 @@ const message = Message.constructor(
     name: `updated: jobs - <Timestamp>`,
     topic: jobs,
     source: process.env.APP_NAME, // Set the source to the app name
+    action: "updated",
     payload: {name: "Job name", cost: 500},
     priority: 1
   },

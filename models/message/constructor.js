@@ -14,6 +14,7 @@ module.exports.constructor = (params, options) => {
 				name: "", // a unique identifier for the message
 				source: "",
 				topic: "", // provides context for the payload
+				action: "", // created, updated, deleted, nofification
 				priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high
 				maxRetries: 3,
 				retriedCount: 0,

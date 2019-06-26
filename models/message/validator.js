@@ -14,6 +14,7 @@ const jobSchema = Joi.object()
 		name: Joi.string().required(),
 		source: Joi.string().required(),
 		topic: Joi.string().required(),
+		action: Joi.string().optional(),
 		priority: Joi.number()
 			.valid(0, 1, 2)
 			.required(),
