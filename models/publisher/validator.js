@@ -8,10 +8,8 @@ const publisherSchema = Joi.object().keys({
 		otherwise: Joi.string().required()
 	}),
 	publisherUrl: Joi.string().required(),
+	subscriberId: Joi.string().required(),
 	lastMessageTime: Joi.string()
-		.allow("")
-		.optional(),
-	lastSyncTime: Joi.string()
 		.allow("")
 		.optional(),
 	updateTime: Joi.string().required(),

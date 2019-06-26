@@ -12,8 +12,8 @@ module.exports.constructor = (params, options) => {
 				_id: ObjectID().toString(),
 				userAccountId: "",
 				publisherUrl: "",
-				lastMessageTime: "",
-				lastSyncTime: ""
+				subscriberId: "",
+				lastMessageTime: ""
 		  };
 
 	// Merge values being passed in the params object with the defaults
