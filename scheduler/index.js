@@ -17,15 +17,15 @@ const { offsetJobStart } = require("../helpers/processing");
 function Scheduler() {
 	console.log("node queue cron scheduler running");
 	schedule.scheduleJob("5 * * * * *", () => {
-		deduplicateQueue();
+		deduplicateQueue({});
 	});
 	schedule.scheduleJob("10 * * * * *", async () => {
 		await offsetJobStart();
-		retryFailedMessages();
+		retryFailedMessages({});
 	});
 	schedule.scheduleJob("10 * * * * *", async () => {
 		await offsetJobStart();
-		processQueuedMessages();
+		processQueuedMessages({});
 	});
 }
 

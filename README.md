@@ -134,15 +134,15 @@ module.exports = {
 };
 ```
 
-7. To create a pub / sub relationship with another micro service using the
-   @d19n/node-mq package. you can run the following command.
+7.) To create a pub / sub relationship with another micro service using the
+@d19n/node-mq package. you can run the following command.
 
 ```
 node -e 'require("@d19n/node-mq").SubscribeToPublisher({publisherUrl: "", topics: []})'
 
 ```
 
-7.) If you want to process custom scripts. You can register a script with a "key".
+8.) If you want to process custom scripts. You can register a script with a "key".
 equal to the topic name of the message. Then add a message to the queue when
 ever you want the script processed.
 
