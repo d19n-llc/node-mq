@@ -39,7 +39,7 @@ class MessageQueuedResource extends BaseResource {
 					name: body.name
 				}
 			});
-			console.log({ createError, createResult });
+
 			if (createError) throw new Error(createError);
 			return [undefined, createResult];
 		} catch (error) {

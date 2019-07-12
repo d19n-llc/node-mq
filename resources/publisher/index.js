@@ -30,15 +30,19 @@ class PublisherResource extends BaseResource {
 	 * @memberof PublisherResource
 	 */
 	async createOne(params) {
-		const { body } = params;
-
-		const [createError, createResult] = await super.createOne({
-			object: body,
-			query: {
-				publisherUrl: body.publisherUrl
-			}
-		});
-		return [createError, createResult];
+		try {
+			const { body } = params;
+			const [createError, createResult] = await super.createOne({
+				object: body,
+				query: {
+					publisherUrl: body.publisherUrl
+				}
+			});
+			if (createError) throw new Error(createError);
+			return [undefined, createResult];
+		} catch (error) {
+			return [error, undefined];
+		}
 	}
 }
 

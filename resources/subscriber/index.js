@@ -30,15 +30,19 @@ class SubscriberResource extends BaseResource {
 	 * @memberof SubscriberResource
 	 */
 	async createOne(params) {
-		const { body } = params;
-
-		const [createError, createResult] = await super.createOne({
-			object: body,
-			query: {
-				subscriberUrl: body.subscriberUrl
-			}
-		});
-		return [createError, createResult];
+		try {
+			const { body } = params;
+			const [createError, createResult] = await super.createOne({
+				object: body,
+				query: {
+					subscriberUrl: body.subscriberUrl
+				}
+			});
+			if (createError) throw new Error(createError);
+			return [undefined, createResult];
+		} catch (error) {
+			return [error, undefined];
+		}
 	}
 }
 

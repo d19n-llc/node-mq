@@ -30,16 +30,20 @@ class MessageProcessedResource extends BaseResource {
 	 * @memberof MessageProcessedResource
 	 */
 	async createOne(params) {
-		const { body } = params;
-
-		const [createError, createResult] = await super.createOne({
-			object: body,
-			query: {
-				source: body.source,
-				name: body.name
-			}
-		});
-		return [createError, createResult];
+		try {
+			const { body } = params;
+			const [createError, createResult] = await super.createOne({
+				object: body,
+				query: {
+					source: body.source,
+					name: body.name
+				}
+			});
+			if (createError) throw new Error(createError);
+			return [undefined, createResult];
+		} catch (error) {
+			return [error, undefined];
+		}
 	}
 }
 

@@ -1,9 +1,12 @@
 const internalHttp = require("../../http/requests");
-const { validate } = require("../../models/publisher/validator");
-const Publisher = require("../../models/publisher/factory");
+const PulbisherResourceClass = require("../../resources/publisher");
 
-module.exports.subscribe = (params = {}) => {
+module.exports.SubscribeToPublisher = async (params = {}) => {
+	const PublisherResource = new PulbisherResourceClass();
 	const { publisherUrl, topics } = params;
+	const pathToSubscibe = `${publisherUrl}/api/mq-subscriber`;
+	const pathToMessages = `${publisherUrl}/api/mq-message-processed`;
+	let subsciberResponse = {};
 
 	// Pass in the url to subscribe to a publisher
 	/**
@@ -16,7 +19,7 @@ module.exports.subscribe = (params = {}) => {
 			// custom logic here
 			internalHttp.POST(
 				{
-					url: publisherUrl,
+					url: pathToSubscibe,
 					payload: {
 						subscriberUrl: `${process.env.APP_URL}/api/mq-message-queued`,
 						topics
@@ -24,71 +27,26 @@ module.exports.subscribe = (params = {}) => {
 				},
 				(err, res) => {
 					console.log("subscribed", { res });
-					if (err) return reject(err);
-					return resolve();
+					subsciberResponse = res;
+					if (err) throw new Error(err);
+					resolve();
 				}
 			);
 		});
 	}
 
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function storePublisher() {
-		return new Promise((resolve, reject) => {
-			const publisher = Publisher.constructor(
-				stepsCompleted.subscribedToPublisher,
-				{ isUpdating: false }
-			);
-			validate({ data: publisher }, { isUpdating: false }, (err, res) => {
-				console.log({ err, res });
-				if (err) return reject(err);
-				// Validation passed, insert the new record into the database
-				collection("app_publishers")
-					.findOneAndUpdate(
-						{
-							userAccountId: res.userAccountId,
-							subscriberId: res.subscriberId
-						},
-						{ $set: res },
-						{ upsert: true, returnNewDocument: true }
-					)
-					.then((result) => {
-						const { lastErrorObject, value } = result;
-						if (value) {
-							return resolve();
-						}
-						if (lastErrorObject) {
-							return resolve();
-						}
-					})
-					.catch((error) => next(error));
-			});
-			return resolve();
-		});
-	}
-
-	// Add all your functions to be processed sync / async
-	/**
-	 * Process functions
-	 *
-	 */
-	async function asyncFunctions() {
+	try {
+		console.log({ subsciberResponse });
 		await subscribeToPublisher();
-		await storePublisher();
-		return { status: `Successfully subscribed to ${process.env.APP_NAME}` };
-	}
-
-	// Invoke our async function to process the script
-	asyncFunctions()
-		.then((result) => {
-			console.log(result);
-			return [undefined, result];
-		})
-		.catch((error) => {
-			console.log(err);
-			return [error, undefined];
+		const [createError, createResult] = await PublisherResource.createOne({
+			publisherUrl: pathToMessages.require
 		});
+		if (createError) throw new Error(createError);
+		return [
+			undefined,
+			{ status: `Successfully subscribed to ${process.env.APP_NAME}` }
+		];
+	} catch (error) {
+		return [error, undefined];
+	}
 };
