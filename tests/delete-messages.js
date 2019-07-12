@@ -1,100 +1,59 @@
-const messageQueued = require("../resources/message-queued/index");
-const messageFailed = require("../resources/message-failed/index");
-const messageInflight = require("../resources/message-inflight/index");
-const messageProcessed = require("../resources/message-processed/index");
+const MessageQueuedResourceClass = require("../resources/message-queued");
+const MessageInflightResourceClass = require("../resources/message-inflight");
+const MessageFailedResourceClass = require("../resources/message-failed");
+const MessageProcessedResourceClass = require("../resources/message-processed");
 
-module.exports = (params, callback = () => {}) => {
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function deleteManyQueued() {
-		return new Promise((resolve, reject) => {
-			messageQueued.deleteMany(
-				{ query: { topic: "internal-test" } },
-				(err, res) => {
-					return resolve(res.deletedCount);
-				}
-			);
-		});
-	}
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function deleteManyInflight() {
-		return new Promise((resolve, reject) => {
-			messageInflight.deleteMany(
-				{ query: { topic: "internal-test" } },
-				(err, res) => {
-					return resolve(res.deletedCount);
-				}
-			);
-		});
-	}
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function deleteManyFailed() {
-		return new Promise((resolve, reject) => {
-			messageFailed.deleteMany(
-				{ query: { topic: "internal-test" } },
-				(err, res) => {
-					return resolve(res.deletedCount);
-				}
-			);
-		});
-	}
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function deleteManyProcessed() {
-		return new Promise((resolve, reject) => {
-			messageProcessed.deleteMany(
-				{ query: { topic: "internal-test" } },
-				(err, res) => {
-					return resolve(res.deletedCount);
-				}
-			);
-		});
-	}
+module.exports = async (params = {}) => {
+	const MessageQueuedResource = new MessageQueuedResourceClass();
+	const MessageInflightResource = new MessageInflightResourceClass();
+	const MessageFailedResource = new MessageFailedResourceClass();
+	const MessageProcessedResource = new MessageProcessedResourceClass();
 
 	// Add all your functions to be processed sync / async
 	/**
 	 * Process functions
 	 *
 	 */
-	async function asyncFunctions() {
-		let result = {};
-		const del1 = await deleteManyQueued();
-		const del2 = await deleteManyFailed();
-		const del3 = await deleteManyInflight();
-		const del4 = await deleteManyProcessed();
-		result = Object.assign({}, result, {
-			del1,
-			del2,
-			del3,
-			del4
-		});
-		return { status: "delete messages test complete", result };
-	}
 
-	// Invoke our async function to process the script
-	asyncFunctions()
-		.then((res) => {
-			return callback(undefined, res);
-		})
-		.catch((err) => {
-			console.log(err);
-			return callback(err, undefined);
+	try {
+		const [queueError, queueResult] = await MessageQueuedResource.deleteMany({
+			query: { topic: "internal-test" }
 		});
+		if (queueError) throw new Error(queueError);
+
+		const [
+			failedError,
+			failedResult
+		] = await MessageInflightResource.deleteMany({
+			query: { topic: "internal-test" }
+		});
+		if (failedError) throw new Error(failedError);
+
+		const [
+			inflightError,
+			inflightResult
+		] = await MessageFailedResource.deleteMany({
+			query: { topic: "internal-test" }
+		});
+		if (inflightError) throw new Error(inflightError);
+
+		const [
+			processedError,
+			processedResult
+		] = await MessageProcessedResource.deleteMany({
+			query: { topic: "internal-test" }
+		});
+		if (processedError) throw new Error(processedError);
+
+		const result = {
+			queueResult,
+			failedResult,
+			inflightResult,
+			processedResult
+		};
+
+		return [undefined, result];
+	} catch (error) {
+		return [error, undefined];
+	}
 };

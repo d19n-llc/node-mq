@@ -7,7 +7,7 @@ module.exports.CreateCollections = () => {
 	 * @returns
 	 */
 	function createCollections() {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			try {
 				useDb({ dbName: process.env.MQ_MONGODB_NAME }).then((res) => {
 					res.createCollection("mq_publishers");
@@ -66,36 +66,6 @@ module.exports.CreateCollections = () => {
 		});
 	}
 
-	// /**
-	//  *
-	//  *
-	//  * @returns
-	//  */
-	// function createCollectionIndexes() {
-	// 	return new Promise((resolve, reject) => {
-	// 		useDb({ dbName: process.env.MQ_MONGODB_NAME })
-	// 			.collection("mq_publisher")
-	// 			.createIndex({ url: 1 });
-	// 		useDb({ dbName: process.env.MQ_MONGODB_NAME })
-	// 			.collection("mq_subscriber")
-	// 			.createIndex({ url: 1 });
-	// 		useDb({ dbName: process.env.MQ_MONGODB_NAME })
-	// 			.collection("mq_messages_queued")
-	// 			.createIndex({ createTime: 1, topic: 1 });
-	// 		useDb({ dbName: process.env.MQ_MONGODB_NAME })
-	// 			.collection("mq_messages_inflight")
-	// 			.createIndex({ name: 1 });
-	// 		useDb({ dbName: process.env.MQ_MONGODB_NAME })
-	// 			.collection("mq_messages_failed")
-	// 			.createIndex({ name: 1 });
-	// 		useDb({ dbName: process.env.MQ_MONGODB_NAME })
-	// 			.collection("mq_messages_processed")
-	// 			.createIndex({ name: 1 });
-	// 		return resolve();
-	// 	});
-	// }
-
-	// Add all your functions to be processed sync / async
 	/**
 	 * Process functions
 	 *

@@ -1,57 +1,20 @@
 const Joi = require("@hapi/joi");
-
-const jobSchema = Joi.object()
-	.keys({
-		userAccountId: Joi.string().optional(),
-		_id: Joi.when("$update", {
-			is: true,
-			then: Joi.strip(),
-			otherwise: Joi.string().required()
-		}),
-		batchId: Joi.string()
-			.optional()
-			.allow(""),
-		name: Joi.string().required(),
-		source: Joi.string().required(),
-		topic: Joi.string().required(),
-		action: Joi.string().optional(),
-		priority: Joi.number()
-			.valid(0, 1, 2)
-			.required(),
-		maxRetries: Joi.number()
-			.optional()
-			.default(0),
-		retriedCount: Joi.number()
-			.optional()
-			.default(0),
-		payload: Joi.object().required(),
-		error: Joi.object().optional(),
-		updateTime: Joi.string().required(),
-		createTime: Joi.string().required()
-	})
-	.options({ stripUnknown: true });
-
-/**
- *
+const schema = require("./schema");
+/*
  *
  * @param {Function} callback
  * @param {Array or Object} data
  * @param {Object} options
  */
-module.exports.validate = (params, options, callback) => {
+module.exports = (params, options) => {
 	const { data } = params;
 	const { isUpdating } = options;
-
 	// Set the validation schema for a single object or an array of objects
-	const schema = Array.isArray(data) ? Joi.array().items(jobSchema) : jobSchema;
+	const schemaObject = Array.isArray(data) ? Joi.array().items(schema) : schema;
 	// validate the data against the schema
-	Joi.validate(
-		data,
-		schema,
-		{ context: { update: isUpdating } },
-		(err, value) => {
-			if (err) return callback(err, null);
-			return callback(null, value);
-		}
-	);
+	// results structure is {error, value} https://github.com/hapijs/joi
+	const { error, value } = Joi.validate(data, schemaObject, {
+		context: { update: isUpdating }
+	});
+	return [error, value];
 };

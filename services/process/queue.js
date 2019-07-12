@@ -2,13 +2,13 @@ const uuidv1 = require("uuid/v1");
 const fs = require("fs");
 const { seriesLoop } = require("../../helpers/functions");
 const { isPastQueueBuffer } = require("../../helpers/processing");
-const messageQueue = require("../../resources/message-queued");
-const messageInFlight = require("../../resources/message-inflight");
-const messageComplete = require("../../resources/message-processed");
-const messageFailedPermanent = require("../../resources/message-failed");
+const MessageQueuedResourceClass = require("../../resources/message-queued");
+const InFlightResourceClass = require("../../resources/message-inflight");
+const FailedResourceClass = require("../../resources/message-failed");
+const ProcessedResourceClass = require("../../resources/message-processed");
 const inflightRollBack = require("../rollback/inflight-batch-failed");
+const ProcessMessageTest = require("../../scripts/test/process-a-message");
 const { PublishMessage } = require("../../services/publish/message");
-const { ProcessMessageTest } = require("../../scripts/test/process-a-message");
 
 const pathToScripts = `${process.cwd()}/mq-scripts`;
 let scriptRegistry = null;
@@ -22,229 +22,116 @@ try {
 
 // Pass in user added scripts for processing custom messages
 
-module.exports = ({ removeBuffer = false }, callback) => {
+module.exports = async ({ removeBuffer = false }) => {
 	const batchId = uuidv1();
-	const stepsCompleted = {};
-	let jobs = [];
 	let currentMessage = {};
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function findQueuedMessages() {
-		return new Promise((resolve, reject) => {
-			// custom logic here
-			messageQueue.findMany(
-				{
-					query: [{ $match: {} }, { $limit: 25 }, { $sort: { priority: -1 } }]
-				},
-				(err, res) => {
-					if (err) {
-						return reject(err);
-					}
-					jobs = res;
-					return resolve(res);
-				}
-			);
-		});
-	}
+	const MessageQueuedResource = new MessageQueuedResourceClass();
+	const InFlightResource = new InFlightResourceClass();
+	const FailedResource = new FailedResourceClass();
+	const ProcessedResource = new ProcessedResourceClass();
 
 	/**
 	 *
 	 *
 	 * @returns
 	 */
-	function processMessage({ message }) {
-		return new Promise((resolve, reject) => {
-			const { source, topic } = message;
-			// If the source is self that means this message has been published
-			// to the queue and should be sent to subscribers.
-			if (source === process.env.APP_NAME) {
-				PublishMessage({ message }, (err, res) => {
-					if (err) return reject(err);
-					return resolve(res);
-				});
-			}
+	async function processMessage({ message }) {
+		const { source, topic } = message;
+		// If the source is self that means this message has been published
+		// to the queue and should be sent to subscribers.
+		if (source === process.env.APP_NAME) {
+			const [error, result] = await PublishMessage({ message });
+			return [error, result];
+		}
 
-			if (topic === "internal-test") {
-				ProcessMessageTest({ message }, (err, res) => {
-					if (err) return reject(err);
-					return resolve(res);
-				});
-			}
-			if (scriptRegistry) {
-				// Use the script with the key === to the message topic
-				scriptRegistry[`${topic}`]({ message }, (err, res) => {
-					if (err) return reject(err);
-					return resolve(res);
-				});
-			}
-		});
+		if (topic === "internal-test") {
+			const [error, result] = await ProcessMessageTest({ message });
+			return [error, result];
+		}
+		if (scriptRegistry) {
+			// Use the script with the key === to the message topic
+			const [error, result] = await scriptRegistry[`${topic}`]({ message });
+			return [error, result];
+		}
 	}
 
 	/**
+	 * Clean up queue on error
 	 *
-	 *
+	 * @param {*} { error }
 	 * @returns
 	 */
-	function removeFromQueue() {
-		return new Promise((resolve, reject) => {
-			messageQueue.deleteOne({ id: currentMessage._id }, (err, res) => {
-				if (err) {
-					return reject(err);
-				}
-				return resolve(res);
-			});
+	async function handleCleanUpOnError({ error }) {
+		// Rollback all messages for this batch from inflight to the queue
+		const [removeError] = await InFlightResource.deleteOne({
+			id: currentMessage._id
 		});
-	}
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function moveToInflight() {
-		return new Promise((resolve, reject) => {
-			currentMessage = Object.assign({}, currentMessage, { batchId });
-			messageInFlight.createOne(
-				{
-					body: currentMessage
-				},
-				(err, res) => {
-					if (err) {
-						return reject(err);
-					}
-					return resolve(res);
-				}
-			);
+		if (removeError) return [removeError, undefined];
+		// Move the message that caused an error to failed
+		const [failError] = await FailedResource.createOne({
+			body: Object.assign({}, currentMessage, {
+				error: { message: error.message }
+			})
 		});
-	}
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function removeFromInFlight() {
-		return new Promise((resolve, reject) => {
-			messageInFlight.deleteOne({ id: currentMessage._id }, (err, res) => {
-				if (err) {
-					return reject(err);
-				}
-				return resolve(res);
-			});
-		});
-	}
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function moveToComplete() {
-		return new Promise((resolve, reject) => {
-			messageComplete.createOne(
-				{
-					body: currentMessage
-				},
-				(err, res) => {
-					if (err) {
-						return reject(err);
-					}
-					return resolve(res);
-				}
-			);
-		});
-	}
-
-	// ************************************************************************** //
-
-	// Handle when a job fails
-
-	// ************************************************************************** //
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function permanentlyFail({ error }) {
-		return new Promise((resolve, reject) => {
-			messageFailedPermanent.createOne(
-				{
-					body: Object.assign({}, currentMessage, {
-						error: { message: error.message }
-					})
-				},
-				(err, res) => {
-					if (err) {
-						return reject(err);
-					}
-					return resolve(res);
-				}
-			);
-		});
-	}
-
-	/**
-	 * Process functions
-	 *
-	 */
-	async function asyncFunctions() {
-		// This will process functions in parallel for anything that can be handled asynchronously
-		await findQueuedMessages();
-		// Claim jobs
-		await seriesLoop(jobs, async (job) => {
-			if (isPastQueueBuffer({ jobCreatedAt: job.createTime }) || removeBuffer) {
-				currentMessage = job;
-				await removeFromQueue();
-				await moveToInflight();
-			}
-		});
-		// process jobs
-		await seriesLoop(jobs, async (job, index) => {
-			currentMessage = job;
-			if (isPastQueueBuffer({ jobCreatedAt: job.createTime }) || removeBuffer) {
-				await processMessage({ message: job });
-				await removeFromInFlight();
-				await moveToComplete();
-			}
-		});
-		return { stepsCompleted };
-	}
-
-	/**
-	 * Process functions
-	 *
-	 */
-	async function asyncFunctionsOnError(fnParams) {
-		const { err } = fnParams;
-		// This will process functions in parallel for anything that can be handled asynchronously
-		await removeFromInFlight();
-		await permanentlyFail({ error: err });
+		if (failError) return [failError, undefined];
 		// Rolback jobs unprocessed into the queue
-		await inflightRollBack({ batchId });
-		return { stepsCompleted };
+		const [rollbackError] = await inflightRollBack({ batchId });
+		if (rollbackError) return [rollbackError, undefined];
+		return { status: "messages inflight clean up complete." };
 	}
 
-	// Invoke our async function to process the script
-	asyncFunctions()
-		.then((result) => {
-			console.log(result);
-			return callback(undefined, result);
-		})
-		.catch((err) => {
-			console.log({ err });
-			// Call the async functions for handling errors
-			asyncFunctionsOnError({ err })
-				.then((res) => {
-					console.log(res);
-					return callback(undefined, res);
-				})
-				.catch((err) => {
-					console.log(err);
-					return callback(err, undefined);
-				});
-		});
+	// This will process functions in parallel for anything that can be handled asynchronously
+	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
+		query: { resultsPerPage: 25, sortAscending: "priority" }
+	});
+	if (queueError) return [queueError, undefined];
+	// Claim jobs
+	await seriesLoop(queueMessages, async (message) => {
+		if (
+			isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
+			removeBuffer
+		) {
+			currentMessage = message;
+			const [removeError] = await MessageQueuedResource.deleteOne({
+				id: currentMessage._id
+			});
+			if (removeError) {
+				handleCleanUpOnError({ error: removeError });
+			}
+			const [inflightError] = await InFlightResource.createOne({
+				body: currentMessage
+			});
+			if (inflightError) {
+				handleCleanUpOnError({ error: inflightError });
+			}
+		}
+	});
+	// process jobs
+	await seriesLoop(queueMessages, async (message, index) => {
+		currentMessage = message;
+		if (
+			isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
+			removeBuffer
+		) {
+			const [processingError] = await processMessage({
+				message
+			});
+			if (processingError) {
+				handleCleanUpOnError({ error: processingError });
+			}
+			const [removeError] = await InFlightResource.deleteOne({
+				id: currentMessage._id
+			});
+			if (removeError) {
+				handleCleanUpOnError({ error: removeError });
+			}
+			const [moveError] = await ProcessedResource.createOne({
+				body: currentMessage
+			});
+			if (moveError) {
+				handleCleanUpOnError({ error: moveError });
+			}
+		}
+	});
+	return [undefined, { status: "messages processed successfully" }];
 };

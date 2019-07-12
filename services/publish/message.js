@@ -1,28 +1,13 @@
 const internalHttp = require("../../http/requests");
 const { seriesLoop } = require("../../helpers/functions");
-const subsriberResource = require("../../resources/message-subscriber");
+const SubscriberResourceClass = require("../../resources/subscriber");
 
-module.exports.PublishMessage = (params, callback = () => {}) => {
+module.exports = async (params = {}) => {
 	const { message } = params;
-	let subscribers = [];
+	const subscribers = [];
 	let lastUpdateError = {};
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function findSubscribers() {
-		return new Promise((resolve, reject) => {
-			subsriberResource.findMany(
-				{ query: [{ $match: { topics: { $in: [message.topic] } } }] },
-				(err, res) => {
-					if (err) return reject(err);
-					subscribers = res;
-					return resolve();
-				}
-			);
-		});
-	}
+	const SubscriberResource = new SubscriberResourceClass();
+
 	/**
 	 *
 	 *
@@ -30,7 +15,6 @@ module.exports.PublishMessage = (params, callback = () => {}) => {
 	 */
 	function sendMessageToSubscriber(params) {
 		const { subscriberUrl } = params;
-		console.log(subscriberUrl);
 		return new Promise((resolve, reject) => {
 			internalHttp.POST(
 				{
@@ -38,26 +22,8 @@ module.exports.PublishMessage = (params, callback = () => {}) => {
 					payload: message
 				},
 				(err, res) => {
-					console.log("message sent", { res });
 					lastUpdateError = { err };
 					return resolve();
-				}
-			);
-		});
-	}
-
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function updateSubscriberStatus({ subscriberUrl, subscriberId }) {
-		return new Promise((resolve, reject) => {
-			subsriberResource.updateOne(
-				{ id: subscriberId, body: { subscriberUrl, lastUpdateError } },
-				(err, res) => {
-					if (err) return reject(err);
-					return resolve(res);
 				}
 			);
 		});
@@ -67,25 +33,24 @@ module.exports.PublishMessage = (params, callback = () => {}) => {
 	 * Process functions
 	 *
 	 */
-	async function asyncFunctions() {
-		await findSubscribers();
+	try {
+		const [findError, findResult] = await SubscriberResource.findMany({
+			query: { topics: { $in: [message.topic] } }
+		});
+		if (findError) throw new Error(findError);
+
 		await seriesLoop(subscribers, async (doc, index) => {
 			await sendMessageToSubscriber({ subscriberUrl: doc.subscriberUrl });
-			await updateSubscriberStatus({
-				subscriberId: doc._id,
-				subscriberUrl: doc.subscriberUrl
-			});
-		});
-		return { subscribers };
-	}
 
-	asyncFunctions()
-		.then((res) => {
-			console.log(res);
-			callback(undefined, res);
-		})
-		.catch((err) => {
-			console.log(err);
-			callback(err, undefined);
+			const [updateError, updateResult] = await SubscriberResource.updateOne({
+				id: doc._id,
+				body: { subscriberUrl: doc.subscriberUrl, lastUpdateError }
+			});
+			if (updateError) throw new Error(updateError);
 		});
+
+		return [undefined, { status: "messages published to subscribers" }];
+	} catch (error) {
+		return [error, undefined];
+	}
 };

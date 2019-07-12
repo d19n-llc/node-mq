@@ -1,6 +1,8 @@
 const router = require("express").Router();
-const { findMany } = require("../../controllers/message-processed/controller");
+const MessageProcessedClass = require("../../controllers/message-processed/controller");
 
-router.get("/mq-message-processed", findMany);
+const MessageProcessed = new MessageProcessedClass();
+
+router.get("/mq-message-processed", MessageProcessed.findMany);
 
 module.exports = router;

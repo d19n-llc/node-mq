@@ -1,17 +1,19 @@
 const uuidv1 = require("uuid/v1");
-const Message = require("../models/message/constructor");
-const messageResource = require("../resources/message-queued/index");
+const MessageFactory = require("../models/message/factory");
+const MessageQueuedResourceClass = require("../resources/message-queued");
 const { seriesLoop } = require("../helpers/functions");
 
-module.exports = (params, callback = () => {}) => {
+module.exports = async (params = {}) => {
 	const messagesNoRetry = [];
+
 	for (let index = 0; index < 1; index++) {
 		messagesNoRetry.push(
-			Message.constructor(
+			MessageFactory(
 				{
 					userAccountId: "5cf1a9f8b79aa40017af4c46",
 					name: `messagesNoRetry - ${uuidv1()}`,
 					topic: "internal-test",
+					action: "created",
 					source: "test-script",
 					payload: {
 						subject: "test",
@@ -28,11 +30,12 @@ module.exports = (params, callback = () => {}) => {
 	const failedMessagesRetriable = [];
 	for (let index = 0; index < 1; index++) {
 		failedMessagesRetriable.push(
-			Message.constructor(
+			MessageFactory(
 				{
 					userAccountId: "5cf1a9f8b79aa40017af4c46",
 					name: `failedMessagesRetriable - ${uuidv1()}`,
 					topic: "internal-test",
+					action: "created",
 					source: "test-script",
 					maxRetries: 4,
 					payload: {
@@ -50,11 +53,12 @@ module.exports = (params, callback = () => {}) => {
 	const failedMessagesNoRetry = [];
 	for (let index = 0; index < 1; index++) {
 		failedMessagesNoRetry.push(
-			Message.constructor(
+			MessageFactory(
 				{
 					userAccountId: "5cf1a9f8b79aa40017af4c46",
 					name: `failedMessagesNoRetry - ${uuidv1()}`,
 					topic: "internal-test",
+					action: "created",
 					source: "test-script",
 					maxRetries: 0,
 					payload: {
@@ -68,26 +72,10 @@ module.exports = (params, callback = () => {}) => {
 			)
 		);
 	}
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function createMessages({ message }) {
-		return new Promise((resolve, reject) => {
-			messageResource.createOne({ body: message }, (err, res) => {
-				if (err) return reject(err);
-				return resolve(res);
-			});
-		});
-	}
 
-	// Add all your functions to be processed sync / async
-	/**
-	 * Process functions
-	 *
-	 */
-	async function asyncFunctions() {
+	try {
+		const MessageQueuedResource = new MessageQueuedResourceClass();
+
 		await seriesLoop(
 			[
 				...messagesNoRetry,
@@ -95,26 +83,26 @@ module.exports = (params, callback = () => {}) => {
 				...failedMessagesRetriable
 			],
 			async (msg) => {
-				await createMessages({ message: msg });
+				const [createError] = await MessageQueuedResource.createOne({
+					body: msg
+				});
+				if (createError) throw new Error(createError);
 			}
 		);
-		return {
-			status: "create messages test complete",
-			messagesCreated: [
-				...messagesNoRetry,
-				...failedMessagesNoRetry,
-				...failedMessagesRetriable
-			].length
-		};
-	}
 
-	// Invoke our async function to process the script
-	asyncFunctions()
-		.then((res) => {
-			return callback(undefined, res);
-		})
-		.catch((err) => {
-			console.log(err);
-			return callback(err, undefined);
-		});
+		return [
+			undefined,
+			{
+				status: "create messages test complete",
+				messagesCreated: [
+					...messagesNoRetry,
+					...failedMessagesNoRetry,
+					...failedMessagesRetriable
+				].length
+			}
+		];
+	} catch (error) {
+		console.log({ error });
+		return [error, undefined];
+	}
 };

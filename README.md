@@ -148,7 +148,7 @@ ever you want the script processed.
 When a script is processed the queue will pass a message to your script.
 
 ```
-module.exports = ({ message }, callback = () => {}) => {
+module.exports = ({ message }) => {
 	console.log("In your registered module", {
     message: {
       name: "", // a unique identifier for the message
@@ -163,7 +163,7 @@ module.exports = ({ message }, callback = () => {}) => {
   function handleMessage(){
     // Your custom code here to process a message
   }
-	return callback(undefined, { message });
+	return [undefined, { message }];
 };
 
 ```
@@ -216,8 +216,7 @@ const message = Message.constructor(
   { isUpdating: false }
 );
 
-AddMessageToQueue({ body: message }, (err, res) => {
-  console.log({ err, res });
-});
+const [error, result ] = AddMessageToQueue({ body: message });
+console.log({ error, result });
 
 ```

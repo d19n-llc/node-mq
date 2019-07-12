@@ -74,6 +74,7 @@ module.exports.RemoveCollections = ({ deleteAll = "REJECT" }) => {
 	asyncFunctions()
 		.then((result) => {
 			console.log(result);
+			process.exit();
 		})
 		.catch((err) => {
 			console.log(err);

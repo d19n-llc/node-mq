@@ -55,9 +55,7 @@ module.exports = {
 			dbUri: process.env.MQ_MONGODB_URL,
 			dbName: process.env.MQ_MONGODB_NAME
 		});
-		console.log("databases successfully connected");
-		console.log("use database", { dbName: process.env.MQ_MONGODB_NAME });
-		console.log({ dbName: process.env.MQ_MONGODB_NAME });
+
 		return databaseConnections[dbName];
 	},
 

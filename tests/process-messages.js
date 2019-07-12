@@ -1,65 +1,35 @@
 const processQueuedMessages = require("../services/process/queue");
-const messageQueue = require("../resources/message-queued");
+const MessageQueuedResourceClass = require("../resources/message-queued");
 const { asyncForLoop } = require("../helpers/functions");
 
-module.exports = (params, callback = () => {}) => {
-	let totalMessages = 0;
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function findQueuedMessages() {
-		return new Promise((resolve, reject) => {
-			// custom logic here
-			messageQueue.findMany(
-				{
-					query: [{ $match: { topic: "internal-test" } }]
-				},
-				(err, res) => {
-					if (err) {
-						return reject(err);
-					}
-					totalMessages = res.length;
-					return resolve(res);
+module.exports = async (params = {}) => {
+	const MessageQueuedResource = new MessageQueuedResourceClass();
+
+	try {
+		const [findError, findResult] = await MessageQueuedResource.findMany({
+			query: { topic: "internal-test" }
+		});
+		if (findError) throw new Error(findError);
+
+		if (findResult.length > 0) {
+			await asyncForLoop(
+				{ total: findResult.length, incrementBy: 25 },
+				async () => {
+					const [processError] = await processQueuedMessages({
+						removeBuffer: true
+					});
+					if (processError) throw new Error(processError);
 				}
 			);
-		});
-	}
-	/**
-	 * This function will run the message queu processing service
-	 *
-	 * @returns
-	 */
-	function processMessagesInQueue() {
-		return new Promise((resolve, reject) => {
-			processQueuedMessages({ removeBuffer: true }, (err, res) => {
-				if (err) return reject(err);
-				return resolve(res);
-			});
-		});
-	}
-	/**
-	 * Process functions
-	 *
-	 */
-	async function asyncFunctions() {
-		await findQueuedMessages();
-		await asyncForLoop(
-			{ total: totalMessages, incrementBy: 25 },
-			async (doc, index) => {
-				await processMessagesInQueue();
+		}
+		return [
+			undefined,
+			{
+				status: "process messages test complete",
+				totalMessages: findResult.length
 			}
-		);
-		return { status: "process messages test complete", totalMessages };
+		];
+	} catch (error) {
+		return [error, undefined];
 	}
-
-	// Invoke our async function to process the script
-	asyncFunctions()
-		.then((res) => {
-			return callback(undefined, res);
-		})
-		.catch((err) => {
-			return callback(err, undefined);
-		});
 };

@@ -1,11 +1,13 @@
-const { findMany } = require("../../resources/message-failed");
+const BaseController = require("../base-controller");
+const MessageFailedResourceClass = require("../../resources/message-failed");
 
-module.exports = {
-	findMany: (request, response, next) => {
-		const { params, body } = request;
-		findMany({ body }, (err, res) => {
-			if (err) return next(err);
-			response.status(200).json(res);
+class MessageFailedController extends BaseController {
+	// eslint-disable-next-line no-useless-constructor
+	constructor(props) {
+		super({
+			resourceModule: new MessageFailedResourceClass()
 		});
 	}
-};
+}
+
+module.exports = MessageFailedController;

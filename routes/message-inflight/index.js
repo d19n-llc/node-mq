@@ -1,10 +1,9 @@
 const router = require("express").Router();
-const {
-	findMany,
-	batchRetry
-} = require("../../controllers/message-inflight/controller");
+const MessageInflightClass = require("../../controllers/message-inflight/controller");
 
-router.get("/mq-message-inflight", findMany);
-router.post("/mq-message-inflight/retry", batchRetry);
+const MessageInflight = new MessageInflightClass();
+
+router.get("/mq-message-inflight", MessageInflight.findMany);
+router.post("/mq-message-inflight/retry", MessageInflight.batchRetry);
 
 module.exports = router;

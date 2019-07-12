@@ -1,80 +1,24 @@
+const MessageFailedQuery = require("../../queries/messages-failed/query");
 const {
-	aggregate,
-	findOneAndUpdate,
-	deleteOne,
-	deleteMany
-} = require("../mongo-methods");
-const { constructor } = require("../../models/message/constructor");
-const { validate } = require("../../models/message/validator");
+	findOneAggregation,
+	findManyAggregation
+} = require("../../queries/messages-failed/query-extension");
+const MessageFailedValidator = require("../../models/message/validator");
+const MessageFailedFactory = require("../../models/message/factory");
+const BaseResource = require("../base-resource");
 
-module.exports = {
-	findMany: ({ query }, callback) => {
-		aggregate(
-			{
-				collName: "mq_messages_failed",
-				query
-			},
-			(err, res) => {
-				if (err) {
-					return callback(err, undefined);
-				}
-				return callback(undefined, res);
-			}
-		);
-	},
-	createOne: ({ body }, callback) => {
-		const message = constructor(body, { isUpdating: false });
-		validate({ data: message }, { isUpdating: false }, (err, res) => {
-			if (err) {
-				return callback(err, undefined);
-			}
-			findOneAndUpdate(
-				{
-					collName: "mq_messages_failed",
-					query: {
-						source: res.source,
-						name: res.name
-					},
-					upsert: true,
-					data: res
-				},
-				(err, res) => {
-					if (err) {
-						return callback(err, undefined);
-					}
-					return callback(undefined, res);
-				}
-			);
+class MessageFailedResource extends BaseResource {
+	// eslint-disable-next-line no-useless-constructor
+	constructor(props) {
+		super({
+			collectionName: "messages_failed",
+			queryBuilder: MessageFailedQuery,
+			queryExtensionFindOne: findOneAggregation,
+			queryExtensionFindMany: findManyAggregation,
+			validator: MessageFailedValidator,
+			factory: MessageFailedFactory
 		});
-	},
-	deleteOne: ({ id }, callback) => {
-		deleteOne(
-			{
-				collName: "mq_messages_failed",
-				query: {
-					_id: id
-				}
-			},
-			(err, res) => {
-				if (err) {
-					return callback(err, undefined);
-				}
-				return callback(undefined, res);
-			}
-		);
-	},
-	deleteMany: ({ query }, callback) => {
-		deleteMany(
-			{
-				collName: "mq_messages_failed",
-				query
-			},
-			(err, res) => {
-				if (err) {
-					return callback(err, undefined);
-				}
-				return callback(undefined, res);
-			}
-		);
 	}
-};
+}
+
+module.exports = MessageFailedResource;

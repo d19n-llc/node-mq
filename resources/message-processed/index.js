@@ -1,80 +1,46 @@
+const MessageProcessedQuery = require("../../queries/messages-processed/query");
 const {
-	aggregate,
-	findOneAndUpdate,
-	deleteOne,
-	deleteMany
-} = require("../mongo-methods");
-const { constructor } = require("../../models/message/constructor");
-const { validate } = require("../../models/message/validator");
+	findOneAggregation,
+	findManyAggregation
+} = require("../../queries/messages-processed/query-extension");
+const MessageProcessedValidator = require("../../models/message/validator");
+const MessageProcessedFactory = require("../../models/message/factory");
+const BaseResource = require("../base-resource");
 
-module.exports = {
-	findMany: ({ query }, callback) => {
-		aggregate(
-			{
-				collName: "mq_messages_processed",
-				query
-			},
-			(err, res) => {
-				if (err) {
-					return callback(err, undefined);
-				}
-				return callback(undefined, res);
-			}
-		);
-	},
-	createOne: ({ body }, callback) => {
-		const message = constructor(body, { isUpdating: false });
-		validate({ data: message }, { isUpdating: false }, (err, res) => {
-			if (err) {
-				return callback(err, undefined);
-			}
-			findOneAndUpdate(
-				{
-					collName: "mq_messages_processed",
-					query: {
-						source: res.source,
-						name: res.name
-					},
-					upsert: true,
-					data: res
-				},
-				(err, res) => {
-					if (err) {
-						return callback(err, undefined);
-					}
-					return callback(undefined, res);
-				}
-			);
+class MessageProcessedResource extends BaseResource {
+	// eslint-disable-next-line no-useless-constructor
+	constructor(props) {
+		super({
+			collectionName: "mq_messages_processed",
+			queryBuilder: MessageProcessedQuery,
+			queryExtensionFindOne: findOneAggregation,
+			queryExtensionFindMany: findManyAggregation,
+			validator: MessageProcessedValidator,
+			factory: MessageProcessedFactory
 		});
-	},
-	deleteOne: ({ id }, callback) => {
-		deleteOne(
-			{
-				collName: "mq_messages_processed",
-				query: {
-					_id: id
-				}
-			},
-			(err, res) => {
-				if (err) {
-					return callback(err, undefined);
-				}
-				return callback(undefined, res);
-			}
-		);
-	},
-	deleteMany: ({ query }, callback) => {
-		deleteMany(
-			{
-				collName: "mq_messages_processed",
-				query
-			},
-			(err, res) => {
-				if (err) {
-					return callback(err, undefined);
-				}
-				return callback(undefined, res);
-			}
-		);
 	}
-};
+
+	/**
+	 *
+	 *
+	 * @param {*} request
+	 * @param {*} response
+	 * @param {*} next
+	 * @returns
+	 * @memberof MessageProcessedResource
+	 */
+	async createOne(params) {
+		const { body } = params;
+
+		const [createError, createResult] = await super.createOne({
+			object: body,
+			query: {
+				source: body.source,
+				name: body.name
+			}
+		});
+		return [createError, createResult];
+	}
+}
+
+module.exports = MessageProcessedResource;

@@ -1,10 +1,9 @@
 const router = require("express").Router();
-const {
-	createOne,
-	findMany
-} = require("../../controllers/message-queued/controller");
+const MessageQueuedClass = require("../../controllers/message-queued/controller");
 
-router.get("/mq-message-queued", findMany);
-router.post("/mq-message-queued", createOne);
+const MessageQueued = new MessageQueuedClass();
+
+router.get("/mq-message-queued", MessageQueued.findMany);
+router.post("/mq-message-queued", MessageQueued.createOne);
 
 module.exports = router;

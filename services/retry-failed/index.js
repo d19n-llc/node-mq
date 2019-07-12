@@ -1,100 +1,44 @@
-// Check for jobs failed with a retryCount < retriedCount
-// If they have a retry count > 0 move it back to the message queue and increment
-// the retriedCount by 1.
-// Repeat this process until the retriedCount is tried the max number of times.
-const messageFailed = require("../../resources/message-failed");
-const messageQueued = require("../../resources/message-queued");
+const FailedResourceClass = require("../../resources/message-failed");
+const MessageQueuedResourceClass = require("../../resources/message-queued");
 const { seriesLoop } = require("../../helpers/functions");
 
-module.exports = (params, callback = () => {}) => {
-	let messages = [];
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function findFailedMessagesToRetry() {
-		return new Promise((resolve, reject) => {
-			// custom logic here
-			messageFailed.findMany(
-				{
-					query: [{ $match: { maxRetries: { $gt: 0 } } }]
-				},
-				(err, res) => {
-					messages = res.filter((elem) => elem.maxRetries > elem.retriedCount);
-					return resolve();
-				}
-			);
-		});
-	}
+module.exports = async (params = {}) => {
+	const MessageQueuedResource = new MessageQueuedResourceClass();
+	const FailedResource = new FailedResourceClass();
 
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function moveMessageToQueue({ message }) {
-		return new Promise((resolve, reject) => {
-			messageQueued.createOne(
-				{
+	try {
+		const [findError, findResult] = await FailedResource.findMany({
+			query: { maxRetries: { $gt: 0 } }
+		});
+
+		if (findError) throw new Error(findResult);
+		const messages = findResult.filter(
+			(elem) => elem.maxRetries > elem.retriedCount
+		);
+
+		if (messages.length > 0) {
+			await seriesLoop(messages, async (message, index) => {
+				const [
+					createError,
+					createResult
+				] = await MessageQueuedResource.createOne({
 					body: Object.assign({}, message, {
 						batchId: "",
 						retriedCount: message.retriedCount + 1
 					})
-				},
-				(err, res) => {
-					if (err) {
-						return reject(err);
-					}
-					return resolve(res);
-				}
-			);
-		});
-	}
+				});
 
-	/**
-	 *
-	 *
-	 * @returns
-	 */
-	function removeMessageFromFailed({ message }) {
-		return new Promise((resolve, reject) => {
-			messageFailed.deleteOne({ id: message._id }, (err, res) => {
-				if (err) {
-					return reject(err);
-				}
-				return resolve(res);
-			});
-		});
-	}
+				if (createError) throw new Error(createError);
 
-	// Add all your functions to be processed sync / async
-	/**
-	 * Process functions
-	 *
-	 */
-	async function asyncFunctions() {
-		// Uncomment to use a database connection
-		await findFailedMessagesToRetry();
-		if (messages.length > 0) {
-			await seriesLoop(messages, async (doc, index) => {
-				await moveMessageToQueue({ message: doc });
-				await removeMessageFromFailed({ message: doc });
+				const [failedError, failedResult] = await FailedResource.deleteOne({
+					query: { _id: message._id }
+				});
+				if (failedError) throw new Error(failedError);
 			});
 		}
-
-		return {
-			status: "failed jobs moved back to queue",
-			messages: messages.length
-		};
+		return [undefined, messages];
+	} catch (error) {
+		console.log({ path: process.cwd(), error });
+		return [error, undefined];
 	}
-
-	// Invoke our async function to process the script
-	asyncFunctions()
-		.then((result) => {
-			return callback(undefined, result);
-		})
-		.catch((err) => {
-			return callback(err, undefined);
-		});
 };

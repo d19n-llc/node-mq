@@ -1,11 +1,13 @@
-const { findMany } = require("../../resources/message-processed");
+const BaseController = require("../base-controller");
+const MessageProcessedResourceClass = require("../../resources/message-processed");
 
-module.exports = {
-	findMany: (request, response, next) => {
-		const { params, body } = request;
-		findMany({ body }, (err, res) => {
-			if (err) return next(err);
-			response.status(200).json(res);
+class MessageProcessedController extends BaseController {
+	// eslint-disable-next-line no-useless-constructor
+	constructor(props) {
+		super({
+			resourceModule: new MessageProcessedResourceClass()
 		});
 	}
-};
+}
+
+module.exports = MessageProcessedController;
