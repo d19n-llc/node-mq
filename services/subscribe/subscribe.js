@@ -1,7 +1,7 @@
 const internalHttp = require("../../http/requests");
 const PulbisherResourceClass = require("../../resources/publisher");
 
-module.exports.SubscribeToPublisher = async (params = {}) => {
+module.exports = async (params = {}) => {
 	const PublisherResource = new PulbisherResourceClass();
 	const { publisherUrl, topics } = params;
 	const pathToSubscibe = `${publisherUrl}/api/mq-subscriber`;
