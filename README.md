@@ -75,6 +75,7 @@ command to create all the collections used by node-mq.
 ```
 node -e 'require("@d19n/node-mq").CreateCollections()'
 node -e 'require("@d19n/node-mq").RunTests()'
+node -e 'require("@d19n/node-mq").SubscribeToPublisher({publisherUrl: "", topics: []})'
 ```
 
 5.) The message queue exports routes for you to use in your app. Our routes/index.js

@@ -9,6 +9,7 @@ const QueueResourceClass = require("./resources/message-queued");
 const PublisherFactory = require("./models/publisher/factory");
 const MessageFactory = require("./models/message/factory");
 const SubscriberFactory = require("./models/subscriber/factory");
+const { SubscribeToPublisher } = require("./services/subscribe/subscribe");
 
 const QueueResource = new QueueResourceClass();
 const PublisherResource = new PublisherResourceClass();
@@ -28,6 +29,7 @@ module.exports = {
 	Message: MessageFactory,
 	AddMessageToQueue: QueueResource.createOne,
 	AddPublisher: PublisherResource.createOne,
+	SubscribeToPublisher,
 	CreateCollections,
 	RemoveCollections,
 	RunTests
