@@ -75,7 +75,6 @@ command to create all the collections used by node-mq.
 ```
 node -e 'require("@d19n/node-mq").CreateCollections()'
 node -e 'require("@d19n/node-mq").RunTests()'
-node -e 'require("@d19n/node-mq").SubscribeToPublisher({publisherUrl: "", topics: []})'
 ```
 
 5.) The message queue exports routes for you to use in your app. Our routes/index.js
@@ -93,8 +92,8 @@ const mqQueuedRouter = require("@d19n/node-mq/routes/message-queued");
 const mqInflightRouter = require("@d19n/node-mq/routes/message-inflight");
 const mqFailedRouter = require("@d19n/node-mq/routes/message-failed");
 const mqProcessedRouter = require("@d19n/node-mq/routes/message-processed");
-const mqPublisherRouter = require("@d19n/node-mq/routes/message-publisher");
-const mqSubscriberRouter = require("@d19n/node-mq/routes/message-subscriber");
+const mqPublisherRouter = require("@d19n/node-mq/routes/publisher");
+const mqSubscriberRouter = require("@d19n/node-mq/routes/subscriber");
 
 const combineRouters = [
   mqQueuedRouter,
@@ -133,7 +132,13 @@ module.exports = {
   customJob1: customJobScript,
   customJob2: customJobTwoScript,
 };
+```
 
+7. To create a pub / sub relationship with another micro service using the
+   @d19n/node-mq package. you can run the following command.
+
+```
+node -e 'require("@d19n/node-mq").SubscribeToPublisher({publisherUrl: "", topics: []})'
 
 ```
 

@@ -7,7 +7,4 @@ router.get("/mq-subscriber", Subscriber.findMany);
 router.post("/mq-subscriber", Subscriber.createOne);
 router.delete("/mq-subscriber/:id", Subscriber.deleteOne);
 
-// Subscribe to a publisher
-router.post("/mq-subscribe", Subscriber.newSubsciption);
-
 module.exports = router;
