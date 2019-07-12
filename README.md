@@ -1,10 +1,5 @@
 # Nodejs Pub / Sub Message Queu For Microservices
 
-## In Development
-
-_This package is currently in development and will be ready
-on June 28, 2019._
-
 API Documentation can be found here:
 https://documenter.getpostman.com/view/3524007/S1a4X7BT
 
