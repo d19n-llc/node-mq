@@ -8,14 +8,6 @@ class SubscriberController extends BaseController {
 			resourceModule: new SubscriberResourceClass()
 		});
 	}
-
-	// eslint-disable-next-line class-methods-use-this
-	async createOne(request, response, next) {
-		const { body } = request;
-		const [error, result] = super.createOne({ object: body });
-		if (error) return next(error);
-		response.status(200).json(result);
-	}
 }
 
 module.exports = SubscriberController;
