@@ -39,14 +39,16 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 		console.log({ subsciberResponse });
 		await subscribeToPublisher();
 		const [createError, createResult] = await PublisherResource.createOne({
-			publisherUrl: pathToMessages.require
+			body: { publisherUrl: pathToMessages }
 		});
+		console.log({ createError, createResult });
 		if (createError) throw new Error(createError);
 		return [
 			undefined,
 			{ status: `Successfully subscribed to ${process.env.APP_NAME}` }
 		];
 	} catch (error) {
+		console.log({ error });
 		return [error, undefined];
 	}
 };
