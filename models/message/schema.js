@@ -2,7 +2,9 @@ const Joi = require("@hapi/joi");
 
 module.exports = Joi.object()
 	.keys({
-		userAccountId: Joi.string().optional(),
+		userAccountId: Joi.string()
+			.optional()
+			.allow(""),
 		_id: Joi.when("$update", {
 			is: true,
 			then: Joi.strip(),

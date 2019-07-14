@@ -45,7 +45,7 @@ class BaseResource {
 			}
 			// construtor may or may not return promise
 			const constructedObject = await factory(object, { isUpdating: false });
-
+			console.log(process.cwd(), { object, constructedObject, query });
 			// Validate
 			const [validationError, value] = validator(
 				{ data: constructedObject },

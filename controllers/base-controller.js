@@ -12,6 +12,7 @@ class BaseController {
 	async createOne(request, response, next) {
 		try {
 			const { body } = request;
+			console.log(process.cwd(), { body });
 			const [error, result] = await this.resourceModule.createOne({
 				object: body
 			});
@@ -27,9 +28,6 @@ class BaseController {
 	async findMany(request, response, next) {
 		try {
 			const { query } = request;
-			console.log({
-				resourceModule: this.resourceModule
-			});
 			const [error, result] = await this.resourceModule.aggregate({
 				query
 			});
