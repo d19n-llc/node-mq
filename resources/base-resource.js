@@ -38,16 +38,19 @@ class BaseResource {
 	 * @memberof BaseResource
 	 */
 	async createOne({ object, query = null }) {
-		const { factory, validator } = this;
+		console.log({ factory: this.factory, validator: this.validator });
+
 		try {
-			if (!factory || !validator) {
+			if (!this.factory || !this.validator) {
 				throw new Error("Missing factory or Validator for this model");
 			}
 			// construtor may or may not return promise
-			const constructedObject = await factory(object, { isUpdating: false });
+			const constructedObject = await this.factory(object, {
+				isUpdating: false
+			});
 			console.log(process.cwd(), { object, constructedObject, query });
 			// Validate
-			const [validationError, value] = validator(
+			const [validationError, value] = this.validator(
 				{ data: constructedObject },
 				{ isUpdating: false }
 			);
@@ -140,15 +143,15 @@ class BaseResource {
 	 * @memberof BaseResource
 	 */
 	async updateOne({ object, query }) {
-		const { factory, validator } = this;
+		console.log({ factory: this.factory, validator: this.validator });
 		try {
-			if (!factory || !validator) {
+			if (!this.factory || !this.validator) {
 				throw new Error("Missing factory or Validator for this model");
 			}
 			// construtor may or may not return promise
-			const project = await factory(object, { isUpdating: true });
+			const project = await this.factory(object, { isUpdating: true });
 			// Validate
-			const [validationError, value] = validator(
+			const [validationError, value] = this.validator(
 				{ data: project },
 				{ isUpdating: true }
 			);

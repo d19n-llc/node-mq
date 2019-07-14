@@ -3,8 +3,8 @@ const {
 	findOneAggregation,
 	findManyAggregation
 } = require("../../queries/messages-processed/query-extension");
-const MessageProcessedValidator = require("../../models/message/validator");
-const MessageProcessedFactory = require("../../models/message/factory");
+const MessageValidator = require("../../models/message/validator");
+const MessageFactory = require("../../models/message/factory");
 const BaseResource = require("../base-resource");
 
 class MessageProcessedResource extends BaseResource {
@@ -15,8 +15,8 @@ class MessageProcessedResource extends BaseResource {
 			queryBuilder: MessageProcessedQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
-			validator: MessageProcessedValidator,
-			factory: MessageProcessedFactory
+			validator: MessageValidator,
+			factory: MessageFactory
 		});
 	}
 

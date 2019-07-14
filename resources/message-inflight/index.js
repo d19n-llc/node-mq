@@ -3,8 +3,8 @@ const {
 	findOneAggregation,
 	findManyAggregation
 } = require("../../queries/messages-inflight/query-extension");
-const MessageInflightValidator = require("../../models/message/validator");
-const MessageInflightFactory = require("../../models/message/factory");
+const MessageValidator = require("../../models/message/validator");
+const MessageFactory = require("../../models/message/factory");
 const BaseResource = require("../base-resource");
 
 class MessageInflightResource extends BaseResource {
@@ -15,8 +15,8 @@ class MessageInflightResource extends BaseResource {
 			queryBuilder: MessageInflightQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
-			validator: MessageInflightValidator,
-			factory: MessageInflightFactory
+			validator: MessageValidator,
+			factory: MessageFactory
 		});
 	}
 

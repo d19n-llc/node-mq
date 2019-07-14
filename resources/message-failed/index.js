@@ -3,8 +3,8 @@ const {
 	findOneAggregation,
 	findManyAggregation
 } = require("../../queries/messages-failed/query-extension");
-const MessageFailedValidator = require("../../models/message/validator");
-const MessageFailedFactory = require("../../models/message/factory");
+const MessageValidator = require("../../models/message/validator");
+const MessageFactory = require("../../models/message/factory");
 const BaseResource = require("../base-resource");
 
 class MessageFailedResource extends BaseResource {
@@ -15,8 +15,8 @@ class MessageFailedResource extends BaseResource {
 			queryBuilder: MessageFailedQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
-			validator: MessageFailedValidator,
-			factory: MessageFailedFactory
+			validator: MessageValidator,
+			factory: MessageFactory
 		});
 	}
 }

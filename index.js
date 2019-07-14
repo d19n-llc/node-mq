@@ -5,13 +5,13 @@ const { CreateCollections } = require("./config/setup/install");
 const { RemoveCollections } = require("./config/setup/uninstall");
 const { RunTests } = require("./tests");
 const PublisherResourceClass = require("./resources/publisher");
-const QueueResourceClass = require("./resources/message-queued");
+const MessageQuedResourceClass = require("./resources/message-queued");
 const PublisherFactory = require("./models/publisher/factory");
 const MessageFactory = require("./models/message/factory");
 const SubscriberFactory = require("./models/subscriber/factory");
 const { SubscribeToPublisher } = require("./services/subscribe/subscribe");
 
-const QueueResource = new QueueResourceClass();
+const MessageQueueResource = new MessageQuedResourceClass();
 const PublisherResource = new PublisherResourceClass();
 
 console.log("@d19n/node-mq is enabled");
@@ -27,7 +27,7 @@ module.exports = {
 	Publisher: PublisherFactory,
 	Subscriber: SubscriberFactory,
 	Message: MessageFactory,
-	AddMessageToQueue: QueueResource.createOne,
+	AddMessageToQueue: MessageQueueResource.createOne,
 	AddPublisher: PublisherResource.createOne,
 	SubscribeToPublisher,
 	CreateCollections,
