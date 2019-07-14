@@ -10,7 +10,7 @@ module.exports = async (params = {}) => {
 		messagesNoRetry.push(
 			MessageFactory(
 				{
-					userAccountId: "5cf1a9f8b79aa40017af4c46",
+					userAccountId: "5d23c8d4806f870411e042b0",
 					name: `messagesNoRetry - ${uuidv1()}`,
 					topic: "internal-test",
 					action: "created",
@@ -32,7 +32,7 @@ module.exports = async (params = {}) => {
 		failedMessagesRetriable.push(
 			MessageFactory(
 				{
-					userAccountId: "5cf1a9f8b79aa40017af4c46",
+					userAccountId: "5d23c8d4806f870411e042b0",
 					name: `failedMessagesRetriable - ${uuidv1()}`,
 					topic: "internal-test",
 					action: "created",
@@ -55,7 +55,7 @@ module.exports = async (params = {}) => {
 		failedMessagesNoRetry.push(
 			MessageFactory(
 				{
-					userAccountId: "5cf1a9f8b79aa40017af4c46",
+					userAccountId: "5d23c8d4806f870411e042b0",
 					name: `failedMessagesNoRetry - ${uuidv1()}`,
 					topic: "internal-test",
 					action: "created",
@@ -84,7 +84,7 @@ module.exports = async (params = {}) => {
 			],
 			async (msg) => {
 				const [createError] = await MessageQueuedResource.createOne({
-					body: msg
+					object: msg
 				});
 				if (createError) throw new Error(createError);
 			}

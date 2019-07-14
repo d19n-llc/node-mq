@@ -1,4 +1,5 @@
 const fs = require("fs");
+const uuidv1 = require("uuid/v1");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const claimMessages = require("./claim");
 const processMessages = require("./process");
@@ -17,6 +18,8 @@ try {
 module.exports = async ({ removeBuffer = false }) => {
 	console.log("PROCESS MESSAGES IN THE QUEUE");
 	const MessageQueuedResource = new MessageQueuedResourceClass();
+
+	const batchId = uuidv1();
 
 	console.log({
 		query: {
@@ -62,17 +65,20 @@ module.exports = async ({ removeBuffer = false }) => {
 	try {
 		// Claim jobs
 		if ([...pubMsgResult, ...queueMessages].length > 0) {
-			console.log("claiming");
-			await claimMessages({
+			const [claimError] = await claimMessages({
 				messages: [...pubMsgResult, ...queueMessages],
+				batchId,
 				removeBuffer
 			});
+			console.log({ claimError });
 			console.log("processing");
-			await processMessages({
+			const [processError] = await processMessages({
 				messages: [...pubMsgResult, ...queueMessages],
+				batchId,
 				scriptRegistry,
 				removeBuffer
 			});
+			console.log({ processError });
 		}
 
 		return [

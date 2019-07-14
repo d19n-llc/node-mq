@@ -13,7 +13,12 @@ const PublishMessage = require("../publish/message");
  * @param {*} { messages, removeBuffer }
  * @returns
  */
-module.exports = async ({ messages, scriptRegistry, removeBuffer }) => {
+module.exports = async ({
+	messages,
+	batchId,
+	scriptRegistry,
+	removeBuffer
+}) => {
 	const InFlightResource = new InFlightResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
 	let currentMessage = {};
@@ -24,7 +29,8 @@ module.exports = async ({ messages, scriptRegistry, removeBuffer }) => {
 			console.log("PROCESSING MESSAGS", {
 				pastBuffer: isPastQueueBuffer({
 					messageCreatedAt: message.createTime
-				})
+				}),
+				messages: messages.length
 			});
 			currentMessage = message;
 			if (
@@ -35,13 +41,13 @@ module.exports = async ({ messages, scriptRegistry, removeBuffer }) => {
 				const { source, topic } = message;
 				console.log({ source, topic });
 				// Test processing works.
-				if (topic === "internal-test") {
+				if (source === "test-script") {
 					const [error, result] = await ProcessMessageTest({ message });
 					console.log({ error, result });
 					if (error) {
 						await handleCleanUpOnError({
 							currentMessage,
-							batchId: currentMessage.batchId,
+							batchId,
 							errorMessage: error
 						});
 					}
@@ -56,22 +62,23 @@ module.exports = async ({ messages, scriptRegistry, removeBuffer }) => {
 					if (error) {
 						await handleCleanUpOnError({
 							currentMessage,
-							batchId: currentMessage.batchId,
+							batchId,
 							errorMessage: error
 						});
 					}
 				}
 
 				// Handle messages
-				if (scriptRegistry) {
+				if (scriptRegistry && Object.keys(scriptRegistry).length > 0) {
 					// Use the script with the key === to the message topic
 					const [error, result] = await scriptRegistry[`${topic}`]({
 						message
 					});
+					console.log({ error });
 					if (error) {
 						await handleCleanUpOnError({
 							currentMessage,
-							batchId: currentMessage.batchId,
+							batchId,
 							errorMessage: error
 						});
 					}
@@ -84,8 +91,8 @@ module.exports = async ({ messages, scriptRegistry, removeBuffer }) => {
 				if (removeError) {
 					await handleCleanUpOnError({
 						currentMessage,
-						batchId: currentMessage.batchId,
-						error: removeError
+						batchId,
+						errorMessage: removeError
 					});
 				}
 				console.log("Move to processed");
@@ -95,8 +102,8 @@ module.exports = async ({ messages, scriptRegistry, removeBuffer }) => {
 				if (moveError) {
 					await handleCleanUpOnError({
 						currentMessage,
-						batchId: currentMessage.batchId,
-						error: moveError
+						batchId,
+						errorMessage: moveError
 					});
 				}
 			}

@@ -7,6 +7,8 @@ module.exports = async (params = {}) => {
 	const MessageInflightResource = new MessageInflightResourceClass();
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 
+	console.log("ROLLING BACK MESSAGES FROM INFLIGHT");
+
 	try {
 		const [findError, findResult] = await MessageInflightResource.findMany({
 			query: { batchId }

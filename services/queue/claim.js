@@ -1,15 +1,13 @@
-const uuidv1 = require("uuid/v1");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const InFlightResourceClass = require("../../resources/message-inflight");
 const { seriesLoop } = require("../../helpers/functions");
 const { isPastQueueBuffer } = require("../../helpers/processing");
 const handleCleanUpOnError = require("./clean-up");
 
-module.exports = async ({ messages, removeBuffer }) => {
+module.exports = async ({ messages, batchId, removeBuffer }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const InFlightResource = new InFlightResourceClass();
 
-	const batchId = uuidv1();
 	let currentMessage = {};
 
 	try {
@@ -19,7 +17,8 @@ module.exports = async ({ messages, removeBuffer }) => {
 			console.log("CLAIMING MESSAGES", {
 				pastBuffer: isPastQueueBuffer({
 					messageCreatedAt: message.createTime
-				})
+				}),
+				messages: messages.length
 			});
 			if (
 				isPastQueueBuffer({ messageCreatedAt: currentMessage.createTime }) ||

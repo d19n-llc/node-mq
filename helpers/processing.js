@@ -20,9 +20,10 @@ module.exports.offsetJobStart = () => {
  * @returns
  */
 module.exports.isPastQueueBuffer = (params) => {
-	const { jobCreatedAt } = params;
+	const { messageCreatedAt } = params;
 	const currentTime = currentDayIso();
-	const difference = getDiffIndates(currentTime, jobCreatedAt, "seconds");
+	const difference = getDiffIndates(currentTime, messageCreatedAt, "seconds");
+	console.log({ difference });
 	if (difference > 15) {
 		return true;
 	}
