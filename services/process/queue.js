@@ -23,6 +23,7 @@ try {
 // Pass in user added scripts for processing custom messages
 
 module.exports = async ({ removeBuffer = false }) => {
+	console.log("PROCESS MESSAGES IN THE QUEUE");
 	const batchId = uuidv1();
 	let currentMessage = {};
 	const MessageQueuedResource = new MessageQueuedResourceClass();
@@ -91,15 +92,14 @@ module.exports = async ({ removeBuffer = false }) => {
 			resultsPerPage: 100,
 			sortAscending: "priority",
 			topic: {
-				$in: [
-					...Object.keys(scriptRegistry),
-					...[process.env.APP_URL, "internal-test"]
-				]
+				$in: [...Object.keys(scriptRegistry), ...["internal-test"]]
 			}
 		}
 	});
-	if (queueError) return [queueError, undefined];
+	if (queueError) throw new Error(queueError);
+
 	try {
+		console.log("queueMessages", { queueMessages });
 		// Claim jobs
 		if (queueMessages.length > 0) {
 			await seriesLoop(queueMessages, async (message) => {

@@ -27,7 +27,8 @@ function Scheduler() {
 	schedule.scheduleJob("2 * * * * *", async () => {
 		await offsetJobStart();
 		console.log("processing queued messages...");
-		processQueuedMessages({});
+		const [error, result] = await processQueuedMessages({});
+		console.log({ error, result });
 	});
 }
 
