@@ -189,8 +189,8 @@ MessageFactory(
     userAccountId: "5cf1a9f8b79aa40017af4c46",
     name: `custom-job-one`,
     topic: "customJob1",
-    source: process.env.APP_NAME, // Set the source to the app name
-    action: "created",
+    source: process.env.APP_URL,
+    action: "create",
     payload: {
       description: "Running a custom job script",
     },
@@ -216,10 +216,10 @@ const MessageQueueResource = new MessageQueuedResourceClass();
 const message = MessageFactory(
   {
     userAccountId: "5cf1a9f8b79aa40017af4c46",
-    name: `updated: jobs - <Timestamp>`,
+    name: `update: jobs - <Timestamp>`,
     topic: jobs,
-    source: process.env.APP_NAME, // Set the source to the app name
-    action: "updated",
+    source: process.env.APP_URL,
+    action: "update",
     payload: {name: "Job name", cost: 500},
     priority: 1
   },

@@ -61,7 +61,14 @@ module.exports = async ({
 				}
 
 				// Handle messages
+				console.log({ scriptRegistry });
+				console.log({ length: Object.keys(scriptRegistry) });
+				console.log({
+					hasScripts: scriptRegistry && Object.keys(scriptRegistry).length > 0
+				});
 				if (scriptRegistry && Object.keys(scriptRegistry).length > 0) {
+					console.log({ scriptRegistry });
+					console.log({ script: scriptRegistry[`${topic}`] });
 					// Use the script with the key === to the message topic
 					const [error, result] = await scriptRegistry[`${topic}`]({
 						message
