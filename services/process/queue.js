@@ -84,7 +84,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	// before we try to handle them.
 	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 		query: {
-			resultsPerPage: 25,
+			resultsPerPage: 100,
 			sortAscending: "priority",
 			topic: {
 				$in: [

@@ -176,11 +176,11 @@ want to run i.e "customJob1". This message will run a script registered with the
 "customJob1". see #6 on registering a script.
 
 ```
-const { Message, MessageQuedResourceClass } = require("@d19n/node-mq");
+const { MessageFactory, MessageQueuedResourceClass } = require("@d19n/node-mq");
 
-const MessageQueueResource = new MessageQuedResourceClass();
+const MessageQueueResource = new MessageQueuedResourceClass();
 
-Message(
+MessageFactory(
   {
     userAccountId: "5cf1a9f8b79aa40017af4c46",
     name: `custom-job-one`,
@@ -205,11 +205,11 @@ with the source: process.env.APP_NAME. And the topic can be anything you want. I
 the case of data replication we set the topic: "Entity" i.e (programs, projects, jobs)
 
 ```
-const { Message, MessageQuedResourceClass } = require("@d19n/node-mq");
+const { MessageFactory, MessageQueuedResourceClass } = require("@d19n/node-mq");
 
-const MessageQueueResource = new MessageQuedResourceClass();
+const MessageQueueResource = new MessageQueuedResourceClass();
 
-const message = Message(
+const message = MessageFactory(
   {
     userAccountId: "5cf1a9f8b79aa40017af4c46",
     name: `updated: jobs - <Timestamp>`,
