@@ -14,7 +14,7 @@ class MessageInflightController extends BaseController {
 	async batchRetry(request, response, next) {
 		const { body } = request;
 		const { batchId } = body;
-		const [error, result] = moveBatchToQueue({ batchId });
+		const [error, result] = await moveBatchToQueue({ batchId });
 		if (error) return next(error);
 		response.status(200).json(result);
 	}

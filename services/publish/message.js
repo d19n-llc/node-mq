@@ -4,7 +4,6 @@ const SubscriberResourceClass = require("../../resources/subscriber");
 
 module.exports = async (params = {}) => {
 	const { message } = params;
-	const subscribers = [];
 	let lastUpdateError = {};
 	const SubscriberResource = new SubscriberResourceClass();
 
@@ -41,6 +40,7 @@ module.exports = async (params = {}) => {
 			}
 		});
 		if (findError) throw new Error(findError);
+		console.log(process.cwd(), { findResult });
 
 		await seriesLoop(findResult, async (doc, index) => {
 			console.log(process.cwd(), { doc });
@@ -48,7 +48,7 @@ module.exports = async (params = {}) => {
 				await sendMessageToSubscriber({ subscriberUrl: doc.subscriberUrl });
 
 				const [updateError, updateResult] = await SubscriberResource.updateOne({
-					id: doc._id,
+					query: { _id: doc._id },
 					object: { subscriberUrl: doc.subscriberUrl, lastUpdateError }
 				});
 				if (updateError) throw new Error(updateError);
@@ -57,6 +57,7 @@ module.exports = async (params = {}) => {
 
 		return [undefined, { status: "messages published to subscribers" }];
 	} catch (error) {
+		console.log(process.cwd(), { error });
 		return [error, undefined];
 	}
 };

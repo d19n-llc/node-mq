@@ -21,10 +21,12 @@ function Scheduler() {
 	});
 	schedule.scheduleJob("2 * * * * *", async () => {
 		await offsetJobStart();
+		console.log("retrying failed messages...");
 		retryFailedMessages({});
 	});
 	schedule.scheduleJob("2 * * * * *", async () => {
 		await offsetJobStart();
+		console.log("processing queued messages...");
 		processQueuedMessages({});
 	});
 }

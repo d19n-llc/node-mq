@@ -8,7 +8,7 @@ const FailedResourceClass = require("../../resources/message-failed");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const inflightRollBack = require("../rollback/inflight-batch-failed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
-const { PublishMessage } = require("../../services/publish/message");
+const PublishMessage = require("../../services/publish/message");
 
 const pathToScripts = `${process.cwd()}/mq-scripts`;
 let scriptRegistry = {};

@@ -9,7 +9,7 @@ module.exports = async (params = {}) => {
 
 	try {
 		const [findError, findResult] = await MessageInflightResource.findMany({
-			query: [{ $match: { batchId } }]
+			query: { batchId }
 		});
 		if (findError) throw new Error(findError);
 
