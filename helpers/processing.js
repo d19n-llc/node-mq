@@ -16,14 +16,14 @@ module.exports.offsetJobStart = () => {
 };
 
 /**
- * check if the job has been queued for 2 min before processing
+ * check if the job is past the 15 second buffer
  * @returns
  */
 module.exports.isPastQueueBuffer = (params) => {
 	const { jobCreatedAt } = params;
 	const currentTime = currentDayIso();
-	const difference = getDiffIndates(currentTime, jobCreatedAt, "minutes");
-	if (difference > 1) {
+	const difference = getDiffIndates(currentTime, jobCreatedAt, "seconds");
+	if (difference > 15) {
 		return true;
 	}
 	return false;
