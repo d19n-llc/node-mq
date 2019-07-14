@@ -58,6 +58,7 @@ exports.BaseQuery = (params) => {
 		extensions.push(sorts);
 	}
 	const numberOrDateKeys = ["$gte", "$gt", "$lt", "$lte"];
+	const arrayOperators = ["$nin", "$in"];
 	Object.keys(strippedQuery).forEach((key) => {
 		let currentElement = strippedQuery[key];
 		if (!distinctAllowedKeys.includes(key)) {
@@ -70,7 +71,22 @@ exports.BaseQuery = (params) => {
 		const activeNumberOrDateKeys = numberOrDateKeys.filter((numKey) =>
 			innerKeys.includes(numKey)
 		);
+		const activeArrayKeys = arrayOperators.filter((key) =>
+			innerKeys.includes(key)
+		);
+
 		const hasNumberOrDateKey = !!activeNumberOrDateKeys.length;
+		const hasArrayKey = !!activeArrayKeys.length;
+
+		console.log({ hasArrayKey });
+		if (hasArrayKey) {
+			// for dates and numbers we need to search on the converted key rather than the original
+			parsedQuery["$match"] = {
+				...parsedQuery["$match"],
+				[key]: { ...currentElement }
+			};
+			console.log({ parsedQuery: parsedQuery["$match"] });
+		}
 		// if we are using fields like gte or lt, we need to convert this to string before we can use gte or lt operator.
 		if (hasNumberOrDateKey) {
 			// take the first value of the number or date key fields, this should allow you to deduce whether it is a date, or number

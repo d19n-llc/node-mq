@@ -135,13 +135,16 @@ module.exports = async ({ removeBuffer = false }) => {
 					isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
 					removeBuffer
 				) {
+					console.log("Claiming message passed Queue Buffer");
 					currentMessage = message;
+					console.log("Delete from queue");
 					const [removeError] = await MessageQueuedResource.deleteOne({
 						query: { _id: currentMessage._id }
 					});
 					if (removeError) {
 						await handleCleanUpOnError({ error: removeError });
 					}
+					console.log("Move to inflight");
 					const [inflightError] = await InFlightResource.createOne({
 						object: currentMessage
 					});
@@ -160,6 +163,7 @@ module.exports = async ({ removeBuffer = false }) => {
 						isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
 						removeBuffer
 					) {
+						console.log("Processing message passed Queue Buffer");
 						const [processingError] = await processMessage({
 							message
 						});
@@ -167,12 +171,14 @@ module.exports = async ({ removeBuffer = false }) => {
 						if (processingError) {
 							await handleCleanUpOnError({ error: processingError });
 						}
+						console.log("Remove from inflight");
 						const [removeError] = await InFlightResource.deleteOne({
 							query: { _id: currentMessage._id }
 						});
 						if (removeError) {
 							await handleCleanUpOnError({ error: removeError });
 						}
+						console.log("Move to processed");
 						const [moveError] = await ProcessedResource.createOne({
 							object: currentMessage
 						});
@@ -186,7 +192,10 @@ module.exports = async ({ removeBuffer = false }) => {
 
 		return [
 			undefined,
-			{ status: "messages processed", totalMessages: queueMessages.length }
+			{
+				status: "messages processed",
+				totalMessages: [...pubMsgResult, ...queueMessages].length
+			}
 		];
 	} catch (error) {
 		console.log({ error });
