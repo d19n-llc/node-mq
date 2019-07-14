@@ -1,6 +1,6 @@
 const schedule = require("node-schedule");
 const deduplicateQueue = require("../services/deduplicate");
-const processQueuedMessages = require("../services/process/queue");
+const processQueuedMessages = require("../services/queue");
 const retryFailedMessages = require("../services/retry-failed");
 const { offsetJobStart } = require("../helpers/processing");
 

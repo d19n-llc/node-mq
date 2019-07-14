@@ -1,4 +1,4 @@
-const processQueuedMessages = require("../services/process/queue");
+const processQueuedMessages = require("../services/queue");
 const MessageQueuedResourceClass = require("../resources/message-queued");
 const { asyncForLoop } = require("../helpers/functions");
 
