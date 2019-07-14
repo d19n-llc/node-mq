@@ -31,11 +31,11 @@ class SubscriberResource extends BaseResource {
 	 */
 	async createOne(params) {
 		try {
-			const { body } = params;
+			const { object } = params;
 			const [createError, createResult] = await super.createOne({
-				object: body,
+				object,
 				query: {
-					subscriberUrl: body.subscriberUrl
+					subscriberUrl: object.subscriberUrl
 				}
 			});
 			if (createError) throw new Error(createError);

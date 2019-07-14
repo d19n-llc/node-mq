@@ -31,11 +31,11 @@ class PublisherResource extends BaseResource {
 	 */
 	async createOne(params) {
 		try {
-			const { body } = params;
+			const { object } = params;
 			const [createError, createResult] = await super.createOne({
-				object: body,
+				object,
 				query: {
-					publisherUrl: body.publisherUrl
+					publisherUrl: object.publisherUrl
 				}
 			});
 			if (createError) throw new Error(createError);
