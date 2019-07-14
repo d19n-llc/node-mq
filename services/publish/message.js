@@ -3,6 +3,7 @@ const { seriesLoop } = require("../../helpers/functions");
 const SubscriberResourceClass = require("../../resources/subscriber");
 
 module.exports = async (params = {}) => {
+	console.log("PUBLISH MESSAGE");
 	const { message } = params;
 	let lastUpdateError = {};
 	const SubscriberResource = new SubscriberResourceClass();
@@ -12,8 +13,8 @@ module.exports = async (params = {}) => {
 	 *
 	 * @returns
 	 */
-	function sendMessageToSubscriber(params) {
-		const { subscriberUrl } = params;
+	function sendMessageToSubscriber({ subscriberUrl }) {
+		console.log(process.cwd(), { subscriberUrl });
 		return new Promise((resolve, reject) => {
 			internalHttp.POST(
 				{

@@ -37,17 +37,19 @@ module.exports = async ({ removeBuffer = false }) => {
 	 */
 	async function processMessage({ message }) {
 		const { source, topic } = message;
-		// If the source is self that means this message has been published
-		// to the queue and should be sent to subscribers.
-		if (source === process.env.APP_URL) {
-			const [error, result] = await PublishMessage({ message });
-			return [error, result];
-		}
-
+		// Test processing works.
 		if (topic === "internal-test") {
 			const [error, result] = await ProcessMessageTest({ message });
 			return [error, result];
 		}
+		// If the source is the APP_URL that means this message should be published
+		// to all subscribers.
+		if (source === process.env.APP_URL) {
+			console.log(process.cwd(), "publish message");
+			const [error, result] = await PublishMessage({ message });
+			return [error, result];
+		}
+
 		if (scriptRegistry) {
 			// Use the script with the key === to the message topic
 			const [error, result] = await scriptRegistry[`${topic}`]({ message });
