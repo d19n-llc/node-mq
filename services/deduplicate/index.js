@@ -36,7 +36,7 @@ module.exports = async (params = {}) => {
 					await seriesLoop(duplicatesToRemove, async (duplicate, index) => {
 						const [removeError] = await deleteOne({
 							collName: "mq_messages_queued",
-							query: { _id: duplicate.id }
+							query: { _id: duplicate._id }
 						});
 						if (removeError) throw new Error(removeError);
 					});
