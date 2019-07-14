@@ -36,6 +36,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	 * @returns
 	 */
 	async function processMessage({ message }) {
+		console.log("process messages");
 		const { source, topic } = message;
 		console.log({ source, topic });
 		// Test processing works.
@@ -67,6 +68,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	 * @returns
 	 */
 	async function handleCleanUpOnError({ error }) {
+		console.log("cleanup items");
 		// Rollback all messages for this batch from inflight to the queue
 		const [removeError] = await InFlightResource.deleteOne({
 			query: { _id: currentMessage._id }
@@ -84,6 +86,15 @@ module.exports = async ({ removeBuffer = false }) => {
 		if (rollbackError) return [rollbackError, undefined];
 		return [undefined, { status: "messages inflight clean up complete." }];
 	}
+	console.log({
+		query: {
+			resultsPerPage: 100,
+			sortAscending: "priority",
+			topic: {
+				$in: [...Object.keys(scriptRegistry), ...["internal-test"]]
+			}
+		}
+	});
 
 	// Using the query.. we want to ensure we have a script to process the topics.
 	// before we try to handle them.
@@ -97,12 +108,28 @@ module.exports = async ({ removeBuffer = false }) => {
 		}
 	});
 	if (queueError) throw new Error(queueError);
+	console.log({
+		query: {
+			resultsPerPage: 100,
+			sortAscending: "priority",
+			source: process.env.APP_URL
+		}
+	});
+
+	const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
+		query: {
+			resultsPerPage: 100,
+			sortAscending: "priority",
+			source: process.env.APP_URL
+		}
+	});
+	if (pubMsgError) throw new Error(pubMsgError);
 
 	try {
 		console.log("queueMessages", { queueMessages });
 		// Claim jobs
-		if (queueMessages.length > 0) {
-			await seriesLoop(queueMessages, async (message) => {
+		if ([...pubMsgResult, ...queueMessages].length > 0) {
+			await seriesLoop([...pubMsgResult, ...queueMessages], async (message) => {
 				console.log("CLAIMING MESSAGES");
 				if (
 					isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
@@ -124,34 +151,37 @@ module.exports = async ({ removeBuffer = false }) => {
 				}
 			});
 			// process jobs
-			await seriesLoop(queueMessages, async (message, index) => {
-				console.log("PROCESSING MESSAGS");
-				currentMessage = message;
-				if (
-					isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
-					removeBuffer
-				) {
-					const [processingError] = await processMessage({
-						message
-					});
-					console.log({ processingError });
-					if (processingError) {
-						await handleCleanUpOnError({ error: processingError });
-					}
-					const [removeError] = await InFlightResource.deleteOne({
-						query: { _id: currentMessage._id }
-					});
-					if (removeError) {
-						await handleCleanUpOnError({ error: removeError });
-					}
-					const [moveError] = await ProcessedResource.createOne({
-						object: currentMessage
-					});
-					if (moveError) {
-						await handleCleanUpOnError({ error: moveError });
+			await seriesLoop(
+				[...pubMsgResult, ...queueMessages],
+				async (message, index) => {
+					console.log("PROCESSING MESSAGS");
+					currentMessage = message;
+					if (
+						isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
+						removeBuffer
+					) {
+						const [processingError] = await processMessage({
+							message
+						});
+						console.log({ processingError });
+						if (processingError) {
+							await handleCleanUpOnError({ error: processingError });
+						}
+						const [removeError] = await InFlightResource.deleteOne({
+							query: { _id: currentMessage._id }
+						});
+						if (removeError) {
+							await handleCleanUpOnError({ error: removeError });
+						}
+						const [moveError] = await ProcessedResource.createOne({
+							object: currentMessage
+						});
+						if (moveError) {
+							await handleCleanUpOnError({ error: moveError });
+						}
 					}
 				}
-			});
+			);
 		}
 
 		return [
