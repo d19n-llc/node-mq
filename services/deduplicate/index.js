@@ -29,7 +29,7 @@ module.exports = async (params = {}) => {
 		console.log({ findResult });
 		if (findResult.length > 0) {
 			await seriesLoop(findResult, async (doc, index) => {
-				const duplicateLen = doc.count.length;
+				const duplicateLen = doc.count;
 				console.log({ duplicateLen });
 				if (duplicateLen > 1) {
 					const duplicatesToRemove = doc.documentIds.slice(0, duplicateLen - 1);
