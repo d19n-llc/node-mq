@@ -107,6 +107,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			}
 		}
 	});
+	console.log({ queueMessages: queueMessages.length });
 	if (queueError) throw new Error(queueError);
 	console.log({
 		query: {
@@ -123,6 +124,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			source: process.env.APP_URL
 		}
 	});
+	console.log({ pubMsgResult: pubMsgResult.length });
 	if (pubMsgError) throw new Error(pubMsgError);
 
 	try {
@@ -130,7 +132,11 @@ module.exports = async ({ removeBuffer = false }) => {
 		// Claim jobs
 		if ([...pubMsgResult, ...queueMessages].length > 0) {
 			await seriesLoop([...pubMsgResult, ...queueMessages], async (message) => {
-				console.log("CLAIMING MESSAGES");
+				console.log("CLAIMING MESSAGES", {
+					pastBuffer: isPastQueueBuffer({
+						messageCreatedAt: message.createTime
+					})
+				});
 				if (
 					isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
 					removeBuffer
@@ -157,7 +163,11 @@ module.exports = async ({ removeBuffer = false }) => {
 			await seriesLoop(
 				[...pubMsgResult, ...queueMessages],
 				async (message, index) => {
-					console.log("PROCESSING MESSAGS");
+					console.log("PROCESSING MESSAGS", {
+						pastBuffer: isPastQueueBuffer({
+							messageCreatedAt: message.createTime
+						})
+					});
 					currentMessage = message;
 					if (
 						isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
