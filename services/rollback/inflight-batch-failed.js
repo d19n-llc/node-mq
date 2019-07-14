@@ -23,6 +23,7 @@ module.exports = async (params = {}) => {
 				});
 				if (createError) throw new Error(createError);
 			});
+
 			const [
 				deleteError,
 				deleteResult
@@ -31,6 +32,7 @@ module.exports = async (params = {}) => {
 			});
 			if (deleteError) throw new Error(deleteError);
 		}
+		return [undefined, { batchCount: findResult.length }];
 	} catch (error) {
 		return [error, undefined];
 	}
