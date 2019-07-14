@@ -14,6 +14,12 @@ then subscribe to other micro services using this package by sending a POST requ
 to the <APP_URL>/mq-subscriber endpoint to begin a recieving messages from the
 micro service you have subscribed to.
 
+Road Map:
+
+1. Lightweight interface to monitor / manage the queue.
+2. Sync with publishers after a service outage. This will batch fetch
+   all messages after the last recieved message from all publishers.
+
 ```
 
 POST http://localhost:3000/api/mq-subscriber
