@@ -1,7 +1,7 @@
 const ObjectID = require("mongodb").ObjectID;
 const { addTimestamps } = require("../../helpers/dates");
 
-module.exports.constructor = (params, options) => {
+module.exports = (params, options) => {
 	const { isUpdating } = options;
 
 	const defaults = isUpdating
