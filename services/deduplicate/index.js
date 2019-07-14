@@ -29,18 +29,21 @@ module.exports = async (params = {}) => {
 
 		if (findResult.length > 0) {
 			await seriesLoop(findResult, async (doc, index) => {
-				const duplicatesLen = doc.count.length;
-				const duplicatesToRemove = doc.documentIds.slice(0, duplicatesLen - 1);
-				await seriesLoop(duplicatesToRemove, async (duplicate, index) => {
-					const [removeError] = await deleteOne({
-						collName: "mq_messages_queued",
-						query: { _id: duplicate.id }
+				const duplicateLen = doc.count.length;
+				console.log({ duplicateLen });
+				if (duplicateLen > 1) {
+					const duplicatesToRemove = doc.documentIds.slice(0, duplicateLen - 1);
+					console.log({ duplicatesToRemove });
+					await seriesLoop(duplicatesToRemove, async (duplicate, index) => {
+						const [removeError] = await deleteOne({
+							collName: "mq_messages_queued",
+							query: { _id: duplicate.id }
+						});
+						if (removeError) throw new Error(removeError);
 					});
-					if (removeError) throw new Error(removeError);
-				});
+				}
 			});
 		}
-
 		return [undefined, {}];
 	} catch (error) {
 		return [error, undefined];
