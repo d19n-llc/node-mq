@@ -2,9 +2,9 @@ const PublisherQuery = require("../../queries/publisher/query");
 const {
 	findOneAggregation,
 	findManyAggregation
-} = require("../../queries/messages-failed/query-extension");
-const PublisherValidator = require("../../models/message/validator");
-const PublisherFactory = require("../../models/message/factory");
+} = require("../../queries/publisher/query-extension");
+const PublisherValidator = require("../../models/publisher/validator");
+const PublisherFactory = require("../../models/publisher/factory");
 const BaseResource = require("../base-resource");
 
 class PublisherResource extends BaseResource {
