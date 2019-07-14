@@ -39,7 +39,7 @@ module.exports = async ({ removeBuffer = false }) => {
 		const { source, topic } = message;
 		// If the source is self that means this message has been published
 		// to the queue and should be sent to subscribers.
-		if (source === process.env.APP_NAME) {
+		if (source === process.env.APP_URL) {
 			const [error, result] = await PublishMessage({ message });
 			return [error, result];
 		}
@@ -89,7 +89,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			topic: {
 				$in: [
 					...Object.keys(scriptRegistry),
-					...[process.env.APP_NAME, "internal-test"]
+					...[process.env.APP_URL, "internal-test"]
 				]
 			}
 		}
