@@ -35,6 +35,7 @@ module.exports = async ({
 				isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
 				removeBuffer
 			) {
+				console.log("PROCESSING MESSAGE");
 				const { source, topic } = message;
 				// Test processing works.
 				if (source === "test-script") {
@@ -66,7 +67,8 @@ module.exports = async ({
 				console.log({
 					hasScripts: scriptRegistry && Object.keys(scriptRegistry).length > 0
 				});
-				if (scriptRegistry && Object.keys(scriptRegistry).length > 0) {
+				console.log({ scriptReg: scriptRegistry[`${topic}`] });
+				if (scriptRegistry[`${topic}`]) {
 					console.log({ scriptRegistry });
 					console.log({ script: scriptRegistry[`${topic}`] });
 					// Use the script with the key === to the message topic
