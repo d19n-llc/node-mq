@@ -65,7 +65,7 @@ require("@d19n/node-mq);
 ```
 MQ_MONGODB_URL=mongodb+srv://<user></user>:<password></password>@test-nbfdp.mongodb.net/test?retryWrites=true&w=majority
 MQ_MONGODB_NAME=<db_name>
-MQ_MESSAGES_URL=http://localhost:3000/api/mq-message-processed
+MQ_API_ACCESS_TOKEN=
 
 ```
 

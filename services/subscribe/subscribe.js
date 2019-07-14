@@ -40,11 +40,14 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 		await subscribeToPublisher();
 		const [createError, createResult] = await PublisherResource.createOne({
 			body: {
+				userAccountId: "111111",
 				publisherUrl: pathToMessages,
 				subscriberId: subsciberResponse._id || "no_id"
 			}
 		});
-		console.log({ createError, createResult });
+
+		console.log({ createResult });
+
 		if (createError) throw new Error(createError);
 		return [
 			undefined,
