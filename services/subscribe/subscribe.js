@@ -6,7 +6,7 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 	const { publisherUrl, topics } = params;
 	const pathToSubscibe = `${publisherUrl}/api/mq-subscriber`;
 	const pathToMessages = `${publisherUrl}/api/mq-message-processed`;
-	let subsciberResponse = {};
+	let publisherResponse = {};
 
 	// Pass in the url to subscribe to a publisher
 	/**
@@ -27,7 +27,7 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 				},
 				(err, res) => {
 					console.log("subscribed", { res });
-					subsciberResponse = res;
+					publisherResponse = res;
 					if (err) throw new Error(err);
 					resolve();
 				}
@@ -36,19 +36,19 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 	}
 
 	try {
-		console.log({ subsciberResponse });
 		await subscribeToPublisher();
 		const [createError, createResult] = await PublisherResource.createOne({
-			body: {
-				userAccountId: "111111",
+			object: {
+				userAccountId: publisherResponse.value.userAccountId || "no_id",
 				publisherUrl: pathToMessages,
-				subscriberId: subsciberResponse._id || "no_id"
+				subscriberId: publisherResponse.value._id || "no_id"
 			}
 		});
 
 		console.log({ createResult });
 
 		if (createError) throw new Error(createError);
+
 		return [
 			undefined,
 			{ status: `Successfully subscribed to ${process.env.APP_NAME}` }

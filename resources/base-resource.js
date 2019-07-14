@@ -164,7 +164,7 @@ class BaseResource {
 				data: value
 			});
 			if (error) throw new Error(error);
-			return [error, result];
+			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
 		}

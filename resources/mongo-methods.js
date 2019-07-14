@@ -21,7 +21,7 @@ module.exports = {
 	async findOneAndUpdate({ collName, query, upsert, data }) {
 		try {
 			const client = await collection(collName);
-			const docs = client.findOneAndUpdate(
+			const docs = await client.findOneAndUpdate(
 				query,
 				{ $set: data },
 				{ upsert, returnOriginal: false }

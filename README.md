@@ -153,12 +153,12 @@ module.exports = ({ message }) => {
 	console.log("In your registered module", {
     message: {
       name: "", // a unique identifier for the message
-      source: "", // Where the message is sent from
+      source: process.env.APP_URL, // source of the message
       topic: "", // provides context for the payload
       action: "", // ["created", "updated", "deleted", "notification"]
       priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high
       maxRetries: 3,
-      payload: {}, // The data being processed
+      payload: {}, // The data to be processed
     }
   });
   function handleMessage(){
