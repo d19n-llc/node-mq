@@ -12,7 +12,6 @@ class BaseController {
 	async createOne(request, response, next) {
 		try {
 			const { body } = request;
-			console.log(process.cwd(), { body });
 			const [error, result] = await this.resourceModule.createOne({
 				object: body
 			});

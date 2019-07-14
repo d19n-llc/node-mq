@@ -6,11 +6,15 @@ const InFlightResourceClass = require("../../resources/message-inflight");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
 const PublishMessage = require("../publish/message");
-
 /**
  *
  *
- * @param {*} { messages, removeBuffer }
+ * @param {*} {
+ * 	messages,
+ * 	batchId,
+ * 	scriptRegistry,
+ * 	removeBuffer
+ * }
  * @returns
  */
 module.exports = async ({
@@ -26,24 +30,15 @@ module.exports = async ({
 	try {
 		// process jobs
 		await seriesLoop(messages, async (message, index) => {
-			console.log("PROCESSING MESSAGS", {
-				pastBuffer: isPastQueueBuffer({
-					messageCreatedAt: message.createTime
-				}),
-				messages: messages.length
-			});
-			currentMessage = message;
+			currentMessage = Object.assign({}, message, { batchId });
 			if (
 				isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
 				removeBuffer
 			) {
-				console.log("Processing message passed Queue Buffer");
 				const { source, topic } = message;
-				console.log({ source, topic });
 				// Test processing works.
 				if (source === "test-script") {
 					const [error, result] = await ProcessMessageTest({ message });
-					console.log({ error, result });
 					if (error) {
 						await handleCleanUpOnError({
 							currentMessage,
@@ -54,11 +49,8 @@ module.exports = async ({
 				}
 				// If the source is the APP_URL that means this message should be published
 				// to all subscribers.
-				console.log({ source, APP_URL: process.env.APP_URL });
 				if (source === process.env.APP_URL) {
-					console.log(process.cwd(), "publish message");
 					const [error, result] = await PublishMessage({ message });
-					console.log({ error, result });
 					if (error) {
 						await handleCleanUpOnError({
 							currentMessage,
@@ -74,7 +66,6 @@ module.exports = async ({
 					const [error, result] = await scriptRegistry[`${topic}`]({
 						message
 					});
-					console.log({ error });
 					if (error) {
 						await handleCleanUpOnError({
 							currentMessage,
@@ -83,8 +74,7 @@ module.exports = async ({
 						});
 					}
 				}
-
-				console.log("Remove from inflight");
+				// Remove message from inflight
 				const [removeError] = await InFlightResource.deleteOne({
 					query: { _id: currentMessage._id }
 				});
@@ -95,7 +85,7 @@ module.exports = async ({
 						errorMessage: removeError
 					});
 				}
-				console.log("Move to processed");
+				// Move message to processed
 				const [moveError] = await ProcessedResource.createOne({
 					object: currentMessage
 				});

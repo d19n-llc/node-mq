@@ -1,7 +1,12 @@
 const FailedResourceClass = require("../../resources/message-failed");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const { seriesLoop } = require("../../helpers/functions");
-
+/**
+ *
+ *
+ * @param {*} [params={}]
+ * @returns
+ */
 module.exports = async (params = {}) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const FailedResource = new FailedResourceClass();
@@ -38,7 +43,6 @@ module.exports = async (params = {}) => {
 		}
 		return [undefined, messages];
 	} catch (error) {
-		console.log({ path: process.cwd(), error });
 		return [error, undefined];
 	}
 };

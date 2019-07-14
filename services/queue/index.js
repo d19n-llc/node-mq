@@ -14,25 +14,18 @@ try {
 } catch (err) {
 	console.error(err);
 }
-
+/**
+ *
+ *
+ * @param {*} { removeBuffer = false }
+ * @returns
+ */
 module.exports = async ({ removeBuffer = false }) => {
-	console.log("PROCESS MESSAGES IN THE QUEUE");
 	const MessageQueuedResource = new MessageQueuedResourceClass();
-
+	// Set a batchId for the messages being processed
 	const batchId = uuidv1();
 
-	console.log({
-		query: {
-			resultsPerPage: 100,
-			sortAscending: "priority",
-			topic: {
-				$in: [...Object.keys(scriptRegistry), ...["internal-test"]]
-			}
-		}
-	});
-
-	// Using the query.. we want to ensure we have a script to process the topics.
-	// before we try to handle them.
+	// Messages to be processed
 	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 		query: {
 			resultsPerPage: 100,
@@ -42,16 +35,9 @@ module.exports = async ({ removeBuffer = false }) => {
 			}
 		}
 	});
-	console.log({ queueMessages: queueMessages.length });
 	if (queueError) throw new Error(queueError);
-	console.log({
-		query: {
-			resultsPerPage: 100,
-			sortAscending: "priority",
-			source: process.env.APP_URL
-		}
-	});
 
+	// Messages to be published out to subscribers
 	const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
 		query: {
 			resultsPerPage: 100,
@@ -59,28 +45,27 @@ module.exports = async ({ removeBuffer = false }) => {
 			source: process.env.APP_URL
 		}
 	});
-	console.log({ pubMsgResult: pubMsgResult.length });
 	if (pubMsgError) throw new Error(pubMsgError);
 
+	// Handle messages
 	try {
-		// Claim jobs
 		if ([...pubMsgResult, ...queueMessages].length > 0) {
+			// Claim messages to be processed
 			const [claimError] = await claimMessages({
 				messages: [...pubMsgResult, ...queueMessages],
 				batchId,
 				removeBuffer
 			});
-			console.log({ claimError });
-			console.log("processing");
+			if (claimError) throw new Error(claimError);
+			// Process messages claimed
 			const [processError] = await processMessages({
 				messages: [...pubMsgResult, ...queueMessages],
 				batchId,
 				scriptRegistry,
 				removeBuffer
 			});
-			console.log({ processError });
+			if (processError) throw new Error(processError);
 		}
-
 		return [
 			undefined,
 			{
@@ -89,7 +74,6 @@ module.exports = async ({ removeBuffer = false }) => {
 			}
 		];
 	} catch (error) {
-		console.log({ error });
 		return [error, undefined];
 	}
 };

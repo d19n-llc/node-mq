@@ -1,13 +1,15 @@
 const MessageInflightResourceClass = require("../../resources/message-inflight");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const { seriesLoop } = require("../../helpers/functions");
-
-module.exports = async (params = {}) => {
-	const { batchId } = params;
+/**
+ *
+ *
+ * @param {*} { batchId }
+ * @returns
+ */
+module.exports = async ({ batchId }) => {
 	const MessageInflightResource = new MessageInflightResourceClass();
 	const MessageQueuedResource = new MessageQueuedResourceClass();
-
-	console.log("ROLLING BACK MESSAGES FROM INFLIGHT");
 
 	try {
 		const [findError, findResult] = await MessageInflightResource.findMany({

@@ -34,16 +34,14 @@ response: {
 
 // Create a new publisher
 
-const publisher = Publisher.constructor({
+const publisher = PublisherFactory({
   body: { publisherUrl: response.publisherUrl, subscriberId: response._id
 });
 
 // Store the publisher
-
-AddPublisher({body: publisher}, (err,res) => {
-  console.log(err,res);
-});
-
+const PublisherResource = new PublisherResourceClass();
+const [error, result] = PublisherResource({body: publisher});
+console.log(error, result);
 ```
 
 For Example messages with a topic of i.e ["job", "projects", "programs"] will be published
@@ -65,7 +63,7 @@ require("@d19n/node-mq);
 ```
 MQ_MONGODB_URL=mongodb+srv://<user></user>:<password></password>@test-nbfdp.mongodb.net/test?retryWrites=true&w=majority
 MQ_MONGODB_NAME=<db_name>
-MQ_API_ACCESS_TOKEN=
+MQ_API_ACCESS_TOKEN=<HEADER_ACCESS_TOKEN>
 
 ```
 

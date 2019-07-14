@@ -5,7 +5,6 @@ const FailedResourceClass = require("../../resources/message-failed");
 module.exports = async ({ currentMessage, batchId, errorMessage }) => {
 	const InFlightResource = new InFlightResourceClass();
 	const FailedResource = new FailedResourceClass();
-	console.log("CLEANING ITEMS");
 	try {
 		// Rollback all messages for this batch from inflight to the queue
 		const [removeError] = await InFlightResource.deleteOne({

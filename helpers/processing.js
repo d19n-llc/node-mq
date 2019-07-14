@@ -23,7 +23,6 @@ module.exports.isPastQueueBuffer = (params) => {
 	const { messageCreatedAt } = params;
 	const currentTime = currentDayIso();
 	const difference = getDiffIndates(currentTime, messageCreatedAt, "seconds");
-	console.log({ difference });
 	if (difference > 15) {
 		return true;
 	}

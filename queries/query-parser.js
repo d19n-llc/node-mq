@@ -78,14 +78,12 @@ exports.BaseQuery = (params) => {
 		const hasNumberOrDateKey = !!activeNumberOrDateKeys.length;
 		const hasArrayKey = !!activeArrayKeys.length;
 
-		console.log({ hasArrayKey });
 		if (hasArrayKey) {
 			// for dates and numbers we need to search on the converted key rather than the original
 			parsedQuery["$match"] = {
 				...parsedQuery["$match"],
 				[key]: { ...currentElement }
 			};
-			console.log({ parsedQuery: parsedQuery["$match"] });
 		}
 		// if we are using fields like gte or lt, we need to convert this to string before we can use gte or lt operator.
 		if (hasNumberOrDateKey) {

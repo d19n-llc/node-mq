@@ -3,7 +3,12 @@ const InFlightResourceClass = require("../../resources/message-inflight");
 const { seriesLoop } = require("../../helpers/functions");
 const { isPastQueueBuffer } = require("../../helpers/processing");
 const handleCleanUpOnError = require("./clean-up");
-
+/**
+ *
+ *
+ * @param {*} { messages, batchId, removeBuffer }
+ * @returns
+ */
 module.exports = async ({ messages, batchId, removeBuffer }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const InFlightResource = new InFlightResourceClass();
@@ -13,20 +18,12 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 	try {
 		await seriesLoop(messages, async (message) => {
 			currentMessage = Object.assign({}, message, { batchId });
-			console.log({ currentMessage });
-			console.log("CLAIMING MESSAGES", {
-				pastBuffer: isPastQueueBuffer({
-					messageCreatedAt: message.createTime
-				}),
-				messages: messages.length
-			});
+
 			if (
 				isPastQueueBuffer({ messageCreatedAt: currentMessage.createTime }) ||
 				removeBuffer
 			) {
-				console.log("PAST QUEUE, CLAIM MESSAGES");
-
-				console.log("REMOVE FROM QUEUE");
+				// Remove from the queue
 				const [removeError] = await MessageQueuedResource.deleteOne({
 					query: { _id: currentMessage._id }
 				});
@@ -37,7 +34,8 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 						errorMessage: removeError.message
 					});
 				}
-				console.log("MOVE TO INFLIGHT");
+
+				// Move to inflight
 				const [inflightError] = await InFlightResource.createOne({
 					object: currentMessage
 				});

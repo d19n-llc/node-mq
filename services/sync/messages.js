@@ -24,7 +24,6 @@ module.exports = async (params = {}) => {
 					}
 				},
 				(err, res) => {
-					console.log("messages", { res });
 					if (err) throw new Error(err);
 					resolve();
 				}
@@ -33,7 +32,6 @@ module.exports = async (params = {}) => {
 	}
 
 	try {
-		console.log({ subsciberResponse });
 		// Loop over each publisher stored locally
 		// await fetchPublishers();
 		// await fetchPublisherMessages();

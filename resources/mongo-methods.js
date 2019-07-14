@@ -26,7 +26,6 @@ module.exports = {
 				{ $set: data },
 				{ upsert, returnOriginal: false }
 			);
-			console.log({ docs });
 			return [undefined, docs];
 			// if (value) {
 			// 	return [undefined, value];

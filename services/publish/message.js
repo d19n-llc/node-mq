@@ -1,10 +1,13 @@
 const internalHttp = require("../../http/requests");
 const { seriesLoop } = require("../../helpers/functions");
 const SubscriberResourceClass = require("../../resources/subscriber");
-
-module.exports = async (params = {}) => {
-	console.log("PUBLISH MESSAGE");
-	const { message } = params;
+/**
+ *
+ *
+ * @param {*} { message }
+ * @returns
+ */
+module.exports = async ({ message }) => {
 	let lastUpdateError = {};
 	const SubscriberResource = new SubscriberResourceClass();
 
@@ -14,7 +17,6 @@ module.exports = async (params = {}) => {
 	 * @returns
 	 */
 	function sendMessageToSubscriber({ subscriberUrl }) {
-		console.log(process.cwd(), { subscriberUrl });
 		return new Promise((resolve, reject) => {
 			internalHttp.POST(
 				{
@@ -41,10 +43,8 @@ module.exports = async (params = {}) => {
 			}
 		});
 		if (findError) throw new Error(findError);
-		console.log(process.cwd(), { findResult });
 
 		await seriesLoop(findResult, async (doc, index) => {
-			console.log(process.cwd(), { doc });
 			if (doc) {
 				await sendMessageToSubscriber({ subscriberUrl: doc.subscriberUrl });
 
@@ -58,7 +58,6 @@ module.exports = async (params = {}) => {
 
 		return [undefined, { status: "messages published to subscribers" }];
 	} catch (error) {
-		console.log(process.cwd(), { error });
 		return [error, undefined];
 	}
 };

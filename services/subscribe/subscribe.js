@@ -26,7 +26,6 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 					}
 				},
 				(err, res) => {
-					console.log("subscribed", { res });
 					publisherResponse = res;
 					if (err) throw new Error(err);
 					resolve();
@@ -44,9 +43,6 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 				subscriberId: publisherResponse.value._id || "no_id"
 			}
 		});
-
-		console.log({ createResult });
-
 		if (createError) throw new Error(createError);
 
 		return [
@@ -54,7 +50,6 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 			{ status: `Successfully subscribed to ${process.env.APP_NAME}` }
 		];
 	} catch (error) {
-		console.log({ error });
 		return [error, undefined];
 	}
 };
