@@ -11,7 +11,7 @@ const ProcessMessageTest = require("../../scripts/test/process-a-message");
 const { PublishMessage } = require("../../services/publish/message");
 
 const pathToScripts = `${process.cwd()}/mq-scripts`;
-let scriptRegistry = null;
+let scriptRegistry = {};
 try {
 	if (fs.existsSync(pathToScripts)) {
 		scriptRegistry = require(`${process.cwd()}/mq-scripts`);
@@ -66,72 +66,88 @@ module.exports = async ({ removeBuffer = false }) => {
 		const [removeError] = await InFlightResource.deleteOne({
 			id: currentMessage._id
 		});
-		if (removeError) return [removeError, undefined];
+		if (removeError) throw new Error(removeError);
 		// Move the message that caused an error to failed
 		const [failError] = await FailedResource.createOne({
 			body: Object.assign({}, currentMessage, {
 				error: { message: error.message }
 			})
 		});
-		if (failError) return [failError, undefined];
+		if (failError) throw new Error(failError);
 		// Rolback jobs unprocessed into the queue
 		const [rollbackError] = await inflightRollBack({ batchId });
 		if (rollbackError) return [rollbackError, undefined];
-		return { status: "messages inflight clean up complete." };
+		return [undefined, { status: "messages inflight clean up complete." }];
 	}
 
-	// This will process functions in parallel for anything that can be handled asynchronously
+	// Using the query.. we want to ensure we have a script to process the topics.
+	// before we try to handle them.
 	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
-		query: { resultsPerPage: 25, sortAscending: "priority" }
+		query: {
+			resultsPerPage: 25,
+			sortAscending: "priority",
+			topic: {
+				$in: [
+					...Object.keys(scriptRegistry),
+					...[process.env.APP_NAME, "internal-test"]
+				]
+			}
+		}
 	});
 	if (queueError) return [queueError, undefined];
 	// Claim jobs
-	await seriesLoop(queueMessages, async (message) => {
-		if (
-			isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
-			removeBuffer
-		) {
+	if (queueMessages.length > 0) {
+		await seriesLoop(queueMessages, async (message) => {
+			if (
+				isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
+				removeBuffer
+			) {
+				currentMessage = message;
+				const [removeError] = await MessageQueuedResource.deleteOne({
+					id: currentMessage._id
+				});
+				if (removeError) {
+					handleCleanUpOnError({ error: removeError });
+				}
+				const [inflightError] = await InFlightResource.createOne({
+					body: currentMessage
+				});
+				if (inflightError) {
+					handleCleanUpOnError({ error: inflightError });
+				}
+			}
+		});
+		// process jobs
+		await seriesLoop(queueMessages, async (message, index) => {
 			currentMessage = message;
-			const [removeError] = await MessageQueuedResource.deleteOne({
-				id: currentMessage._id
-			});
-			if (removeError) {
-				handleCleanUpOnError({ error: removeError });
+			if (
+				isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
+				removeBuffer
+			) {
+				const [processingError] = await processMessage({
+					message
+				});
+				if (processingError) {
+					handleCleanUpOnError({ error: processingError });
+				}
+				const [removeError] = await InFlightResource.deleteOne({
+					id: currentMessage._id
+				});
+				if (removeError) {
+					handleCleanUpOnError({ error: removeError });
+				}
+				const [moveError] = await ProcessedResource.createOne({
+					body: currentMessage
+				});
+				if (moveError) {
+					handleCleanUpOnError({ error: moveError });
+				}
 			}
-			const [inflightError] = await InFlightResource.createOne({
-				body: currentMessage
-			});
-			if (inflightError) {
-				handleCleanUpOnError({ error: inflightError });
-			}
-		}
-	});
-	// process jobs
-	await seriesLoop(queueMessages, async (message, index) => {
-		currentMessage = message;
-		if (
-			isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
-			removeBuffer
-		) {
-			const [processingError] = await processMessage({
-				message
-			});
-			if (processingError) {
-				handleCleanUpOnError({ error: processingError });
-			}
-			const [removeError] = await InFlightResource.deleteOne({
-				id: currentMessage._id
-			});
-			if (removeError) {
-				handleCleanUpOnError({ error: removeError });
-			}
-			const [moveError] = await ProcessedResource.createOne({
-				body: currentMessage
-			});
-			if (moveError) {
-				handleCleanUpOnError({ error: moveError });
-			}
-		}
-	});
-	return [undefined, { status: "messages processed successfully" }];
+		});
+	}
+
+	return [
+		undefined,
+		{ status: "messages processed", totalMessages: queueMessages.length }
+	];
 };

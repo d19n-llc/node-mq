@@ -102,7 +102,6 @@ module.exports = async (params = {}) => {
 			}
 		];
 	} catch (error) {
-		console.log({ error });
 		return [error, undefined];
 	}
 };

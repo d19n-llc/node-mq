@@ -25,11 +25,8 @@ const distinctAllowedKeys = [...new Set(allowedKeys)];
 
 exports.BaseQuery = (params) => {
 	const { query } = params;
-	console.log({ query });
 	const parsedQuery = {
-		$match: {
-			// endEstimated: { $ne: "" }
-		}
+		$match: {}
 	};
 	const extensions = [];
 	const sorts = { $sort: {} };
@@ -84,7 +81,7 @@ exports.BaseQuery = (params) => {
 					"YYYY-MM-DD"
 				) === currentElement[sampleNumberOrDateKey];
 			// convert to number or date depending on type
-			console.log({ isDate });
+
 			if (isDate) {
 				conversionStagePrior.$addFields[`${key}Converted`] = {
 					$dateFromString: {
@@ -94,7 +91,6 @@ exports.BaseQuery = (params) => {
 				};
 				// swap all valuues in the current element to be dates - ie {$gte: "100", $lt: "120"} becomes {$gte: 100, $lt: 120}
 				activeNumberOrDateKeys.forEach((relevantDateKey) => {
-					console.log(new Date(currentElement[relevantDateKey]));
 					currentElement[relevantDateKey] = new Date(
 						currentElement[relevantDateKey]
 					);
@@ -134,7 +130,6 @@ exports.BaseQuery = (params) => {
 		}
 	});
 
-	console.log("parsedQuery[$match]", parsedQuery["$match"]);
 	const queryPipeline = [parsedQuery, ...extensions];
 	// if there is a prior conversion to be performed, add it to the beginning of the pipeline
 	if (Object.keys(conversionStagePrior.$addFields).length) {
@@ -144,6 +139,6 @@ exports.BaseQuery = (params) => {
 	if (Object.keys(conversionStageAfter.$addFields).length) {
 		queryPipeline.push(conversionStageAfter);
 	}
-	console.log({ queryPipeline });
+
 	return { queryPipeline };
 };

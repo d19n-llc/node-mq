@@ -19,31 +19,6 @@ class SubscriberResource extends BaseResource {
 			factory: SubscriberFactory
 		});
 	}
-
-	/**
-	 *
-	 *
-	 * @param {*} request
-	 * @param {*} response
-	 * @param {*} next
-	 * @returns
-	 * @memberof SubscriberResource
-	 */
-	async createOne(params) {
-		try {
-			const { body } = params;
-			const [createError, createResult] = await super.createOne({
-				object: body,
-				query: {
-					subscriberUrl: body.subscriberUrl
-				}
-			});
-			if (createError) throw new Error(createError);
-			return [undefined, createResult];
-		} catch (error) {
-			return [error, undefined];
-		}
-	}
 }
 
 module.exports = SubscriberResource;

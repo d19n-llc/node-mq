@@ -15,15 +15,21 @@ module.exports.RunTests = async () => {
 			const [processError, processResult] = await processMessages({});
 			if (processError) throw new Error(processError);
 			processResponse = processResult;
+			console.log("PROCESSED MESSAGES");
 
 			const [retryError, retryResult] = await retryMessages({});
 			if (retryError) throw new Error(retryError);
 			retryResponse = retryResult;
+			console.log("RETRIED MESSAGES");
 		});
+
 		const [deleteError, deleteResult] = await deleteMessages({});
 		if (deleteError) throw new Error(deleteError);
-
-		return [seedResult, processResponse, retryResponse, deleteResult];
+		console.log("DELETED MESSAGES");
+		return [
+			undefined,
+			{ seedResult, processResponse, retryResponse, deleteResult }
+		];
 	} catch (error) {
 		console.log("error", error);
 		return [error, undefined];
