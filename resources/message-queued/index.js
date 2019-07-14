@@ -30,13 +30,13 @@ class MessageQueuedResource extends BaseResource {
 	 * @memberof MessageQueuedResource
 	 */
 	async createOne(params) {
-		const { body } = params;
+		const { object } = params;
 		try {
 			const [createError, createResult] = await super.createOne({
-				object: body,
+				object,
 				query: {
-					source: body.source,
-					name: body.name
+					source: object.source,
+					name: object.name
 				}
 			});
 

@@ -69,7 +69,7 @@ module.exports = async ({ removeBuffer = false }) => {
 		if (removeError) throw new Error(removeError);
 		// Move the message that caused an error to failed
 		const [failError] = await FailedResource.createOne({
-			body: Object.assign({}, currentMessage, {
+			object: Object.assign({}, currentMessage, {
 				error: { message: error.message }
 			})
 		});
@@ -110,7 +110,7 @@ module.exports = async ({ removeBuffer = false }) => {
 					handleCleanUpOnError({ error: removeError });
 				}
 				const [inflightError] = await InFlightResource.createOne({
-					body: currentMessage
+					object: currentMessage
 				});
 				if (inflightError) {
 					handleCleanUpOnError({ error: inflightError });
@@ -137,7 +137,7 @@ module.exports = async ({ removeBuffer = false }) => {
 					handleCleanUpOnError({ error: removeError });
 				}
 				const [moveError] = await ProcessedResource.createOne({
-					body: currentMessage
+					object: currentMessage
 				});
 				if (moveError) {
 					handleCleanUpOnError({ error: moveError });

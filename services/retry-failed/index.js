@@ -22,7 +22,7 @@ module.exports = async (params = {}) => {
 					createError,
 					createResult
 				] = await MessageQueuedResource.createOne({
-					body: Object.assign({}, message, {
+					object: Object.assign({}, message, {
 						batchId: "",
 						retriedCount: message.retriedCount + 1
 					})

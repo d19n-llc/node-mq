@@ -31,12 +31,12 @@ class MessageInflightResource extends BaseResource {
 	 */
 	async createOne(params) {
 		try {
-			const { body } = params;
+			const { object } = params;
 			const [createError, createResult] = await super.createOne({
-				object: body,
+				object,
 				query: {
-					source: body.source,
-					name: body.name
+					source: object.source,
+					name: object.name
 				}
 			});
 			if (createError) throw new Error(createError);

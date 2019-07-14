@@ -19,7 +19,7 @@ module.exports = async (params = {}) => {
 					createError,
 					createResult
 				] = await MessageQueuedResource.createOne({
-					body: Object.assign({}, job, { batchId: "" })
+					object: Object.assign({}, job, { batchId: "" })
 				});
 				if (createError) throw new Error(createError);
 			});

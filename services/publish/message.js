@@ -35,18 +35,24 @@ module.exports = async (params = {}) => {
 	 */
 	try {
 		const [findError, findResult] = await SubscriberResource.findMany({
-			query: { topics: { $in: [message.topic] } }
+			query: {
+				userAccountId: message.userAccountId,
+				topics: { $in: [message.topic] }
+			}
 		});
 		if (findError) throw new Error(findError);
 
-		await seriesLoop(subscribers, async (doc, index) => {
-			await sendMessageToSubscriber({ subscriberUrl: doc.subscriberUrl });
+		await seriesLoop(findResult, async (doc, index) => {
+			console.log(process.cwd(), { doc });
+			if (doc) {
+				await sendMessageToSubscriber({ subscriberUrl: doc.subscriberUrl });
 
-			const [updateError, updateResult] = await SubscriberResource.updateOne({
-				id: doc._id,
-				body: { subscriberUrl: doc.subscriberUrl, lastUpdateError }
-			});
-			if (updateError) throw new Error(updateError);
+				const [updateError, updateResult] = await SubscriberResource.updateOne({
+					id: doc._id,
+					object: { subscriberUrl: doc.subscriberUrl, lastUpdateError }
+				});
+				if (updateError) throw new Error(updateError);
+			}
 		});
 
 		return [undefined, { status: "messages published to subscribers" }];
