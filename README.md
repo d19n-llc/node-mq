@@ -10,9 +10,7 @@ the queued messages, scale your apps horizontally and the node-mq handles
 deduplication and batch processing to prevent processing a message more than once.
 
 When deploying a new micro service into your network, install the node-mq package,
-then subscribe to other micro services using this package by sending a POST requst
-to the <APP_URL>/mq-subscriber endpoint to begin a recieving messages from the
-micro service you have subscribed to.
+then subscribe to other micro services using this package.
 
 Road Map:
 
@@ -20,43 +18,9 @@ Road Map:
 2. Sync with publishers after a service outage. This will batch fetch
    all messages after the last recieved message from all publishers.
 
-```
-
-POST http://localhost:3000/api/mq-subscriber
-// pass in the body
-body: {
-"subscriberUrl": "http://requestbin.fullcontact.com/13oqj921",
-"topics":["job", "projects", "programs"]
-}
-
-// the response will be the _id of the subsciber and the publisher url where
-// you can access messages processed. (Save this reponse in the publisher)
-// collection
-
-response: {
-    "_id": "5d129253976c8f0e83950363",
-    "publisherUrl": "http://127.0.0.1:8083/api/mq-message"
-}
-
-// Create a new publisher
-
-const publisher = PublisherFactory({
-  body: { publisherUrl: response.publisherUrl, subscriberId: response._id
-});
-
-// Store the publisher
-const PublisherResource = new PublisherResourceClass();
-const [error, result] = PublisherResource({body: publisher});
-console.log(error, result);
-```
-
-For Example messages with a topic of i.e ["job", "projects", "programs"] will be published
-to the subsciberUrl if the subscriber is subscribed to one or all of those topics.
-
 ## Getting Started
 
 1.) yarn add @d19n/node-mq or npm install @d19n/node-mq
-
 2.) import the package in your server.js file
 
 ```
@@ -73,15 +37,7 @@ MQ_API_ACCESS_TOKEN=<HEADER_ACCESS_TOKEN>
 
 ```
 
-4.) from your terminal cd into your project directory and run the following
-command to create all the collections used by node-mq.
-
-```
-node -e 'require("@d19n/node-mq").CreateCollections()'
-node -e 'require("@d19n/node-mq").RunTests()'
-```
-
-5.) The message queue exports routes for you to use in your app. Our routes/index.js
+4.) The message queue exports routes for you to use in your app. Our routes/index.js
 file is setup to merge routers into a single app router. An example is below for
 how we merge routers.
 
@@ -119,30 +75,31 @@ the message queue will import this file to access all scripts registered by topi
 
 Set the key equal to the message "topic" for your script to be processed.
 The value is the module you want the queue processor to run when a message
-with the topic equal to the registered script "key"
+with the topic matches the key in your mq-scripts.js file.
 
 ```
-const jobMessageScript = require("path/to/script");
-const projectMessageScript = require("path/to/script");
-const programMessageScript = require("path/to/script");
-const customJobScript = require("path/to/script");
-const customJobTwoScript = require("path/to/script");
+const handleJobMessages = require("path/to/script");
+const handleProjectMessages = require("path/to/script");
+const handleProgrammessages = require("path/to/script");
+const handleCustomJob1 = require("path/to/script");
+const handleCustomJob2 = require("path/to/script");
 
 // [topic]: function()
 module.exports = {
-  jobs: jobMessageScript,
-  projects: projectMessageScript,
-  programs: programMessageScript,
-  customJob1: customJobScript,
-  customJob2: customJobTwoScript,
+  jobs: handleJobMessages,
+  projects: handleProjectMessages,
+  programs: handleProgrammessages,
+  customJob1: handleCustomJob1,
+  customJob2: handleCustomJob2,
 };
 ```
 
 7.) To create a pub / sub relationship with another micro service using the
-@d19n/node-mq package. you can run the following command.
+@d19n/node-mq package. you can run the following command from the root directory
+of your project.
 
 ```
-node -e 'require("@d19n/node-mq").SubscribeToPublisher({publisherUrl: "", topics: []})'
+node -e 'require("@d19n/node-mq").SubscribeToPublisher({publisherUrl: "http://localhost:8080", topics: ["programs", "projects", "jobs"]})'
 
 ```
 
@@ -199,7 +156,7 @@ MessageFactory(
   { isUpdating: false }
 );
 
-const [error, result ] = MessageQueueResource.createOne({object: message});
+const [error, result ] = await MessageQueueResource.createOne({object: message});
 console.log({error, result});
 
 ```
@@ -229,6 +186,6 @@ const message = MessageFactory(
   { isUpdating: false }
 );
 
-const [error, result ] = MessageQueueResource.createOne({object: message});
+const [error, result ] = await MessageQueueResource.createOne({object: message});
 console.log({error, result});
 ```
