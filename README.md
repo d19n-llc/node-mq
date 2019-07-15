@@ -220,7 +220,10 @@ const message = MessageFactory(
     topic: jobs,
     source: process.env.APP_URL,
     action: "update",
-    payload: {name: "Job name", cost: 500},
+    payload: {
+      name: "Job name",
+      cost: 500
+    },
     priority: 1
   },
   { isUpdating: false }
