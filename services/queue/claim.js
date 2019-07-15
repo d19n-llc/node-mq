@@ -18,7 +18,11 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 	try {
 		await seriesLoop(messages, async (message) => {
 			currentMessage = Object.assign({}, message, { batchId });
-
+			console.log(
+				"CLAIM MESSAGES",
+				isPastQueueBuffer({ messageCreatedAt: currentMessage.createTime }) ||
+					removeBuffer
+			);
 			if (
 				isPastQueueBuffer({ messageCreatedAt: currentMessage.createTime }) ||
 				removeBuffer

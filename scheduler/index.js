@@ -16,15 +16,18 @@ const { offsetJobStart } = require("../helpers/processing");
 
 function Scheduler() {
 	schedule.scheduleJob("1 * * * * *", () => {
+		console.log("mq deduplicating messages...");
 		deduplicateQueue({});
 	});
 	schedule.scheduleJob("2 * * * * *", async () => {
 		await offsetJobStart();
-		retryFailedMessages({});
+		console.log("mq processing messages...");
+		processQueuedMessages({});
 	});
 	schedule.scheduleJob("2 * * * * *", async () => {
 		await offsetJobStart();
-		processQueuedMessages({});
+		console.log("mq retrying failed messages...");
+		retryFailedMessages({});
 	});
 }
 

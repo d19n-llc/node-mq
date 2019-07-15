@@ -3,17 +3,6 @@ const uuidv1 = require("uuid/v1");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const claimMessages = require("./claim");
 const processMessages = require("./process");
-
-// Load the queue scripts
-const pathToScripts = `${process.cwd()}/mq-scripts`;
-let scriptRegistry = {};
-try {
-	if (fs.existsSync(pathToScripts)) {
-		scriptRegistry = require(`${process.cwd()}/mq-scripts`);
-	}
-} catch (err) {
-	console.error(err);
-}
 /**
  *
  *
@@ -21,10 +10,29 @@ try {
  * @returns
  */
 module.exports = async ({ removeBuffer = false }) => {
+	// Load the queue scripts
+	const pathToScripts = `${process.cwd()}/mq-scripts`;
+	console.log({ pathToScripts });
+	let scriptRegistry = {};
+	console.log(fs.existsSync(pathToScripts));
+	try {
+		scriptRegistry = require(`${process.cwd()}/mq-scripts`);
+		console.log({ scriptRegistry1: scriptRegistry });
+	} catch (err) {
+		// set to default
+		scriptRegistry = {};
+		console.error(err);
+	}
+	console.log({ scriptRegistry });
+
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	// Set a batchId for the messages being processed
 	const batchId = uuidv1();
-
+	console.log({
+		topic: {
+			$in: [...Object.keys(scriptRegistry), ...["internal-test"]]
+		}
+	});
 	// Messages to be processed
 	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 		query: {
@@ -35,6 +43,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			}
 		}
 	});
+	console.log({ queueMessages });
 	if (queueError) throw new Error(queueError);
 
 	// Messages to be published out to subscribers
@@ -51,20 +60,22 @@ module.exports = async ({ removeBuffer = false }) => {
 	try {
 		if ([...pubMsgResult, ...queueMessages].length > 0) {
 			// Claim messages to be processed
-			const [claimError] = await claimMessages({
+			const [claimError, claimResult] = await claimMessages({
 				messages: [...pubMsgResult, ...queueMessages],
 				batchId,
 				removeBuffer
 			});
 			if (claimError) throw new Error(claimError);
+			console.log({ claimResult });
 			// Process messages claimed
-			const [processError] = await processMessages({
+			const [processError, processResult] = await processMessages({
 				messages: [...pubMsgResult, ...queueMessages],
 				batchId,
 				scriptRegistry,
 				removeBuffer
 			});
 			if (processError) throw new Error(processError);
+			console.log({ processResult });
 		}
 		return [
 			undefined,
