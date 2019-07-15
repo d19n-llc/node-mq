@@ -21,6 +21,7 @@ Road Map:
 ## Getting Started
 
 1.) yarn add @d19n/node-mq or npm install @d19n/node-mq
+
 2.) import the package in your server.js file
 
 ```
