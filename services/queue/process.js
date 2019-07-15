@@ -5,6 +5,7 @@ const handleCleanUpOnError = require("./clean-up");
 const InFlightResourceClass = require("../../resources/message-inflight");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
+const SubscriberResourceClass = require("../../resources/subscriber");
 const PublishMessage = require("../publish/message");
 /**
  *
@@ -25,6 +26,8 @@ module.exports = async ({
 }) => {
 	const InFlightResource = new InFlightResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
+	const SubscriberResource = new SubscriberResourceClass();
+
 	let currentMessage = {};
 
 	/**
@@ -65,7 +68,6 @@ module.exports = async ({
 				isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
 				removeBuffer
 			) {
-				console.log("PROCESSING MESSAGE");
 				const { source, topic } = message;
 				// Test processing works.
 				if (source === "test-script") {
@@ -79,10 +81,9 @@ module.exports = async ({
 					} else {
 						handleProcessedMessage();
 					}
-				}
-				// If the source is the APP_URL that means this message should be published
-				// to all subscribers.
-				if (source === process.env.APP_URL) {
+				} else if (source === process.env.APP_URL) {
+					// If the source is the APP_URL that means this message should be published
+					// to all subscribers and not processed internally with the script registry.
 					const [error, result] = await PublishMessage({ message });
 					if (error) {
 						await handleCleanUpOnError({
@@ -93,10 +94,11 @@ module.exports = async ({
 					} else {
 						handleProcessedMessage();
 					}
-				}
-
-				// Handle messages
-				if (scriptRegistry[`${topic}`]) {
+				} else if (
+					source !== process.env.APP_URL &&
+					scriptRegistry[`${topic}`]
+				) {
+					// If the source is not the current APP and their is a script then
 					// Use the script with the key === to the message topic
 					const [error, result] = await scriptRegistry[`${topic}`]({
 						message
