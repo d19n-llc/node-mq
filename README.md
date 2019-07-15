@@ -7,9 +7,9 @@ A distributed messaging queue built for Node.js/express applications and designe
 for a horizontally scalling micro service architecture. You can have
 applications running in clusters and on multiple servers working to satisfy
 the queued messages, scale your apps horizontally and the node-mq handles
-deduplication and batch processing to prevent processing a message more than once.
+deduplication and batching to prevent processing a message more than once.
 
-When deploying a new micro service into your network, install the node-mq package,
+When deploying a new application into your network, install the node-mq package,
 then subscribe to other micro services using this package.
 
 Road Map:
@@ -42,7 +42,9 @@ MQ_API_ACCESS_TOKEN=<HEADER_ACCESS_TOKEN>
 file is setup to merge routers into a single app router. An example is below for
 how we merge routers.
 
-Copy & Paste the following express routers to your routes index.js file.
+Copy & Paste the following express routers to your routes **index.js** file. You
+can see an example of how we export a route file.
+https://github.com/FTruglio/d19n-node-mq/blob/01ee47c4437bcf58654e6a52d61b5046e81b51ef/routes/publisher/index.js
 
 ```
 const express = require("express");
@@ -70,7 +72,7 @@ router.stack = combineRouters;
 module.exports = router;
 ```
 
-6.) Create a file in your root directory named "mq-scripts.js" and register
+6.) Create a file in your root directory named **"mq-scripts.js"** and register
 all the scripts that you want to have the mq run when messages are added to the queue.
 the message queue will import this file to access all scripts registered by topic.
 
