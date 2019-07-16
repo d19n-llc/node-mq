@@ -109,7 +109,7 @@ allows [ x-request-source, Content-type, Accept ] headers or requests might fail
 headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
-    "x-request-source": "node-mq",
+    "request-source": "node-mq",
     ...httpHeaders
   },
 
