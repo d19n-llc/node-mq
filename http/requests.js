@@ -1,5 +1,15 @@
 const axios = require("axios");
 
+let httpHeaders = {};
+try {
+	const config = require(`${process.cwd()}/mq-config`);
+	httpHeaders = config.httpHeaders;
+} catch (err) {
+	// set to default
+	httpHeaders = {};
+	console.error(err);
+}
+
 exports.GET = (params, callback) => {
 	const { url } = params;
 	// entity ex: tickets, macros etc..
@@ -10,8 +20,8 @@ exports.GET = (params, callback) => {
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
-			"X-source": "node-mq",
-			Authorization: "internal-auth-token-here"
+			"x-source": "node-mq",
+			...httpHeaders
 		}
 	})
 		.then((res) => {
@@ -32,8 +42,8 @@ exports.POST = (params, callback) => {
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
-			"X-source": "node-mq",
-			Authorization: "internal-auth-token-here"
+			"x-source": "node-mq",
+			...httpHeaders
 		},
 		data: payload
 	})
@@ -55,8 +65,8 @@ exports.PUT = (params, callback) => {
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
-			"X-source": "node-mq",
-			Authorization: "internal-auth-token-here"
+			"x-source": "node-mq",
+			...httpHeaders
 		},
 		data: payload
 	})

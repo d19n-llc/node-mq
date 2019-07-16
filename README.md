@@ -72,13 +72,13 @@ router.stack = combineRouters;
 module.exports = router;
 ```
 
-6.) Create a file in your root directory named **"mq-scripts.js"** and register
+6.) Create a file in your root directory named **"mq-config.js"** and register
 all the scripts that you want to have the mq run when messages are added to the queue.
 the message queue will import this file to access all scripts registered by topic.
 
 Set the key equal to the message "topic" for your script to be processed.
 The value is the module you want the queue processor to run when a message
-with the topic matches the key in your mq-scripts.js file.
+with the topic matches the key in your mq-config.js file.
 
 ```
 const handleJobMessages = require("path/to/script");
@@ -88,13 +88,31 @@ const handleCustomJob1 = require("path/to/script");
 const handleCustomJob2 = require("path/to/script");
 
 // [topic]: function()
-module.exports = {
+module.exports.messageHandlers = {
   jobs: handleJobMessages,
   projects: handleProjectMessages,
   programs: handleProgrammessages,
   customJob1: handleCustomJob1,
   customJob2: handleCustomJob2,
 };
+
+module.exports.httpHeaders = {
+	Authorisation: process.env.AUTH_TOKEN,
+	"X-Custom-Header": "<CUSTOM_HEADER_VALUE>"
+}
+```
+
+Example of the http headers in the message queue. Make sure your nginx config
+allows [ x-source, Content-type, Accept ] headers or requests might fail.
+
+```
+headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    "x-source": "node-mq",
+    ...httpHeaders
+  },
+
 ```
 
 7.) To create a pub / sub relationship with another micro service using the

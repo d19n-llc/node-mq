@@ -10,12 +10,13 @@ const processMessages = require("./process");
  */
 module.exports = async ({ removeBuffer = false }) => {
 	// Load the queue scripts
-	let scriptRegistry = {};
+	let messageHandlers = {};
 	try {
-		scriptRegistry = require(`${process.cwd()}/mq-scripts`);
+		const config = require(`${process.cwd()}/mq-config`);
+		messageHandlers = config.messageHandlers;
 	} catch (err) {
 		// set to default
-		scriptRegistry = {};
+		messageHandlers = {};
 		console.error(err);
 	}
 
@@ -28,7 +29,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			resultsPerPage: 100,
 			sortAscending: "priority",
 			topic: {
-				$in: [...Object.keys(scriptRegistry), ...["internal-test"]]
+				$in: [...Object.keys(messageHandlers), ...["internal-test"]]
 			}
 		}
 	});
@@ -59,7 +60,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			const [processError, processResult] = await processMessages({
 				messages: [...pubMsgResult, ...queueMessages],
 				batchId,
-				scriptRegistry,
+				messageHandlers,
 				removeBuffer
 			});
 			if (processError) throw new Error(processError);

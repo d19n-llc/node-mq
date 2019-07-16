@@ -14,8 +14,8 @@ const SubscriberFactory = require("./models/subscriber/factory");
 console.log("@d19n/node-mq is enabled");
 
 try {
-	const scriptRegistry = require(`${process.cwd()}/mq-scripts`);
-	console.log({ scriptRegistry });
+	const config = require(`${process.cwd()}/mq-config`);
+	console.log({ config });
 } catch (error) {
 	console.log({ error });
 }
