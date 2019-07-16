@@ -34,7 +34,6 @@ require("@d19n/node-mq);
 ```
 MQ_MONGODB_URL=mongodb+srv://<user></user>:<password></password>@test-nbfdp.mongodb.net/test?retryWrites=true&w=majority
 MQ_MONGODB_NAME=<db_name>
-MQ_API_ACCESS_TOKEN=<HEADER_ACCESS_TOKEN>
 
 ```
 
@@ -97,13 +96,13 @@ module.exports.messageHandlers = {
 };
 
 module.exports.httpHeaders = {
-	Authorisation: process.env.AUTH_TOKEN,
+	"Access-Token": process.env.API_ACCESS_TOKEN,
 	"X-Custom-Header": "<CUSTOM_HEADER_VALUE>"
 }
 ```
 
 Example of the http headers in the message queue. Make sure your nginx config
-allows [ x-request-source, Content-type, Accept ] headers or requests might fail.
+allows [ request-source, Content-type, Accept ] headers or requests might fail.
 
 ```
 headers: {
@@ -132,17 +131,7 @@ When a script is processed the queue will pass a message to your script.
 
 ```
 module.exports = ({ message }) => {
-	console.log("In your registered module", {
-    message: {
-      name: "", // a unique identifier for the message
-      source: process.env.APP_URL, // source of the message
-      topic: "", // provides context for the payload
-      action: "", // ["created", "updated", "deleted", "notification"]
-      priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high
-      maxRetries: 3,
-      payload: {}, // The data to be processed
-    }
-  });
+	console.log("In your registered module", { message });
   function handleMessage(){
     // Your custom code here to process a message
   }
