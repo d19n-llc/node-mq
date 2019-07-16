@@ -65,7 +65,7 @@ exports.PUT = (params, callback) => {
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
-			"x-source": "node-mq",
+			"x-request-source": "node-mq",
 			...httpHeaders
 		},
 		data: payload

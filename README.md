@@ -103,13 +103,13 @@ module.exports.httpHeaders = {
 ```
 
 Example of the http headers in the message queue. Make sure your nginx config
-allows [ x-source, Content-type, Accept ] headers or requests might fail.
+allows [ x-request-source, Content-type, Accept ] headers or requests might fail.
 
 ```
 headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
-    "x-source": "node-mq",
+    "x-request-source": "node-mq",
     ...httpHeaders
   },
 
