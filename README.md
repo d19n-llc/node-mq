@@ -156,7 +156,7 @@ MessageFactory(
     userAccountId: "5cf1a9f8b79aa40017af4c46",
     name: `custom-job-one`,
     topic: "customJob1",
-    source: process.env.APP_URL,
+    source: "internalProcess",
     action: "create",
     payload: {
       description: "Running a custom job script",
