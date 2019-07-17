@@ -5,7 +5,7 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 	require("dotenv").config({
 		path: `${process.cwd()}/.env`
 	});
-	
+
 	const PublisherResource = new PulbisherResourceClass();
 	const { publisherUrl, topics } = params;
 	const pathToSubscibe = `${publisherUrl}/api/mq-subscriber`;
@@ -31,8 +31,8 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 				},
 				(err, res) => {
 					publisherResponse = res;
-					if (err) throw new Error(err);
-					resolve();
+					if (err) return reject(err);
+					return resolve();
 				}
 			);
 		});
