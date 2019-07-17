@@ -1,6 +1,7 @@
 const axios = require("axios");
 
 let httpHeaders = {};
+
 try {
 	const config = require(`${process.cwd()}/mq-config`);
 	httpHeaders = config.httpHeaders;
@@ -10,70 +11,81 @@ try {
 	console.error(err);
 }
 
-exports.GET = (params, callback) => {
+exports.GET = async (params) => {
 	const { url } = params;
 	// entity ex: tickets, macros etc..
 	const baseRoute = `${url}`;
-	axios({
-		method: "get",
-		url: baseRoute,
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-			"request-source": "node-mq",
-			...httpHeaders
+	try {
+		const response = await axios({
+			method: "get",
+			url: baseRoute,
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"request-source": "node-mq",
+				...httpHeaders
+			}
+		});
+		return [undefined, response];
+	} catch (error) {
+		let errorMessage = error.message;
+		if (error.response) {
+			errorMessage = error.response.data.error;
 		}
-	})
-		.then((res) => {
-			callback(undefined, res.data);
-		})
-		.catch((err) => {
-			callback(err, undefined);
-		});
+		return [errorMessage, undefined];
+	}
 };
 
-exports.POST = (params, callback) => {
+exports.POST = async (params) => {
 	const { url, payload } = params;
 	// entity ex: tickets, macros etc..
 	const baseRoute = `${url}`;
-	axios({
-		method: "post",
-		url: baseRoute,
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-			"request-source": "node-mq",
-			...httpHeaders
-		},
-		data: payload
-	})
-		.then((res) => {
-			callback(undefined, res.data);
-		})
-		.catch((err) => {
-			callback(err, undefined);
+
+	try {
+		const response = await axios({
+			method: "post",
+			url: baseRoute,
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"request-source": "node-mq",
+				...httpHeaders
+			},
+			data: payload
 		});
+
+		return [undefined, response];
+	} catch (error) {
+		let errorMessage = error.message;
+		if (error.response) {
+			errorMessage = error.response.data.error;
+		}
+		return [errorMessage, undefined];
+	}
 };
 
-exports.PUT = (params, callback) => {
+exports.PUT = async (params) => {
 	const { url, payload } = params;
 	// entity ex: tickets, macros etc..
 	const baseRoute = `${url}`;
-	axios({
-		method: "put",
-		url: baseRoute,
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-			"request-source": "node-mq",
-			...httpHeaders
-		},
-		data: payload
-	})
-		.then((res) => {
-			callback(undefined, res.data);
-		})
-		.catch((err) => {
-			callback(err, undefined);
+	try {
+		const response = await axios({
+			method: "put",
+			url: baseRoute,
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"request-source": "node-mq",
+				...httpHeaders
+			},
+			data: payload
 		});
+		return [undefined, response];
+	} catch (error) {
+		let errorMessage = error.message;
+		if (error.response) {
+			errorMessage = error.response.data.error;
+		}
+		return [errorMessage, undefined];
+	}
 };

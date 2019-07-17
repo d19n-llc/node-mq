@@ -10,7 +10,7 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 	const { publisherUrl, topics } = params;
 	const pathToSubscibe = `${publisherUrl}/api/mq-subscriber`;
 	const pathToMessages = `${publisherUrl}/api/mq-message-processed`;
-	let publisherResponse = {};
+	const publisherResponse = {};
 
 	// Pass in the url to subscribe to a publisher
 	/**
@@ -18,28 +18,28 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 	 *
 	 * @returns
 	 */
-	function subscribeToPublisher() {
-		return new Promise((resolve, reject) => {
-			// custom logic here
-			internalHttp.POST(
-				{
-					url: pathToSubscibe,
-					payload: {
-						subscriberUrl: `${process.env.APP_URL}/api/mq-message-queued`,
-						topics
-					}
-				},
-				(err, res) => {
-					publisherResponse = res;
-					if (err) return reject(err);
-					return resolve();
+	async function subscribeToPublisher() {
+		// custom logic here
+		try {
+			const [error, result] = await internalHttp.POST({
+				url: pathToSubscibe,
+				payload: {
+					subscriberUrl: `${process.env.APP_URL}/api/mq-message-queued`,
+					topics
 				}
-			);
-		});
+			});
+
+			if (error) throw new Error(error);
+			return [undefined, result];
+		} catch (error) {
+			return [error, undefined];
+		}
 	}
 
 	try {
-		await subscribeToPublisher();
+		const [subscribeError, subscribeResult] = await subscribeToPublisher();
+		if (subscribeError) throw new Error(subscribeError);
+
 		const [createError, createResult] = await PublisherResource.createOne({
 			object: {
 				userAccountId: publisherResponse.value.userAccountId || "no_id",
