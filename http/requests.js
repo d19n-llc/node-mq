@@ -20,7 +20,7 @@ exports.GET = (params, callback) => {
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
-			"x-source": "node-mq",
+			"request-source": "node-mq",
 			...httpHeaders
 		}
 	})
@@ -42,7 +42,7 @@ exports.POST = (params, callback) => {
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
-			"x-source": "node-mq",
+			"request-source": "node-mq",
 			...httpHeaders
 		},
 		data: payload

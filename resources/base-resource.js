@@ -55,7 +55,7 @@ class BaseResource {
 
 			if (validationError) {
 				validationError.statusCode = 422;
-				return [validationError, undefined];
+				throw new Error(validationError);
 			}
 
 			const [error, result] = await findOneAndUpdate({
