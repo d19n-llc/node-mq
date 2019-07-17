@@ -30,9 +30,9 @@ exports.GET = async (params) => {
 	} catch (error) {
 		let errorMessage = error.message;
 		if (error.response) {
-			errorMessage = error.response.data.error;
+			errorMessage = error.response.data.error.message;
 		}
-		return [errorMessage, undefined];
+		return [new Error(errorMessage), undefined];
 	}
 };
 
@@ -58,9 +58,9 @@ exports.POST = async (params) => {
 	} catch (error) {
 		let errorMessage = error.message;
 		if (error.response) {
-			errorMessage = error.response.data.error;
+			errorMessage = error.response.data.error.message;
 		}
-		return [errorMessage, undefined];
+		return [new Error(errorMessage), undefined];
 	}
 };
 
@@ -84,8 +84,8 @@ exports.PUT = async (params) => {
 	} catch (error) {
 		let errorMessage = error.message;
 		if (error.response) {
-			errorMessage = error.response.data.error;
+			errorMessage = error.response.data.error.message;
 		}
-		return [errorMessage, undefined];
+		return [new Error(errorMessage), undefined];
 	}
 };
