@@ -1,5 +1,9 @@
 // eslint-disable-next-line global-require
 
+	require("dotenv").config({
+		path: `${process.cwd()}/.env`
+	});
+
 // const handleOrderMessages = require("path/to/module");
 // const handleProjectMessages = require("path/to/module");
 // const handleInvoiceMessages = require("path/to/module");

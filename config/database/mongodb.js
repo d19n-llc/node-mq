@@ -1,9 +1,8 @@
 const MongoClient = require("mongodb").MongoClient;
-const path = require("path");
 
 // For internal testing
 require("dotenv").config({
-	path: path.join(__dirname, "../../.env")
+	path: `${process.cwd()}/.env`
 });
 
 const databaseConnections = {};

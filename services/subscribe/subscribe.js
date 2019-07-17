@@ -2,6 +2,10 @@ const internalHttp = require("../../http/requests");
 const PulbisherResourceClass = require("../../resources/publisher");
 
 module.exports.SubscribeToPublisher = async (params = {}) => {
+	require("dotenv").config({
+		path: `${process.cwd()}/.env`
+	});
+	
 	const PublisherResource = new PulbisherResourceClass();
 	const { publisherUrl, topics } = params;
 	const pathToSubscibe = `${publisherUrl}/api/mq-subscriber`;
