@@ -11,6 +11,7 @@ module.exports = (params, options) => {
 		  {
 				_id: ObjectID().toString(),
 				userAccountId: "",
+				userId: "",
 				publisherUrl: "",
 				subscriberId: "",
 				lastMessageTime: ""

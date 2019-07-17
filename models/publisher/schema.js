@@ -5,6 +5,9 @@ module.exports = Joi.object()
 		userAccountId: Joi.string()
 			.optional()
 			.allow(""),
+		userId: Joi.string()
+			.optional()
+			.allow(""),
 		_id: Joi.when("$update", {
 			is: true,
 			then: Joi.strip(),

@@ -9,6 +9,7 @@ module.exports = (params, options) => {
 		: // isUpdating = false set default values
 		  {
 				userAccountId: "",
+				userId: "",
 				_id: ObjectID().toString(),
 				batchId: "", // added at the time the message is processed from the queue
 				name: "", // a unique identifier for the message

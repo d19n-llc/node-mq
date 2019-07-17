@@ -173,7 +173,8 @@ const MessageQueueResource = new MessageQueuedResourceClass();
 MessageFactory(
   {
     userAccountId: "5cf1a9f8b79aa40017af4c46",
-    name: `custom-job-one`,
+    userId: "5cf1a9f8b79aa40017af4c35",
+    name: `CustomJobOne-<Timestamp>`,
     topic: "customJob1",
     source: "internalProcess",
     action: "create",
@@ -202,6 +203,7 @@ const MessageQueueResource = new MessageQueuedResourceClass();
 const message = MessageFactory(
   {
     userAccountId: "5cf1a9f8b79aa40017af4c46",
+        userId: "5cf1a9f8b79aa40017af4c35",
     name: `update: jobs - <Timestamp>`,
     topic: jobs,
     source: process.env.APP_URL,

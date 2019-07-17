@@ -11,14 +11,13 @@ const PublisherFactory = require("./models/publisher/factory");
 const MessageFactory = require("./models/message/factory");
 const SubscriberFactory = require("./models/subscriber/factory");
 
-console.log("@d19n/node-mq is enabled");
-
 try {
 	const config = require(`${process.cwd()}/mq-config`);
-	console.log({ config });
 } catch (error) {
-	console.log({ error });
+	console.error(error);
 }
+
+console.log("@d19n/node-mq is running");
 
 module.exports = {
 	PublisherFactory,
