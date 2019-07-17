@@ -8,7 +8,6 @@ const SubscriberResourceClass = require("../../resources/subscriber");
  * @returns
  */
 module.exports = async ({ message }) => {
-	let lastUpdateError = {};
 	const SubscriberResource = new SubscriberResourceClass();
 
 	/**
@@ -16,19 +15,19 @@ module.exports = async ({ message }) => {
 	 *
 	 * @returns
 	 */
-	function sendMessageToSubscriber({ subscriberUrl }) {
-		return new Promise((resolve, reject) => {
-			internalHttp.POST(
-				{
-					url: `${subscriberUrl}`,
-					payload: message
-				},
-				(err, res) => {
-					lastUpdateError = { err };
-					return resolve();
-				}
-			);
-		});
+	async function sendMessageToSubscriber({ subscriberUrl }) {
+		// custom logic here
+		try {
+			const [error, result] = await internalHttp.POST({
+				url: `${subscriberUrl}`,
+				payload: message
+			});
+
+			if (error) throw new Error(error);
+			return [undefined, result];
+		} catch (error) {
+			return [error, undefined];
+		}
 	}
 
 	/**
@@ -46,11 +45,16 @@ module.exports = async ({ message }) => {
 
 		await seriesLoop(findResult, async (doc, index) => {
 			if (doc) {
-				await sendMessageToSubscriber({ subscriberUrl: doc.subscriberUrl });
+				const [publishError, publishResult] = await sendMessageToSubscriber({
+					subscriberUrl: doc.subscriberUrl
+				});
 
 				const [updateError, updateResult] = await SubscriberResource.updateOne({
 					query: { _id: doc._id },
-					object: { subscriberUrl: doc.subscriberUrl, lastUpdateError }
+					object: {
+						subscriberUrl: doc.subscriberUrl,
+						lastUpdateError: publishError
+					}
 				});
 				if (updateError) throw new Error(updateError);
 			}

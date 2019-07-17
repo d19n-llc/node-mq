@@ -5,7 +5,6 @@ const handleCleanUpOnError = require("./clean-up");
 const InFlightResourceClass = require("../../resources/message-inflight");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
-const SubscriberResourceClass = require("../../resources/subscriber");
 const PublishMessage = require("../publish/message");
 /**
  *
@@ -26,7 +25,6 @@ module.exports = async ({
 }) => {
 	const InFlightResource = new InFlightResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
-	const SubscriberResource = new SubscriberResourceClass();
 
 	let currentMessage = {};
 
