@@ -19,12 +19,12 @@ function Scheduler() {
 		console.log("mq deduplicating messages...");
 		deduplicateQueue({});
 	});
-	schedule.scheduleJob("2 * * * * *", async () => {
+	schedule.scheduleJob("5 * * * * *", async () => {
 		await offsetJobStart();
 		console.log("mq processing messages...");
 		processQueuedMessages({});
 	});
-	schedule.scheduleJob("2 * * * * *", async () => {
+	schedule.scheduleJob("30 * * * * *", async () => {
 		await offsetJobStart();
 		console.log("mq retrying failed messages...");
 		retryFailedMessages({});
