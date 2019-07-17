@@ -11,7 +11,7 @@ class MessageFailedResource extends BaseResource {
 	// eslint-disable-next-line no-useless-constructor
 	constructor(props) {
 		super({
-			collectionName: "messages_failed",
+			collectionName: "mq_messages_failed",
 			queryBuilder: MessageFailedQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
