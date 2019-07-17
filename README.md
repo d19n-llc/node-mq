@@ -140,6 +140,25 @@ module.exports = ({ message }) => {
 
 ```
 
+#### Error Handling
+
+9.) An example for your error handler in your Express App **server.js** file
+the global error handler can be found here. We send a message response back in json
+format with an http status code. Then in our http/requests.js file in the node-mq.
+We process the errors as a json object. This gives us more flexibility in the errors
+we can send when our applications has errors.
+
+```
+... All other code
+
+// Global error handler
+app.use((err, req, res, next) => {
+	if (!err.status) err.status = 500; // If err has no specified error code, set error code to 'Internal Server Error (500)'
+	res.status(err.status).send({ error: { message: err.message } }); // All HTTP requests must have a response, so let's send back an error with its status code and message
+});
+... All other code
+```
+
 ## Publishing a message
 
 1.) To create a scheduled Job. Create a message with the "topic" for a script you
