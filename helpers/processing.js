@@ -7,16 +7,15 @@ const { currentDayIso, getDiffIndates } = require("./dates");
  * @returns
  */
 module.exports.offsetJobStart = ({ addTime = 0 }) => {
-	console.log({ addTime });
 	/**
 	 * Returns a random number between min (inclusive) and max (exclusive)
+	 * If the app is running in cluster mode the addTime  represents the
+	 * appInstanceId and will be multiplied by 2000ms.
 	 */
 	const randomizeTime = (min, max) => Math.random() * (max - min) + min;
 	const offSetInterval = randomizeTime(0, 60000);
 	const convertedToMs = Number(addTime) * 2000;
-	console.log({ convertedToMs });
 	const delay = offSetInterval + convertedToMs;
-	console.log({ delay });
 	return new Promise((resolve) => setTimeout(resolve, delay));
 };
 

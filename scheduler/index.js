@@ -17,6 +17,7 @@ const { offsetJobStart } = require("../helpers/processing");
 function Scheduler() {
 	let queueSettings = {};
 	try {
+		// eslint-disable-next-line global-require
 		const config = require(`${process.cwd()}/mq-config`);
 		queueSettings = config.queueSettings;
 	} catch (err) {
