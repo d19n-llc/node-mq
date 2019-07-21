@@ -99,6 +99,12 @@ module.exports.httpHeaders = {
 	"Access-Token": process.env.API_ACCESS_TOKEN,
 	"X-Custom-Header": "<CUSTOM_HEADER_VALUE>"
 }
+
+module.exports.queueSettings = {
+	// Support applications running in clusters
+	// For PM2 this variable is declared in the ecosystem.config.js
+	appInstanceId: process.env.INSTANCE_ID
+};
 ```
 
 Example of the http headers in the message queue. Make sure your nginx config

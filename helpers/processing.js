@@ -6,13 +6,18 @@ const { currentDayIso, getDiffIndates } = require("./dates");
  *
  * @returns
  */
-module.exports.offsetJobStart = () => {
+module.exports.offsetJobStart = ({ addTime = 0 }) => {
+	console.log({ addTime });
 	/**
 	 * Returns a random number between min (inclusive) and max (exclusive)
 	 */
 	const randomizeTime = (min, max) => Math.random() * (max - min) + min;
-	const offSetInterval = randomizeTime(0, 50000);
-	return new Promise((resolve) => setTimeout(resolve, offSetInterval));
+	const offSetInterval = randomizeTime(0, 60000);
+	const convertedToMs = Number(addTime) * 2000;
+	console.log({ convertedToMs });
+	const delay = offSetInterval + convertedToMs;
+	console.log({ delay });
+	return new Promise((resolve) => setTimeout(resolve, delay));
 };
 
 /**

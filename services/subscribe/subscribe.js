@@ -2,6 +2,7 @@ const internalHttp = require("../../http/requests");
 const PulbisherResourceClass = require("../../resources/publisher");
 
 module.exports.SubscribeToPublisher = async (params = {}) => {
+	// eslint-disable-next-line global-require
 	require("dotenv").config({
 		path: `${process.cwd()}/.env`
 	});
