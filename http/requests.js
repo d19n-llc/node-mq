@@ -28,11 +28,7 @@ exports.GET = async (params) => {
 		});
 		return [undefined, response];
 	} catch (error) {
-		let errorMessage = error.message;
-		if (error.response) {
-			errorMessage = error.response.error.message;
-		}
-		return [new Error(errorMessage), undefined];
+		return [error, undefined];
 	}
 };
 
@@ -56,14 +52,7 @@ exports.POST = async (params) => {
 
 		return [undefined, response];
 	} catch (error) {
-		console.log("error", error);
-		let errorMessage = error.message;
-		console.log("errorMessage", errorMessage);
-		if (error.response) {
-			errorMessage = error.response.error.message;
-			console.log("errorMessage inside if", errorMessage);
-		}
-		return [new Error(errorMessage), undefined];
+		return [error, undefined];
 	}
 };
 

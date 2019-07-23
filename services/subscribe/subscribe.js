@@ -30,7 +30,7 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 				}
 			});
 
-			if (error) throw new Error(error);
+			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
@@ -43,9 +43,9 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 
 		const [createError, createResult] = await PublisherResource.createOne({
 			object: {
-				userAccountId: publisherResponse.value.userAccountId || "no_id",
+				userAccountId: publisherResponse.userAccountId || "no_id",
 				publisherUrl: pathToMessages,
-				subscriberId: publisherResponse.value._id || "no_id"
+				subscriberId: publisherResponse._id || "no_id"
 			}
 		});
 		if (createError) throw new Error(createError);
@@ -56,7 +56,7 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 			{ status: `Successfully subscribed to ${process.env.APP_NAME}` }
 		];
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		return [error, undefined];
 	}
 };
