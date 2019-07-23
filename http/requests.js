@@ -28,7 +28,27 @@ exports.GET = async (params) => {
 		});
 		return [undefined, response];
 	} catch (error) {
-		return [error, undefined];
+		if (error.response) {
+			// The request was made and the server responded with a status code
+			// that falls out of the range of 2xx
+			console.log("err.res", error.response.data);
+			console.log("err.res", error.response.status);
+			// console.log("err.res", error.response.headers);
+			return [error.response.data.message, undefined];
+		}
+		if (error.request) {
+			// The request was made but no response was received
+			// `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+			// http.ClientRequest in node.js
+			console.log("err.req", error.request);
+			return [
+				new Error("The request was made but no response was received"),
+				undefined
+			];
+		}
+		// Something happened in setting up the request that triggered an Error
+		console.log("Error", error.message);
+		return [error.message, undefined];
 	}
 };
 
@@ -57,21 +77,22 @@ exports.POST = async (params) => {
 			// that falls out of the range of 2xx
 			console.log("err.res", error.response.data);
 			console.log("err.res", error.response.status);
-			console.log("err.res", error.response.headers);
-			return [error.response.data, undefined];
+			// console.log("err.res", error.response.headers);
+			return [error.response.data.message, undefined];
 		}
 		if (error.request) {
 			// The request was made but no response was received
 			// `error.request` is an instance of XMLHttpRequest in the browser and an instance of
 			// http.ClientRequest in node.js
 			console.log("err.req", error.request);
-			return [error.request, undefined];
+			return [
+				new Error("The request was made but no response was received"),
+				undefined
+			];
 		}
 		// Something happened in setting up the request that triggered an Error
 		console.log("Error", error.message);
 		return [error.message, undefined];
-
-		// return [error, undefined];
 	}
 };
 
@@ -93,10 +114,26 @@ exports.PUT = async (params) => {
 		});
 		return [undefined, response];
 	} catch (error) {
-		let errorMessage = error.message;
 		if (error.response) {
-			errorMessage = error.response.error.message;
+			// The request was made and the server responded with a status code
+			// that falls out of the range of 2xx
+			console.log("err.res", error.response.data);
+			console.log("err.res", error.response.status);
+			// console.log("err.res", error.response.headers);
+			return [error.response.data.message, undefined];
 		}
-		return [new Error(errorMessage), undefined];
+		if (error.request) {
+			// The request was made but no response was received
+			// `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+			// http.ClientRequest in node.js
+			console.log("err.req", error.request);
+			return [
+				new Error("The request was made but no response was received"),
+				undefined
+			];
+		}
+		// Something happened in setting up the request that triggered an Error
+		console.log("Error", error.message);
+		return [error.message, undefined];
 	}
 };
