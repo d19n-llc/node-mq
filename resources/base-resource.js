@@ -55,7 +55,7 @@ class BaseResource {
 
 			if (validationError) {
 				validationError.statusCode = 422;
-				throw new Error(validationError);
+				return [validationError, undefined];
 			}
 
 			const [error, result] = await findOneAndUpdate({
@@ -105,7 +105,7 @@ class BaseResource {
 				collName: this.collectionName,
 				query: [...queryPipeline, ...this.queryExtensionFindMany]
 			});
-			if (error) throw new Error(error);
+			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
@@ -126,7 +126,7 @@ class BaseResource {
 				collName: this.collectionName,
 				query: [...queryPipeline, ...this.queryExtensionFindOne]
 			});
-			if (error) throw new Error(error);
+			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
@@ -154,7 +154,7 @@ class BaseResource {
 			);
 			if (validationError) {
 				validationError.statusCode = 422;
-				throw new Error(validationError);
+				return [validationError, undefined];
 			}
 			// Update record
 			const [error, result] = await findOneAndUpdate({
@@ -184,7 +184,7 @@ class BaseResource {
 				query
 			});
 
-			if (error) throw new Error(error);
+			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
@@ -205,7 +205,7 @@ class BaseResource {
 				query
 			});
 
-			if (error) throw new Error(error);
+			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];

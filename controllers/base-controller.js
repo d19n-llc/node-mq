@@ -16,7 +16,8 @@ class BaseController {
 				object: body
 			});
 			if (error) {
-				return next(error);
+				console.error({ error });
+				throw new Error(error);
 			}
 			return response.status(200).json(result);
 		} catch (error) {
@@ -31,7 +32,8 @@ class BaseController {
 				query
 			});
 			if (error) {
-				return next(error);
+				console.error({ error });
+				throw new Error(error);
 			}
 			return response.status(200).json(result);
 		} catch (error) {
@@ -47,7 +49,8 @@ class BaseController {
 				query: { _id: id }
 			});
 			if (error) {
-				return next(error);
+				console.error({ error });
+				throw new Error(error);
 			}
 			return response.status(200).json(result[0]);
 		} catch (error) {
@@ -62,7 +65,8 @@ class BaseController {
 				object: body
 			});
 			if (error) {
-				return next(error);
+				console.error({ error });
+				throw new Error(error);
 			}
 			return response.status(200).json(result);
 		} catch (error) {

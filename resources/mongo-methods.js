@@ -20,19 +20,16 @@ module.exports = {
 	 */
 	async findOneAndUpdate({ collName, query, upsert, data }) {
 		try {
-			const client = await collection(collName);
-			const docs = await client.findOneAndUpdate(
+			const client = collection(collName);
+			const { lastErrorObject, value } = await client.findOneAndUpdate(
 				query,
 				{ $set: data },
 				{ upsert, returnOriginal: false }
 			);
-			return [undefined, docs];
-			// if (value) {
-			// 	return [undefined, value];
-			// }
-			// if (lastErrorObject) {
-			// 	return [lastErrorObject, undefined];
-			// }
+			if (lastErrorObject) {
+				return [lastErrorObject, undefined];
+			}
+			return [undefined, value];
 		} catch (error) {
 			if (error.code === 66) {
 				const queryKeys = Object.keys(query);
@@ -47,7 +44,7 @@ module.exports = {
 
 	async aggregate({ collName, query }) {
 		try {
-			const client = await collection(collName);
+			const client = collection(collName);
 			const docs = await client.aggregate(query).toArray();
 			return [undefined, docs];
 		} catch (error) {
@@ -57,7 +54,7 @@ module.exports = {
 
 	async findOne({ collName, query }) {
 		try {
-			const client = await collection(collName);
+			const client = collection(collName);
 			const docs = await client.findOne(query);
 			return [undefined, docs];
 		} catch (error) {
@@ -67,7 +64,7 @@ module.exports = {
 
 	async find({ collName, query }) {
 		try {
-			const client = await collection(collName);
+			const client = collection(collName);
 			const docs = await client.find(query);
 			return [undefined, docs];
 		} catch (error) {
@@ -77,7 +74,7 @@ module.exports = {
 
 	async insertMany({ collName, data }) {
 		try {
-			const client = await collection(collName);
+			const client = collection(collName);
 			const docs = await client.insertMany(data);
 			return [undefined, docs];
 		} catch (error) {
@@ -87,18 +84,7 @@ module.exports = {
 
 	async deleteOne({ collName, query }) {
 		try {
-			const client = await collection(collName);
-			const docs = await client.deleteOne(query);
-			return [undefined, docs];
-		} catch (error) {
-			return [error, undefined];
-		}
-	},
-
-	async deleteMany({ collName, query }) {
-		try {
-			const client = await collection(collName);
-			const docs = await client.deleteMany(query);
+			const docs = collection(collName).deleteOne(query);
 			return [undefined, docs];
 		} catch (error) {
 			return [error, undefined];
