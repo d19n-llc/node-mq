@@ -50,7 +50,6 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 		});
 		if (createError) throw new Error(createError);
 
-		console.log({ subscribeResult, createResult });
 		return [
 			undefined,
 			{ status: `Successfully subscribed to ${process.env.APP_NAME}` }
