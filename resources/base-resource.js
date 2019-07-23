@@ -64,7 +64,7 @@ class BaseResource {
 				upsert: true,
 				data: value
 			});
-			if (error) throw new Error(error);
+			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
@@ -163,7 +163,7 @@ class BaseResource {
 				upsert: false,
 				data: value
 			});
-			if (error) throw new Error(error);
+			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];

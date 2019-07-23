@@ -17,7 +17,7 @@ class BaseController {
 			});
 			if (error) {
 				console.error({ error });
-				throw new Error(error);
+				return next(error);
 			}
 			return response.status(200).json(result);
 		} catch (error) {
@@ -33,7 +33,7 @@ class BaseController {
 			});
 			if (error) {
 				console.error({ error });
-				throw new Error(error);
+				return next(error);
 			}
 			return response.status(200).json(result);
 		} catch (error) {
@@ -50,7 +50,7 @@ class BaseController {
 			});
 			if (error) {
 				console.error({ error });
-				throw new Error(error);
+				return next(error);
 			}
 			return response.status(200).json(result[0]);
 		} catch (error) {
@@ -66,7 +66,7 @@ class BaseController {
 			});
 			if (error) {
 				console.error({ error });
-				throw new Error(error);
+				return next(error);
 			}
 			return response.status(200).json(result);
 		} catch (error) {
