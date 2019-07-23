@@ -12,7 +12,7 @@ const PublishMessage = require("../publish/message");
  * @param {*} {
  * 	messages,
  * 	batchId,
- * 	scriptRegistry,
+ * 	messageHandlers,
  * 	removeBuffer
  * }
  * @returns
@@ -20,7 +20,7 @@ const PublishMessage = require("../publish/message");
 module.exports = async ({
 	messages,
 	batchId,
-	scriptRegistry,
+	messageHandlers,
 	removeBuffer
 }) => {
 	const InFlightResource = new InFlightResourceClass();
@@ -94,11 +94,11 @@ module.exports = async ({
 					}
 				} else if (
 					source !== process.env.APP_URL &&
-					scriptRegistry[`${topic}`]
+					messageHandlers[`${topic}`]
 				) {
 					// If the source is not the current APP and their is a script then
 					// Use the script with the key === to the message topic
-					const [error, result] = await scriptRegistry[`${topic}`]({
+					const [error, result] = await messageHandlers[`${topic}`]({
 						message
 					});
 					if (error) {
