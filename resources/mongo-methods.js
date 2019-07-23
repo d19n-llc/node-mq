@@ -45,7 +45,7 @@ module.exports = {
 	async aggregate({ collName, query }) {
 		try {
 			const client = collection(collName);
-			const docs = await client.aggregate(query).toArray();
+			const docs = await client.findMany(query).toArray();
 			return [undefined, docs];
 		} catch (error) {
 			return [error, undefined];
