@@ -32,8 +32,8 @@ require("@d19n/node-mq);
 3.) add the mongodb url and database name in your .env file
 
 ```
-MQ_MONGODB_URL=mongodb+srv://<user></user>:<password></password>@test-nbfdp.mongodb.net/test?retryWrites=true&w=majority
-MQ_MONGODB_NAME=<db_name>
+MONGODB_URL=mongodb+srv://<user></user>:<password></password>@test-nbfdp.mongodb.net/test?retryWrites=true&w=majority
+MONGODB_NAME=<db_name>
 
 ```
 

@@ -27,7 +27,7 @@ class BaseController {
 	async findMany(request, response, next) {
 		try {
 			const { query } = request;
-			const [error, result] = await this.resourceModule.aggregate({
+			const [error, result] = await this.resourceModule.findMany({
 				query
 			});
 			if (error) {
