@@ -26,10 +26,6 @@ module.exports = {
 				{ $set: data },
 				{ upsert, returnOriginal: false }
 			);
-
-			if (lastErrorObject) {
-				return [lastErrorObject, undefined];
-			}
 			return [undefined, value];
 		} catch (error) {
 			if (error.code === 66) {
