@@ -38,7 +38,7 @@ class PublisherResource extends BaseResource {
 					publisherUrl: object.publisherUrl
 				}
 			});
-			if (createError) throw new Error(createError);
+			if (createError) return [createError, undefined];
 			return [undefined, createResult];
 		} catch (error) {
 			return [error, undefined];

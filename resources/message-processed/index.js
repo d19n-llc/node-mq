@@ -39,7 +39,7 @@ class MessageProcessedResource extends BaseResource {
 					name: object.name
 				}
 			});
-			if (createError) throw new Error(createError);
+			if (createError) return [createError, undefined];
 			return [undefined, createResult];
 		} catch (error) {
 			return [error, undefined];
