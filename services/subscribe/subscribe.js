@@ -1,5 +1,6 @@
 const internalHttp = require("../../http/requests");
 const PulbisherResourceClass = require("../../resources/publisher");
+const { makeError } = require("../../helpers/errors.js");
 
 module.exports.SubscribeToPublisher = async (params = {}) => {
 	// eslint-disable-next-line global-require
@@ -38,17 +39,17 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 	}
 
 	try {
-		const [subscribeError, subscribeResult] = await subscribeToPublisher();
-		if (subscribeError) throw new Error(subscribeError);
+		const [subscribeError] = await subscribeToPublisher();
+		if (subscribeError) return [makeError(subscribeError), undefined];
 
-		const [createError, createResult] = await PublisherResource.createOne({
+		const [createError] = await PublisherResource.createOne({
 			object: {
 				userAccountId: publisherResponse.userAccountId || "no_id",
 				publisherUrl: pathToMessages,
 				subscriberId: publisherResponse._id || "no_id"
 			}
 		});
-		if (createError) throw new Error(createError);
+		if (createError) return [makeError(createError), undefined];
 
 		return [
 			undefined,
@@ -56,6 +57,6 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 		];
 	} catch (error) {
 		console.error(error);
-		return [error, undefined];
+		return [makeError(error), undefined];
 	}
 };

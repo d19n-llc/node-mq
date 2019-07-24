@@ -1,3 +1,5 @@
+const { makeError } = require("../helpers/errors.js");
+
 class BaseController {
 	constructor({ resourceModule }) {
 		if (!resourceModule) throw new Error("No resource module provided");
@@ -16,12 +18,11 @@ class BaseController {
 				object: body
 			});
 			if (error) {
-				console.error({ error });
-				return next(error);
+				return next(makeError(error));
 			}
 			return response.status(200).json(result);
 		} catch (error) {
-			return next(error);
+			return next(makeError(error));
 		}
 	}
 
@@ -33,11 +34,11 @@ class BaseController {
 			});
 			if (error) {
 				console.error({ error });
-				return next(error);
+				return next(makeError(error));
 			}
 			return response.status(200).json(result);
 		} catch (error) {
-			return next(error);
+			return next(makeError(error));
 		}
 	}
 
@@ -50,11 +51,11 @@ class BaseController {
 			});
 			if (error) {
 				console.error({ error });
-				return next(error);
+				return next(makeError(error));
 			}
 			return response.status(200).json(result[0]);
 		} catch (error) {
-			return next(error);
+			return next(makeError(error));
 		}
 	}
 
@@ -66,11 +67,11 @@ class BaseController {
 			});
 			if (error) {
 				console.error({ error });
-				return next(error);
+				return next(makeError(error));
 			}
 			return response.status(200).json(result);
 		} catch (error) {
-			return next(error);
+			return next(makeError(error));
 		}
 	}
 
@@ -85,7 +86,7 @@ class BaseController {
 			if (error) return next(error);
 			return response.status(200).json(result);
 		} catch (error) {
-			return next(error);
+			return next(makeError(error));
 		}
 	}
 }
