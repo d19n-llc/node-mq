@@ -35,3 +35,5 @@ module.exports.RunTests = async () => {
 		return [error, undefined];
 	}
 };
+
+this.RunTests();

@@ -17,7 +17,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	} catch (err) {
 		// set to default
 		messageHandlers = {};
-		console.error(err);
+		// console.error(err);
 	}
 
 	const MessageQueuedResource = new MessageQueuedResourceClass();

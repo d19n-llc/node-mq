@@ -81,7 +81,18 @@ module.exports = {
 
 	async deleteOne({ collName, query }) {
 		try {
-			const docs = collection(collName).deleteOne(query);
+			const client = await collection(collName);
+			const docs = client.deleteOne(query);
+			return [undefined, docs];
+		} catch (error) {
+			return [error, undefined];
+		}
+	},
+
+	async deleteMany({ collName, query }) {
+		try {
+			const client = await collection(collName);
+			const docs = client.deleteMany(query);
 			return [undefined, docs];
 		} catch (error) {
 			return [error, undefined];
