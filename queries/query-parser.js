@@ -34,7 +34,7 @@ class Query {
 		this.parsedQuery = {
 			$match: { deletedAt: null }
 		};
-		console.log({ queryCopy });
+
 		const skip = pageNumber * resultsPerPage;
 		const limit = resultsPerPage;
 		// we will remove some unique fields like pageNumber, results, and sort from the query. We create a copy beforehand so we are not altering the original param.
@@ -224,7 +224,6 @@ class Query {
 				]
 			};
 		}
-		console.log({ queryPipeline: this.queryPipeline });
 		return { queryPipeline: this.queryPipeline };
 	}
 

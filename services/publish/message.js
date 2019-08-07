@@ -44,24 +44,30 @@ module.exports = async ({ message }) => {
 		});
 		if (findError) throw new Error(findError);
 
-		await seriesLoop(findResult, async (doc, index) => {
-			if (doc) {
-				const [publishError, publishResult] = await sendMessageToSubscriber({
-					subscriberUrl: doc.subscriberUrl
-				});
+		const subscribers = findResult ? findResult[0].data : [];
 
-				const [updateError, updateResult] = await SubscriberResource.updateOne({
-					query: { _id: doc._id },
-					object: {
-						subscriberUrl: doc.subscriberUrl,
-						lastUpdateError: publishError ? publishError.message : "",
-						lastUpdateTime: utcDate(),
-						lastMessageName: message.name
-					}
-				});
-				if (updateError) throw new Error(updateError);
-			}
-		});
+		if (subscribers.length > 0)
+			await seriesLoop(subscribers, async (doc, index) => {
+				if (doc) {
+					const [publishError, publishResult] = await sendMessageToSubscriber({
+						subscriberUrl: doc.subscriberUrl
+					});
+
+					const [
+						updateError,
+						updateResult
+					] = await SubscriberResource.updateOne({
+						query: { _id: doc._id },
+						object: {
+							subscriberUrl: doc.subscriberUrl,
+							lastUpdateError: publishError ? publishError.message : "",
+							lastUpdateTime: utcDate(),
+							lastMessageName: message.name
+						}
+					});
+					if (updateError) throw new Error(updateError);
+				}
+			});
 
 		return [undefined, { status: "messages published to subscribers" }];
 	} catch (error) {
