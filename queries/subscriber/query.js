@@ -1,3 +1,3 @@
-const { BaseQuery } = require("../query-parser");
+const { Query } = require("../query-parser");
 
-module.exports = BaseQuery;
+module.exports = Query;
