@@ -19,7 +19,6 @@ function error404(req, res, next) {
 function handleRouteErrors(error, req, res, next) {
 	// for actual JS exceptions, log the exception stack
 	if (error.stack) console.error(error.stack);
-
 	res.status(error.statusCode || 500).send({ message: error.message });
 }
 

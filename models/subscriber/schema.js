@@ -19,7 +19,12 @@ module.exports = Joi.object()
 			then: Joi.strip(),
 			otherwise: Joi.array().required()
 		}),
-		lastUpdateError: Joi.object().optional(),
+		lastUpdateError: Joi.string()
+			.optional()
+			.allow(""),
+		lastUpdateTime: Joi.string()
+			.optional()
+			.allow(""),
 		updateTime: Joi.string().required(),
 		createTime: Joi.string().required()
 	})

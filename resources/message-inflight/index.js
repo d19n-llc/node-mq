@@ -18,6 +18,7 @@ class MessageInflightResource extends BaseResource {
 			validator: MessageValidator,
 			factory: MessageFactory
 		});
+		this.createOne = this.createOne.bind(this);
 	}
 
 	/**
@@ -39,6 +40,7 @@ class MessageInflightResource extends BaseResource {
 					name: object.name
 				}
 			});
+
 			if (createError) return [createError, undefined];
 			return [undefined, createResult];
 		} catch (error) {

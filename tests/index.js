@@ -4,6 +4,8 @@ const processMessages = require("./process-messages");
 const retryMessages = require("./retry-messages");
 const deleteMessages = require("./delete-messages");
 
+// node -e 'require("./tests").RunTests()'
+
 module.exports.RunTests = async () => {
 	try {
 		const [seedError, seedResult] = await createMessages();

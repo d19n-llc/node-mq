@@ -1,11 +1,10 @@
-// const { Message, AddMessageToQueue } = require("@d19n/node-mq");
-// const { utcDate } = require("../helpers/dates");
 const {
+	insertOne,
 	findOneAndUpdate,
 	aggregate,
 	deleteOne,
-	deleteMany,
-	insertMany
+	insertMany,
+	deleteMany
 } = require("./mongo-methods");
 
 class BaseResource {
@@ -15,7 +14,10 @@ class BaseResource {
 		queryExtensionFindOne = [],
 		queryExtensionFindMany = [],
 		validator,
-		factory
+		factory,
+		cascadingDeletes = null,
+		addMessageToQueue,
+		logUserEvent
 	}) {
 		if (!collectionName) throw new Error("No coll name provided");
 		if (!QueryBuilder) throw new Error("No query builder provided");
@@ -28,6 +30,9 @@ class BaseResource {
 		this.queryExtensionFindMany = queryExtensionFindMany;
 		this.validator = validator;
 		this.factory = factory;
+		this.cascadingDeletes = cascadingDeletes;
+		this.addMessageToQueue = addMessageToQueue;
+		this.logUserEvent = logUserEvent;
 	}
 
 	/**
@@ -55,13 +60,55 @@ class BaseResource {
 
 			if (validationError) {
 				validationError.statusCode = 422;
-				return [validationError, undefined];
+				throw new Error(validationError);
 			}
 
 			const [error, result] = await findOneAndUpdate({
 				collName: this.collectionName,
-				query: query || { name: value.name },
+				query: Object.assign({}, query || { name: value.name }, {
+					deletedAt: null
+				}),
 				upsert: true,
+				data: value
+			});
+
+			if (error) throw new Error(error);
+
+			return [undefined, result];
+		} catch (error) {
+			return [error, undefined];
+		}
+	}
+
+	/**
+	 *
+	 *
+	 * @param {*} { query }
+	 * @returns
+	 * @memberof BaseResource
+	 */
+	async createOneNonIdempotent({ object, query = null }) {
+		try {
+			if (!this.factory || !this.validator) {
+				throw new Error("Missing factory or Validator for this model");
+			}
+			// construtor may or may not return promise
+			const constructedObject = await this.factory(object, {
+				isUpdating: false
+			});
+
+			// Validate
+			const [validationError, value] = this.validator(
+				{ data: constructedObject },
+				{ isUpdating: false }
+			);
+
+			if (validationError) {
+				validationError.statusCode = 422;
+				throw new Error(validationError);
+			}
+			const [error, result] = await insertOne({
+				collName: this.collectionName,
 				data: value
 			});
 			if (error) return [error, undefined];
@@ -75,15 +122,17 @@ class BaseResource {
 	 *
 	 *
 	 * @param {*} { data }
+	 * @param {*} { object } // this is the request body
 	 * @returns
 	 * @memberof BaseResource
 	 */
-	async insertMany({ data }) {
+	async insertMany({ data, object }) {
 		try {
 			const [error, result] = await insertMany({
 				collName: this.collectionName,
 				data
 			});
+
 			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
@@ -106,7 +155,7 @@ class BaseResource {
 		try {
 			const [error, result] = await aggregate({
 				collName: this.collectionName,
-				query: [...queryPipeline, ...this.queryExtensionFindMany]
+				query: [...this.queryExtensionFindMany, ...queryPipeline]
 			});
 			if (error) return [error, undefined];
 			return [undefined, result];
@@ -130,10 +179,10 @@ class BaseResource {
 		try {
 			const [error, result] = await aggregate({
 				collName: this.collectionName,
-				query: [...queryPipeline, ...this.queryExtensionFindOne]
+				query: [...this.queryExtensionFindOne, ...queryPipeline]
 			});
 			if (error) return [error, undefined];
-			return [undefined, result];
+			return [undefined, result[0] || {}];
 		} catch (error) {
 			return [error, undefined];
 		}
@@ -169,7 +218,9 @@ class BaseResource {
 				upsert: false,
 				data: value
 			});
+			// End of message queue
 			if (error) return [error, undefined];
+
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
@@ -183,13 +234,12 @@ class BaseResource {
 	 * @returns
 	 * @memberof BaseResource
 	 */
-	async deleteOne({ query }) {
+	async deleteOne({ query, object }) {
 		try {
 			const [error, result] = await deleteOne({
 				collName: this.collectionName,
 				query
 			});
-
 			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {
@@ -210,7 +260,6 @@ class BaseResource {
 				collName: this.collectionName,
 				query
 			});
-
 			if (error) return [error, undefined];
 			return [undefined, result];
 		} catch (error) {

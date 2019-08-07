@@ -18,6 +18,7 @@ class MessageProcessedResource extends BaseResource {
 			validator: MessageValidator,
 			factory: MessageFactory
 		});
+		this.createOne = this.createOne.bind(this);
 	}
 
 	/**

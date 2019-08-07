@@ -1,4 +1,5 @@
 const database = require("../config/database/mongodb");
+const { utcDate } = require("../helpers/dates");
 
 /**
  *
@@ -19,19 +20,34 @@ module.exports = {
 	 * @param {Object} params
 	 */
 	async findOneAndUpdate({ collName, query, upsert, data }) {
+		const dbClient = await collection(collName);
 		try {
-			const client = await collection(collName);
-			const { lastErrorObject, value } = await client.findOneAndUpdate(
+			const { lastErrorObject, value } = await dbClient.findOneAndUpdate(
 				query,
 				{ $set: data },
 				{ upsert, returnOriginal: false }
 			);
-			return [undefined, value];
+			if (value) {
+				return [undefined, value];
+			}
+			if (lastErrorObject) {
+				// No documents were updated
+				if (!lastErrorObject.updatedExisting) {
+					const errorMessage = new Error(
+						`No documents where updated with your query: ${JSON.stringify(
+							query
+						)}`
+					);
+					return [errorMessage, undefined];
+				}
+			}
 		} catch (error) {
 			if (error.code === 66) {
-				const queryKeys = Object.keys(query);
+				// Duplicate document based on query
 				const errorMessage = new Error(
-					`There is already a record with this ${queryKeys}, choose a new one`
+					`There is already a record matching this query ${JSON.stringify(
+						query
+					)}, It should be unique.`
 				);
 				return [errorMessage, undefined];
 			}
@@ -41,8 +57,8 @@ module.exports = {
 
 	async aggregate({ collName, query }) {
 		try {
-			const client = await collection(collName);
-			const docs = await client.aggregate(query).toArray();
+			const dbClient = await collection(collName);
+			const docs = await dbClient.aggregate(query).toArray();
 			return [undefined, docs];
 		} catch (error) {
 			return [error, undefined];
@@ -51,8 +67,8 @@ module.exports = {
 
 	async findOne({ collName, query }) {
 		try {
-			const client = await collection(collName);
-			const docs = await client.findOne(query);
+			const dbClient = await collection(collName);
+			const docs = await dbClient.findOne(query);
 			return [undefined, docs];
 		} catch (error) {
 			return [error, undefined];
@@ -61,9 +77,19 @@ module.exports = {
 
 	async find({ collName, query }) {
 		try {
-			const client = await collection(collName);
-			const docs = await client.find(query);
+			const dbClient = await collection(collName);
+			const docs = await dbClient.find(query);
 			return [undefined, docs];
+		} catch (error) {
+			return [error, undefined];
+		}
+	},
+
+	async insertOne({ collName, data }) {
+		try {
+			const dbClient = await collection(collName);
+			const docs = await dbClient.insertOne(data);
+			return [undefined, docs.ops[0] || {}];
 		} catch (error) {
 			return [error, undefined];
 		}
@@ -71,19 +97,19 @@ module.exports = {
 
 	async insertMany({ collName, data }) {
 		try {
-			const client = await collection(collName);
-			const docs = await client.insertMany(data);
+			const dbClient = await collection(collName);
+			const docs = await dbClient.insertMany(data);
 			return [undefined, docs];
 		} catch (error) {
 			return [error, undefined];
 		}
 	},
 
-	async deleteOne({ collName, query }) {
+	async deleteOne({ query, collName }) {
 		try {
-			const client = await collection(collName);
-			const docs = client.deleteOne(query);
-			return [undefined, docs];
+			const dbClient = await collection(collName);
+			const doc = await dbClient.deleteOne(query);
+			return [undefined, doc];
 		} catch (error) {
 			return [error, undefined];
 		}
@@ -91,9 +117,9 @@ module.exports = {
 
 	async deleteMany({ collName, query }) {
 		try {
-			const client = await collection(collName);
-			const docs = client.deleteMany(query);
-			return [undefined, docs];
+			const dbClient = await collection(collName);
+			const result = await dbClient.deleteMany(query);
+			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
 		}

@@ -13,7 +13,8 @@ module.exports = (params, options) => {
 				userAccountId: "",
 				userId: "",
 				subscriberUrl: "",
-				lastUpdateError: {},
+				lastUpdateError: "",
+				lastMessageSent: "",
 				topics: []
 		  };
 

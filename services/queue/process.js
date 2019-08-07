@@ -67,6 +67,7 @@ module.exports = async ({
 				removeBuffer
 			) {
 				const { source, topic } = message;
+				console.log({ source, topic });
 				// Test processing works.
 				if (source === "test-script") {
 					const [error, result] = await ProcessMessageTest({ message });
@@ -79,7 +80,7 @@ module.exports = async ({
 					} else {
 						handleProcessedMessage();
 					}
-				} else if (source === process.env.APP_URL) {
+				} else if (process.env.APP_URL && source === process.env.APP_URL) {
 					// If the source is the APP_URL that means this message should be published
 					// to all subscribers and not processed internally with the script registry.
 					const [error, result] = await PublishMessage({ message });

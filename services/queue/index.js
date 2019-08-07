@@ -44,21 +44,22 @@ module.exports = async ({ removeBuffer = false }) => {
 			source: process.env.APP_URL
 		}
 	});
+
 	if (pubMsgError) throw new Error(pubMsgError);
 
 	// Handle messages
 	try {
-		if ([...pubMsgResult, ...queueMessages].length > 0) {
+		if ([...pubMsgResult[0].data, ...queueMessages[0].data].length > 0) {
 			// Claim messages to be processed
 			const [claimError, claimResult] = await claimMessages({
-				messages: [...pubMsgResult, ...queueMessages],
+				messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
 				batchId,
 				removeBuffer
 			});
 			if (claimError) throw new Error(claimError);
 			// Process messages claimed
 			const [processError, processResult] = await processMessages({
-				messages: [...pubMsgResult, ...queueMessages],
+				messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
 				batchId,
 				messageHandlers,
 				removeBuffer
@@ -69,11 +70,11 @@ module.exports = async ({ removeBuffer = false }) => {
 			undefined,
 			{
 				status: "messages processed",
-				totalMessages: [...pubMsgResult, ...queueMessages].length
+				totalMessages: [...pubMsgResult[0].data, ...queueMessages[0].data]
+					.length
 			}
 		];
 	} catch (error) {
-		console.error(error);
 		return [error, undefined];
 	}
 };

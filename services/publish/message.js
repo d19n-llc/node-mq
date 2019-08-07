@@ -1,5 +1,6 @@
 const internalHttp = require("../../http/requests");
 const { seriesLoop } = require("../../helpers/functions");
+const { utcDate } = require("../../helpers/dates");
 const SubscriberResourceClass = require("../../resources/subscriber");
 /**
  *
@@ -53,7 +54,9 @@ module.exports = async ({ message }) => {
 					query: { _id: doc._id },
 					object: {
 						subscriberUrl: doc.subscriberUrl,
-						lastUpdateError: publishError
+						lastUpdateError: publishError ? publishError.message : "",
+						lastUpdateTime: utcDate(),
+						lastMessageName: message.name
 					}
 				});
 				if (updateError) throw new Error(updateError);
