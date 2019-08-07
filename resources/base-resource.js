@@ -11,19 +11,19 @@ const {
 class BaseResource {
 	constructor({
 		collectionName,
-		queryBuilder,
+		QueryBuilder,
 		queryExtensionFindOne = [],
 		queryExtensionFindMany = [],
 		validator,
 		factory
 	}) {
 		if (!collectionName) throw new Error("No coll name provided");
-		if (!queryBuilder) throw new Error("No query builder provided");
+		if (!QueryBuilder) throw new Error("No query builder provided");
 		if (!validator) throw new Error("No validator provided");
 		if (!factory) throw new Error("No factory module provided");
 
 		this.collectionName = collectionName;
-		this.queryBuilder = queryBuilder;
+		this.QueryBuilder = QueryBuilder;
 		this.queryExtensionFindOne = queryExtensionFindOne;
 		this.queryExtensionFindMany = queryExtensionFindMany;
 		this.validator = validator;
@@ -99,7 +99,10 @@ class BaseResource {
 	 * @memberof BaseResource
 	 */
 	async findMany({ query }) {
-		const { queryPipeline } = this.queryBuilder({ query });
+		const { queryPipeline } = new this.QueryBuilder({
+			query,
+			isPaginated: true
+		}).processAndReturnQuery();
 		try {
 			const [error, result] = await aggregate({
 				collName: this.collectionName,
@@ -120,7 +123,10 @@ class BaseResource {
 	 * @memberof BaseResource
 	 */
 	async findOne({ query }) {
-		const { queryPipeline } = this.queryBuilder({ query });
+		const { queryPipeline } = new this.QueryBuilder({
+			query,
+			isPaginated: false
+		}).processAndReturnQuery();
 		try {
 			const [error, result] = await aggregate({
 				collName: this.collectionName,
