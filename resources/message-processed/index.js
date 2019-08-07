@@ -12,7 +12,7 @@ class MessageProcessedResource extends BaseResource {
 	constructor(props) {
 		super({
 			collectionName: "mq_messages_processed",
-			queryBuilder: MessageProcessedQuery,
+			QueryBuilder: MessageProcessedQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
 			validator: MessageValidator,

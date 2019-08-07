@@ -12,7 +12,7 @@ class MessageInflightResource extends BaseResource {
 	constructor(props) {
 		super({
 			collectionName: "mq_messages_inflight",
-			queryBuilder: MessageInflightQuery,
+			QueryBuilder: MessageInflightQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
 			validator: MessageValidator,

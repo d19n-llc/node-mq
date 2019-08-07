@@ -12,7 +12,7 @@ class MessageQueuedResource extends BaseResource {
 	constructor(props) {
 		super({
 			collectionName: "mq_messages_queued",
-			queryBuilder: MessageQueuedQuery,
+			QueryBuilder: MessageQueuedQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
 			validator: MessageValidator,

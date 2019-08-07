@@ -12,7 +12,7 @@ class PublisherResource extends BaseResource {
 	constructor(props) {
 		super({
 			collectionName: "mq_publishers",
-			queryBuilder: PublisherQuery,
+			QueryBuilder: PublisherQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
 			validator: PublisherValidator,

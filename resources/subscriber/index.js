@@ -12,7 +12,7 @@ class SubscriberResource extends BaseResource {
 	constructor(props) {
 		super({
 			collectionName: "mq_subscriber",
-			queryBuilder: SubscriberQuery,
+			QueryBuilder: SubscriberQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
 			validator: SubscriberValidator,

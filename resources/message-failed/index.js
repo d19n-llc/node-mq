@@ -12,7 +12,7 @@ class MessageFailedResource extends BaseResource {
 	constructor(props) {
 		super({
 			collectionName: "mq_messages_failed",
-			queryBuilder: MessageFailedQuery,
+			QueryBuilder: MessageFailedQuery,
 			queryExtensionFindOne: findOneAggregation,
 			queryExtensionFindMany: findManyAggregation,
 			validator: MessageValidator,
