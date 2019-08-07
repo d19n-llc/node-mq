@@ -27,7 +27,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 		query: {
 			resultsPerPage: 100,
-			sortAscending: "priority",
+			sort: "1|priority|",
 			topic: {
 				$in: [...Object.keys(messageHandlers), ...["internal-test"]]
 			}
@@ -40,7 +40,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
 		query: {
 			resultsPerPage: 100,
-			sortAscending: "priority",
+			sort: "1|priority|",
 			source: process.env.APP_URL
 		}
 	});
