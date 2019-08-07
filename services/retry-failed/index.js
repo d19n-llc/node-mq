@@ -17,11 +17,12 @@ module.exports = async (params = {}) => {
 		});
 
 		if (findError) throw new Error(findResult);
-		const messages = findResult.filter(
-			(elem) => elem.maxRetries > elem.retriedCount
-		);
+		const failedMessages = findResult ? findResult[0].data : [];
 
-		if (messages.length > 0) {
+		if (failedMessages.length > 0) {
+			const messages = failedMessages.filter(
+				(elem) => elem.maxRetries > elem.retriedCount
+			);
 			await seriesLoop(messages, async (message, index) => {
 				const [
 					createError,
@@ -41,7 +42,7 @@ module.exports = async (params = {}) => {
 				if (failedError) throw new Error(failedError);
 			});
 		}
-		return [undefined, messages];
+		return [undefined, { failedMessages: failedMessages.length }];
 	} catch (error) {
 		return [error, undefined];
 	}

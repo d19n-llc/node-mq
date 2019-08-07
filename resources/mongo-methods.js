@@ -1,5 +1,4 @@
 const database = require("../config/database/mongodb");
-const { utcDate } = require("../helpers/dates");
 
 /**
  *

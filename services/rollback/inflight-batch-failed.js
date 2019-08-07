@@ -17,8 +17,10 @@ module.exports = async ({ batchId }) => {
 		});
 		if (findError) throw new Error(findError);
 
-		if (findResult.length > 0) {
-			await seriesLoop(findResult, async (job, index) => {
+		const failedMessages = findResult ? findResult[0].data : [];
+
+		if (failedMessages.length > 0) {
+			await seriesLoop(failedMessages, async (job, index) => {
 				const [
 					createError,
 					createResult

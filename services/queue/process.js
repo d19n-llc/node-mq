@@ -42,7 +42,7 @@ module.exports = async ({
 			await handleCleanUpOnError({
 				currentMessage,
 				batchId,
-				errorMessage: removeError
+				errorMessage: removeError ? removeError.message : ""
 			});
 		}
 		// Move message to processed
@@ -53,7 +53,7 @@ module.exports = async ({
 			await handleCleanUpOnError({
 				currentMessage,
 				batchId,
-				errorMessage: moveError
+				errorMessage: removeError ? removeError.message : ""
 			});
 		}
 	}
@@ -75,7 +75,7 @@ module.exports = async ({
 						await handleCleanUpOnError({
 							currentMessage,
 							batchId,
-							errorMessage: error
+							errorMessage: error ? error.message : ""
 						});
 					} else {
 						handleProcessedMessage();
@@ -88,7 +88,7 @@ module.exports = async ({
 						await handleCleanUpOnError({
 							currentMessage,
 							batchId,
-							errorMessage: error
+							errorMessage: error ? error.message : ""
 						});
 					} else {
 						handleProcessedMessage();
@@ -106,7 +106,7 @@ module.exports = async ({
 						await handleCleanUpOnError({
 							currentMessage,
 							batchId,
-							errorMessage: error
+							errorMessage: error ? error.message : ""
 						});
 					} else {
 						handleProcessedMessage();
