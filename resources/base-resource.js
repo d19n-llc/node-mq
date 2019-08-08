@@ -6,6 +6,7 @@ const {
 	insertMany,
 	deleteMany
 } = require("./mongo-methods");
+const { makeError } = require("../helpers/errors");
 
 class BaseResource {
 	constructor({
@@ -72,10 +73,10 @@ class BaseResource {
 				data: value
 			});
 
-			if (error) return [error, undefined];
+			if (error) return [makeError(error), undefined];
 			return [undefined, result];
 		} catch (error) {
-			return [error, undefined];
+			return [makeError(error), undefined];
 		}
 	}
 
@@ -86,8 +87,9 @@ class BaseResource {
 	 * @returns
 	 * @memberof BaseResource
 	 */
-	async createOneNonIdempotent({ object, query = null }) {
+	async createOneNonIdempotent({ object }) {
 		try {
+			console.log({ object });
 			if (!this.factory || !this.validator) {
 				throw new Error("Missing factory or Validator for this model");
 			}
@@ -111,10 +113,10 @@ class BaseResource {
 				data: value
 			});
 
-			if (error) return [error, undefined];
+			if (error) return [makeError(error), undefined];
 			return [undefined, result];
 		} catch (error) {
-			return [error, undefined];
+			return [makeError(error), undefined];
 		}
 	}
 
@@ -133,10 +135,10 @@ class BaseResource {
 				data
 			});
 
-			if (error) return [error, undefined];
+			if (error) return [makeError(error), undefined];
 			return [undefined, result];
 		} catch (error) {
-			return [error, undefined];
+			return [makeError(error), undefined];
 		}
 	}
 
@@ -157,10 +159,10 @@ class BaseResource {
 				collName: this.collectionName,
 				query: [...this.queryExtensionFindMany, ...queryPipeline]
 			});
-			if (error) return [error, undefined];
+			if (error) return [makeError(error), undefined];
 			return [undefined, result];
 		} catch (error) {
-			return [error, undefined];
+			return [makeError(error), undefined];
 		}
 	}
 
@@ -181,10 +183,10 @@ class BaseResource {
 				collName: this.collectionName,
 				query: [...this.queryExtensionFindOne, ...queryPipeline]
 			});
-			if (error) return [error, undefined];
+			if (error) return [makeError(error), undefined];
 			return [undefined, result[0] || {}];
 		} catch (error) {
-			return [error, undefined];
+			return [makeError(error), undefined];
 		}
 	}
 
@@ -219,11 +221,11 @@ class BaseResource {
 				data: value
 			});
 			// End of message queue
-			if (error) return [error, undefined];
+			if (error) return [makeError(error), undefined];
 
 			return [undefined, result];
 		} catch (error) {
-			return [error, undefined];
+			return [makeError(error), undefined];
 		}
 	}
 
@@ -240,10 +242,10 @@ class BaseResource {
 				collName: this.collectionName,
 				query
 			});
-			if (error) return [error, undefined];
+			if (error) return [makeError(error), undefined];
 			return [undefined, result];
 		} catch (error) {
-			return [error, undefined];
+			return [makeError(error), undefined];
 		}
 	}
 
@@ -260,10 +262,10 @@ class BaseResource {
 				collName: this.collectionName,
 				query
 			});
-			if (error) return [error, undefined];
+			if (error) return [makeError(error), undefined];
 			return [undefined, result];
 		} catch (error) {
-			return [error, undefined];
+			return [makeError(error), undefined];
 		}
 	}
 }

@@ -34,15 +34,16 @@ class NetworkRouterResource extends BaseResource {
 	async createOne(params) {
 		try {
 			const { object } = params;
-			const [createRouteErr, createRouteResult] = await CreateNewRoute({
+			const [createRouteError, createRouteResult] = await CreateNewRoute({
 				object
 			});
-			if (createRouteErr) return [makeError(createRouteErr), undefined];
+			if (createRouteError) return [makeError(createRouteError), undefined];
 			// Record the new pub sub route in the database
 			const [createError, createResult] = await super.createOneNonIdempotent({
 				object
 			});
-			if (createRouteErr) return [makeError(createError), undefined];
+			console.log({ createError, createResult });
+			if (createError) return [makeError(createError), undefined];
 			return [undefined, createResult];
 		} catch (error) {
 			return [error, undefined];
