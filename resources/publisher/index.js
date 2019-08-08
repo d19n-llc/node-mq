@@ -6,7 +6,6 @@ const {
 const PublisherValidator = require("../../models/publisher/validator");
 const PublisherFactory = require("../../models/publisher/factory");
 const BaseResource = require("../base-resource");
-const SubscribeToPublisher = require("../../services/publisher/create-subscriber");
 
 class PublisherResource extends BaseResource {
 	// eslint-disable-next-line no-useless-constructor
@@ -19,28 +18,6 @@ class PublisherResource extends BaseResource {
 			validator: PublisherValidator,
 			factory: PublisherFactory
 		});
-	}
-
-	/**
-	 *
-	 *
-	 * @param {*} request
-	 * @param {*} response
-	 * @param {*} next
-	 * @returns
-	 * @memberof PublisherResource
-	 */
-	async createSubscriber(params) {
-		try {
-			const { object } = params;
-			const [createError, createResult] = await SubscribeToPublisher({
-				object
-			});
-			if (createError) return [createError, undefined];
-			return [undefined, createResult];
-		} catch (error) {
-			return [error, undefined];
-		}
 	}
 
 	/**

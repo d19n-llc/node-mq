@@ -56,6 +56,7 @@ const mqFailedRouter = require("@d19n/node-mq/routes/message-failed");
 const mqProcessedRouter = require("@d19n/node-mq/routes/message-processed");
 const mqPublisherRouter = require("@d19n/node-mq/routes/publisher");
 const mqSubscriberRouter = require("@d19n/node-mq/routes/subscriber");
+const mqNetworkRouter = require("@d19n/node-mq/routes/network-router");
 
 const combineRouters = [
   mqQueuedRouter,
@@ -64,6 +65,7 @@ const combineRouters = [
   mqProcessedRouter,
   mqPublisherRouter,
   mqSubscriberRouter,
+  mqNetworkRouter,
   ...other routers
 ].reduce((newArray, elem) => [...newArray, ...elem.stack], []);
 
