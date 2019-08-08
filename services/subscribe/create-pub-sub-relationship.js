@@ -2,16 +2,17 @@ const internalHttp = require("../../http/requests");
 const PulbisherResourceClass = require("../../resources/publisher");
 const { makeError } = require("../../helpers/errors.js");
 
-module.exports.SubscribeToPublisher = async (params = {}) => {
+module.exports = async (params = {}) => {
 	// eslint-disable-next-line global-require
-	require("dotenv").config({
-		path: `${process.cwd()}/.env`
-	});
-
 	const PublisherResource = new PulbisherResourceClass();
-	const { publisherUrl, topics } = params;
-	const pathToSubscibe = `${publisherUrl}/api/mq-subscriber`;
-	const pathToMessages = `${publisherUrl}/api/mq-message-processed`;
+	const { publisherUrl, subscriberUrl, topics } = params;
+	// EXAMPLE:
+	// http://localhost:8091/api (api url of publisher)
+	// http://localhost:8098/api (api url of subscriber)
+	// topics: ["contacts", "accounts", "users"]
+	const pathToSubscibe = `${publisherUrl}/mq-subscriber`;
+	// This is where you would retrieve messages that have been processed
+	const pathToMessages = `${publisherUrl}/mq-message-processed`;
 	const publisherResponse = {};
 
 	// Pass in the url to subscribe to a publisher
@@ -26,7 +27,7 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 			const [error, result] = await internalHttp.POST({
 				url: pathToSubscibe,
 				payload: {
-					subscriberUrl: `${process.env.APP_URL}/api/mq-message-queued`,
+					subscriberUrl: `${subscriberUrl}/mq-message-queued`,
 					topics
 				}
 			});
@@ -53,7 +54,7 @@ module.exports.SubscribeToPublisher = async (params = {}) => {
 
 		return [
 			undefined,
-			{ status: `Successfully subscribed to ${process.env.APP_NAME}` }
+			{ status: `Successfully subscribed to ${publisherUrl}` }
 		];
 	} catch (error) {
 		console.error(error);

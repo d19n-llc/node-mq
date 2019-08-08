@@ -6,6 +6,7 @@ const {
 const SubscriberValidator = require("../../models/subscriber/validator");
 const SubscriberFactory = require("../../models/subscriber/factory");
 const BaseResource = require("../base-resource");
+const SubscribeToPublisher = require("../../services/subscribe/create-pub-sub-relationship");
 
 class SubscriberResource extends BaseResource {
 	// eslint-disable-next-line no-useless-constructor
@@ -18,6 +19,7 @@ class SubscriberResource extends BaseResource {
 			validator: SubscriberValidator,
 			factory: SubscriberFactory
 		});
+		this.createOne = this.createOne.bind(this);
 	}
 
 	/**
@@ -32,11 +34,11 @@ class SubscriberResource extends BaseResource {
 	async createOne(params) {
 		try {
 			const { object } = params;
-			const [createError, createResult] = await super.createOne({
-				object,
+			const [createError, createResult] = await SubscribeToPublisher({
 				query: {
 					subscriberUrl: object.subscriberUrl
-				}
+				},
+				object
 			});
 			if (createError) return [createError, undefined];
 			return [undefined, createResult];
