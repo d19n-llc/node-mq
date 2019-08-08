@@ -2,10 +2,10 @@ const internalHttp = require("../../http/requests");
 const PulbisherResourceClass = require("../../resources/publisher");
 const { makeError } = require("../../helpers/errors.js");
 
-module.exports = async (params = {}) => {
+module.exports = async ({ object = {} }) => {
 	// eslint-disable-next-line global-require
 	const PublisherResource = new PulbisherResourceClass();
-	const { publisherUrl, subscriberUrl, topics } = params;
+	const { publisherUrl, subscriberUrl, topics } = object;
 	// EXAMPLE:
 	// http://localhost:8091/api (api url of publisher)
 	// http://localhost:8098/api (api url of subscriber)

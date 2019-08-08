@@ -35,9 +35,6 @@ class SubscriberResource extends BaseResource {
 		try {
 			const { object } = params;
 			const [createError, createResult] = await SubscribeToPublisher({
-				query: {
-					subscriberUrl: object.subscriberUrl
-				},
 				object
 			});
 			if (createError) return [createError, undefined];
