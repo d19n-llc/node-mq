@@ -9,7 +9,7 @@ module.exports = async ({ object = {} }) => {
 	// http://localhost:8098/api (api url of subscriber)
 	// topics: ["contacts", "accounts", "users"]
 	// This is where you would retrieve messages that have been processed
-	const publisherResponse = {};
+	let subscriberResponse = {};
 
 	// Pass in the url to subscribe to a publisher
 	/**
@@ -29,6 +29,7 @@ module.exports = async ({ object = {} }) => {
 			});
 
 			if (error) return [error, undefined];
+			subscriberResponse = result;
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
@@ -46,9 +47,9 @@ module.exports = async ({ object = {} }) => {
 			const [error, result] = await internalHttp.POST({
 				url: `${subscriberUrl}/mq-publisher`,
 				payload: {
-					userAccountId: publisherResponse.userAccountId || "no_id",
+					userAccountId: subscriberResponse.userAccountId || "no_id",
 					publisherUrl: `${publisherUrl}/mq-message-processed`, // endpoint where historic messages are retreived
-					subscriberId: publisherResponse._id || "no_id"
+					subscriberId: subscriberResponse._id || "no_id"
 				}
 			});
 

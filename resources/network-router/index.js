@@ -7,6 +7,7 @@ const NetworkRouterValidator = require("../../models/message/validator");
 const NetworkRouterFactory = require("../../models/message/factory");
 const BaseResource = require("../base-resource");
 const CreateNewRoute = require("../../services/network-router/create-route");
+const { makeError } = require("../../helpers/errors");
 
 class NetworkRouterResource extends BaseResource {
 	// eslint-disable-next-line no-useless-constructor
@@ -33,10 +34,15 @@ class NetworkRouterResource extends BaseResource {
 	async createOne(params) {
 		try {
 			const { object } = params;
-			const [createError, createResult] = await CreateNewRoute({
+			const [createRouteErr, createRouteResult] = await CreateNewRoute({
 				object
 			});
-			if (createError) return [createError, undefined];
+			if (createRouteErr) return [makeError(createRouteErr), undefined];
+			// Record the new pub sub route in the database
+			const [createError, createResult] = await super.createOneNonIdempotent({
+				object
+			});
+			if (createRouteErr) return [makeError(createError), undefined];
 			return [undefined, createResult];
 		} catch (error) {
 			return [error, undefined];
