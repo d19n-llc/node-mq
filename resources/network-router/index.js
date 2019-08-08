@@ -3,8 +3,8 @@ const {
 	findOneAggregation,
 	findManyAggregation
 } = require("../../queries/network-router/query-extension");
-const NetworkRouterValidator = require("../../models/message/validator");
-const NetworkRouterFactory = require("../../models/message/factory");
+const NetworkRouterValidator = require("../../models/network-router/validator");
+const NetworkRouterFactory = require("../../models/network-router/factory");
 const BaseResource = require("../base-resource");
 const CreateNewRoute = require("../../services/network-router/create-route");
 const { makeError } = require("../../helpers/errors");
@@ -42,9 +42,8 @@ class NetworkRouterResource extends BaseResource {
 			const [createError, createResult] = await super.createOneNonIdempotent({
 				object
 			});
-			console.log({ createError, createResult });
 			if (createError) return [makeError(createError), undefined];
-			return [undefined, createResult];
+			return [undefined, createRouteResult || {}];
 		} catch (error) {
 			return [error, undefined];
 		}

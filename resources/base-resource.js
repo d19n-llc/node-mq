@@ -89,7 +89,6 @@ class BaseResource {
 	 */
 	async createOneNonIdempotent({ object }) {
 		try {
-			console.log({ object });
 			if (!this.factory || !this.validator) {
 				throw new Error("Missing factory or Validator for this model");
 			}
