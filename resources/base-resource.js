@@ -97,11 +97,15 @@ class BaseResource {
 				isUpdating: false
 			});
 
+			console.log({ constructedObject });
+
 			// Validate
 			const [validationError, value] = this.validator(
 				{ data: constructedObject },
 				{ isUpdating: false }
 			);
+
+			console.log({ value });
 
 			if (validationError) {
 				validationError.statusCode = 422;
