@@ -25,17 +25,14 @@ function Scheduler() {
 		queueSettings = {};
 	}
 	schedule.scheduleJob("1 * * * * *", () => {
-		console.log("mq deduplicating messages...");
 		deduplicateQueue({});
 	});
-	schedule.scheduleJob("15 * * * * *", async () => {
+	schedule.scheduleJob("4 * * * * *", async () => {
 		await offsetJobStart({ addTime: queueSettings.appInstanceId });
-		console.log("mq processing messages...");
 		processQueuedMessages({});
 	});
-	schedule.scheduleJob("30 * * * * *", async () => {
+	schedule.scheduleJob("8 * * * * *", async () => {
 		await offsetJobStart({ addTime: queueSettings.appInstanceId });
-		console.log("mq retrying failed messages...");
 		retryFailedMessages({});
 	});
 }
