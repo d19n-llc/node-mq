@@ -9,7 +9,6 @@ module.exports = async ({ object = {} }) => {
 	// http://localhost:8098/api (api url of subscriber)
 	// topics: ["contacts", "accounts", "users"]
 	// This is where you would retrieve messages that have been processed
-	let subscriberResponse = {};
 
 	// Pass in the url to subscribe to a publisher
 	/**
@@ -29,7 +28,6 @@ module.exports = async ({ object = {} }) => {
 			});
 
 			if (error) return [error, undefined];
-			subscriberResponse = result;
 			return [undefined, result];
 		} catch (error) {
 			return [error, undefined];
@@ -41,15 +39,15 @@ module.exports = async ({ object = {} }) => {
 	 *
 	 * @returns
 	 */
-	async function createPublisherOnSubscriber() {
+	async function createPublisherOnSubscriber({ subscriberId, userAccountId }) {
 		// custom logic here
 		try {
 			const [error, result] = await internalHttp.POST({
 				url: `${subscriberUrl}/mq-publisher`,
 				payload: {
-					userAccountId: subscriberResponse.userAccountId || "no_id",
+					userAccountId,
 					publisherUrl: `${publisherUrl}/mq-message-processed`, // endpoint where historic messages are retreived
-					subscriberId: subscriberResponse._id || "no_id"
+					subscriberId
 				}
 			});
 
@@ -63,11 +61,12 @@ module.exports = async ({ object = {} }) => {
 	try {
 		const [createSubErr, createSubRes] = await createSubscriberOnPublisher();
 		if (createSubErr) return [makeError(createSubErr), undefined];
-		console.log({ createSubRes });
 
-		const [createPubErr, createPubRes] = await createPublisherOnSubscriber();
+		const [createPubErr, createPubRes] = await createPublisherOnSubscriber({
+			subscriberId: createSubRes.data ? createSubRes.data._id : "",
+			userAccountId: createSubRes.data ? createSubRes.data.userAccountId : ""
+		});
 		if (createPubErr) return [makeError(createPubErr), undefined];
-		console.log({ createPubRes });
 
 		return [
 			undefined,
