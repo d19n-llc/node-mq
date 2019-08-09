@@ -27,7 +27,8 @@ module.exports.isPastQueueBuffer = (params) => {
 	const { messageCreatedAt } = params;
 	const currentTime = currentDayIso();
 	const difference = getDiffIndates(currentTime, messageCreatedAt, "seconds");
-	if (difference > 5) {
+	// Adding a queue buffer of 3 seconds
+	if (difference > 3) {
 		return true;
 	}
 	return false;

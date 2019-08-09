@@ -24,17 +24,30 @@ function Scheduler() {
 		// set to default
 		queueSettings = {};
 	}
-	schedule.scheduleJob("1 * * * * *", () => {
-		deduplicateQueue({});
-	});
-	schedule.scheduleJob("4 * * * * *", async () => {
-		await offsetJobStart({ addTime: queueSettings.appInstanceId });
-		processQueuedMessages({});
-	});
-	schedule.scheduleJob("8 * * * * *", async () => {
-		await offsetJobStart({ addTime: queueSettings.appInstanceId });
-		retryFailedMessages({});
-	});
+
+	// Deduplicate message queue
+	schedule.scheduleJob(
+		`${queueSettings.deduplicateQueueEvery || 1} * * * * *`,
+		() => {
+			deduplicateQueue({});
+		}
+	);
+	// Process messages queued
+	schedule.scheduleJob(
+		`${queueSettings.processQueueEvery || 2} * * * * *`,
+		async () => {
+			await offsetJobStart({ addTime: queueSettings.appInstanceId });
+			processQueuedMessages({});
+		}
+	);
+	// Retry failed messages
+	schedule.scheduleJob(
+		`${queueSettings.retryFailedEvery || 8} * * * * *`,
+		async () => {
+			await offsetJobStart({ addTime: queueSettings.appInstanceId });
+			retryFailedMessages({});
+		}
+	);
 }
 
 Scheduler();
