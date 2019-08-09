@@ -12,6 +12,7 @@ module.exports = (params, options) => {
 				userAccountId: "",
 				userId: "",
 				batchId: "", // added at the time the message is processed from the queue
+				externalId: "", // Id for the topic of the message
 				name: "", // a unique identifier for the message
 				source: "",
 				topic: "", // provides context for the payload

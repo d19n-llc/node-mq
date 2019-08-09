@@ -16,6 +16,9 @@ module.exports = Joi.object()
 		batchId: Joi.string()
 			.optional()
 			.allow(""),
+		externalId: Joi.string()
+			.optional()
+			.allow(""),
 		name: Joi.string().required(),
 		source: Joi.string().required(),
 		topic: Joi.string().required(),
