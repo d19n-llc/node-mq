@@ -2,18 +2,18 @@ const inflightRollBack = require("../rollback/inflight-batch-failed");
 const InFlightResourceClass = require("../../resources/message-inflight");
 const FailedResourceClass = require("../../resources/message-failed");
 
-module.exports = async ({ currentMessage, batchId, errorMessage }) => {
+module.exports = async ({ message, batchId, errorMessage }) => {
 	const InFlightResource = new InFlightResourceClass();
 	const FailedResource = new FailedResourceClass();
 	try {
 		// Rollback all messages for this batch from inflight to the queue
 		const [removeError] = await InFlightResource.deleteOne({
-			query: { _id: currentMessage._id }
+			query: { _id: message._id }
 		});
 		if (removeError) throw new Error(removeError);
 		// Move the message that caused an error to failed
 		const [failError] = await FailedResource.createOne({
-			object: Object.assign({}, currentMessage, {
+			object: Object.assign({}, message, {
 				error: { message: errorMessage }
 			})
 		});

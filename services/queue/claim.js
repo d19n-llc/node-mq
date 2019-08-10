@@ -13,11 +13,9 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const InFlightResource = new InFlightResourceClass();
 
-	let currentMessage = {};
-
 	try {
 		await seriesLoop(messages, async (message) => {
-			currentMessage = Object.assign({}, message, { batchId });
+			const currentMessage = Object.assign({}, message, { batchId });
 
 			if (
 				isPastQueueBuffer({ messageCreatedAt: currentMessage.createTime }) ||
@@ -29,7 +27,7 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 				});
 				if (removeError) {
 					await handleCleanUpOnError({
-						currentMessage,
+						message: currentMessage,
 						batchId: currentMessage.batchId,
 						errorMessage: removeError.message
 					});
@@ -41,7 +39,7 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 				});
 				if (inflightError) {
 					await handleCleanUpOnError({
-						currentMessage,
+						message: currentMessage,
 						batchId: currentMessage.batchId,
 						errorMessage: inflightError.message
 					});
