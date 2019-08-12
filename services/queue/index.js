@@ -26,7 +26,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	// Messages to be processed
 	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 		query: {
-			resultsPerPage: 100,
+			resultsPerPage: 50,
 			sort: "1|priority|",
 			topic: {
 				$in: [...Object.keys(messageHandlers), ...["internal-test"]]
@@ -39,7 +39,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	// Messages to be published out to subscribers
 	const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
 		query: {
-			resultsPerPage: 100,
+			resultsPerPage: 50,
 			sort: "1|priority|",
 			source: process.env.APP_URL
 		}

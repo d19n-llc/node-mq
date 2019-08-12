@@ -14,38 +14,41 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 	const InFlightResource = new InFlightResourceClass();
 
 	try {
-		await seriesLoop(messages, async (message) => {
+		for (let index = 0; index < messages.length; index++) {
+			const message = messages[index];
 			const currentMessage = Object.assign({}, message, { batchId });
-
 			if (
 				isPastQueueBuffer({ messageCreatedAt: currentMessage.createTime }) ||
 				removeBuffer
 			) {
-				// Remove from the queue
-				const [removeError] = await MessageQueuedResource.deleteOne({
-					query: { _id: currentMessage._id }
-				});
-				if (removeError) {
-					await handleCleanUpOnError({
-						message: currentMessage,
-						batchId: currentMessage.batchId,
-						errorMessage: removeError.message
-					});
-				}
-
 				// Move to inflight
+				// eslint-disable-next-line no-await-in-loop
 				const [inflightError] = await InFlightResource.createOne({
 					object: currentMessage
 				});
 				if (inflightError) {
+					// eslint-disable-next-line no-await-in-loop
 					await handleCleanUpOnError({
 						message: currentMessage,
 						batchId: currentMessage.batchId,
 						errorMessage: inflightError.message
 					});
 				}
+				// Remove from the queue
+				// eslint-disable-next-line no-await-in-loop
+				const [removeError] = await MessageQueuedResource.deleteOne({
+					query: { _id: currentMessage._id }
+				});
+				if (removeError) {
+					// eslint-disable-next-line no-await-in-loop
+					await handleCleanUpOnError({
+						message: currentMessage,
+						batchId: currentMessage.batchId,
+						errorMessage: removeError.message
+					});
+				}
 			}
-		});
+		}
 		return [undefined, { status: "messages claimed", total: messages.length }];
 	} catch (error) {
 		return [error, undefined];

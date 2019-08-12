@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const { seriesLoop } = require("../../helpers/functions");
 const { isPastQueueBuffer } = require("../../helpers/processing");
 const handleCleanUpOnError = require("./clean-up");
@@ -58,7 +59,8 @@ module.exports = async ({
 
 	try {
 		// process jobs
-		await seriesLoop(messages, async (message, index) => {
+		for (let index = 0; index < messages.length; index++) {
+			const message = messages[index];
 			const currentMessage = Object.assign({}, message, { batchId });
 			if (
 				isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
@@ -100,6 +102,7 @@ module.exports = async ({
 						message
 					});
 					if (error) {
+						// eslint-disable-next-line no-await-in-loop
 						await handleCleanUpOnError({
 							currentMessage,
 							batchId,
@@ -110,7 +113,7 @@ module.exports = async ({
 					}
 				}
 			}
-		});
+		}
 
 		return [
 			undefined,
