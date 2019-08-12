@@ -1,6 +1,5 @@
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const InFlightResourceClass = require("../../resources/message-inflight");
-const { seriesLoop } = require("../../helpers/functions");
 const { isPastQueueBuffer } = require("../../helpers/processing");
 const handleCleanUpOnError = require("./clean-up");
 /**
@@ -12,6 +11,7 @@ const handleCleanUpOnError = require("./clean-up");
 module.exports = async ({ messages, batchId, removeBuffer }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const InFlightResource = new InFlightResourceClass();
+	console.log("claiming", batchId);
 
 	try {
 		for (let index = 0; index < messages.length; index++) {

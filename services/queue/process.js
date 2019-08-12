@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-const { seriesLoop } = require("../../helpers/functions");
 const { isPastQueueBuffer } = require("../../helpers/processing");
 const handleCleanUpOnError = require("./clean-up");
 
@@ -26,6 +25,7 @@ module.exports = async ({
 }) => {
 	const InFlightResource = new InFlightResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
+	console.log("processing", batchId);
 
 	/**
 	 * When a message is successfully processed, we want to remove it from

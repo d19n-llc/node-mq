@@ -26,20 +26,7 @@ module.exports = {
 				{ $set: data },
 				{ upsert, returnOriginal: false }
 			);
-			if (value) {
-				return [undefined, value];
-			}
-			if (lastErrorObject) {
-				// No documents were updated
-				if (!lastErrorObject.updatedExisting) {
-					const errorMessage = new Error(
-						`No documents where updated with your query: ${JSON.stringify(
-							query
-						)}`
-					);
-					return [errorMessage, undefined];
-				}
-			}
+			return [undefined, value];
 		} catch (error) {
 			if (error.code === 66) {
 				// Duplicate document based on query

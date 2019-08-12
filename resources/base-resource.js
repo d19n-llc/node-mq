@@ -97,7 +97,6 @@ class BaseResource {
 				isUpdating: false
 			});
 
-
 			// Validate
 			const [validationError, value] = this.validator(
 				{ data: constructedObject },
