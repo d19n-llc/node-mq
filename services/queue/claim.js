@@ -26,6 +26,7 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 				const [inflightError] = await InFlightResource.createOne({
 					object: currentMessage
 				});
+				console.log("CLAIM", { inflightError });
 				if (inflightError) {
 					// eslint-disable-next-line no-await-in-loop
 					await handleCleanUpOnError({
@@ -39,6 +40,7 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 				const [removeError] = await MessageQueuedResource.deleteOne({
 					query: { _id: currentMessage._id }
 				});
+				console.log("CLAIM", { removeError });
 				if (removeError) {
 					// eslint-disable-next-line no-await-in-loop
 					await handleCleanUpOnError({

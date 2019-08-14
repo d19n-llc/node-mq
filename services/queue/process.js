@@ -37,6 +37,7 @@ module.exports = async ({
 		const [moveError] = await ProcessedResource.createOne({
 			object: message
 		});
+		console.log("PROCESS", { moveError });
 		if (moveError) {
 			await handleCleanUpOnError({
 				message,
@@ -48,6 +49,7 @@ module.exports = async ({
 		const [removeError] = await InFlightResource.deleteOne({
 			query: { _id: message._id }
 		});
+		console.log("PROCESS", { removeError });
 		if (removeError) {
 			await handleCleanUpOnError({
 				message,

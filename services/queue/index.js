@@ -56,6 +56,7 @@ module.exports = async ({ removeBuffer = false }) => {
 				batchId,
 				removeBuffer
 			});
+			console.log("QUEUE INDEX", { claimError });
 			if (claimError) throw new Error(claimError);
 			// Process messages claimed
 			const [processError, processResult] = await processMessages({
@@ -64,6 +65,7 @@ module.exports = async ({ removeBuffer = false }) => {
 				messageHandlers,
 				removeBuffer
 			});
+			console.log("QUEUE INDEX", { processError });
 			if (processError) throw new Error(processError);
 		}
 		return [
