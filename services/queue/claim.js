@@ -16,6 +16,7 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 	try {
 		for (let index = 0; index < messages.length; index++) {
 			const message = messages[index];
+			console.log("CLAIM", { message });
 			const currentMessage = Object.assign({}, message, { batchId });
 			if (
 				isPastQueueBuffer({ messageCreatedAt: currentMessage.createTime }) ||

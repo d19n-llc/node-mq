@@ -75,10 +75,12 @@ module.exports = async ({
 				const { source, topic } = message;
 				// Test processing works.
 				if (source === "test-script") {
-					const [error, result] = await ProcessMessageTest({ message });
+					const [error, result] = await ProcessMessageTest({
+						message: currentMessage
+					});
 					if (error) {
 						await handleCleanUpOnError({
-							currentMessage,
+							message: currentMessage,
 							batchId,
 							errorMessage: error ? error.message : ""
 						});
@@ -88,10 +90,12 @@ module.exports = async ({
 				} else if (process.env.APP_URL && source === process.env.APP_URL) {
 					// If the source is the APP_URL that means this message should be published
 					// to all subscribers and not processed internally with the script registry.
-					const [error, result] = await PublishMessage({ message });
+					const [error, result] = await PublishMessage({
+						message: currentMessage
+					});
 					if (error) {
 						await handleCleanUpOnError({
-							currentMessage,
+							message: currentMessage,
 							batchId,
 							errorMessage: error ? error.message : ""
 						});
@@ -110,7 +114,7 @@ module.exports = async ({
 					if (error) {
 						// eslint-disable-next-line no-await-in-loop
 						await handleCleanUpOnError({
-							currentMessage,
+							message: currentMessage,
 							batchId,
 							errorMessage: error ? error.message : ""
 						});
