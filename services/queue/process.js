@@ -34,9 +34,10 @@ module.exports = async ({
 	 */
 	async function handleProcessedMessage({ message }) {
 		// Move message to processed
-		const [moveError] = await ProcessedResource.createOne({
+		const [moveError, moveResult] = await ProcessedResource.createOne({
 			object: message
 		});
+		console.log("PROCESS", { moveResult });
 		console.log("PROCESS", { moveError });
 		if (moveError) {
 			await handleCleanUpOnError({
@@ -45,17 +46,20 @@ module.exports = async ({
 				errorMessage: moveError ? moveError.message : ""
 			});
 		}
-		// Remove message from inflight
-		const [removeError] = await InFlightResource.deleteOne({
-			query: { _id: message._id }
-		});
-		console.log("PROCESS", { removeError });
-		if (removeError) {
-			await handleCleanUpOnError({
-				message,
-				batchId,
-				errorMessage: removeError ? removeError.message : ""
+		// If the messages was moved successfully then delete it
+		if (moveResult) {
+			// Remove message from inflight
+			const [removeError] = await InFlightResource.deleteOne({
+				query: { _id: message._id }
 			});
+			console.log("PROCESS", { removeError });
+			if (removeError) {
+				await handleCleanUpOnError({
+					message,
+					batchId,
+					errorMessage: removeError ? removeError.message : ""
+				});
+			}
 		}
 	}
 

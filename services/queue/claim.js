@@ -23,9 +23,13 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 			) {
 				// Move to inflight
 				// eslint-disable-next-line no-await-in-loop
-				const [inflightError] = await InFlightResource.createOne({
+				const [
+					inflightError,
+					inflightResult
+				] = await InFlightResource.createOne({
 					object: currentMessage
 				});
+				console.log({ inflightResult });
 				console.log("CLAIM", { inflightError });
 				if (inflightError) {
 					// eslint-disable-next-line no-await-in-loop
@@ -35,19 +39,22 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 						errorMessage: inflightError.message
 					});
 				}
-				// Remove from the queue
-				// eslint-disable-next-line no-await-in-loop
-				const [removeError] = await MessageQueuedResource.deleteOne({
-					query: { _id: currentMessage._id }
-				});
-				console.log("CLAIM", { removeError });
-				if (removeError) {
+				// If we have the result then delete the message from the queue
+				if (inflightResult) {
+					// Remove from the queue
 					// eslint-disable-next-line no-await-in-loop
-					await handleCleanUpOnError({
-						message: currentMessage,
-						batchId: currentMessage.batchId,
-						errorMessage: removeError.message
+					const [removeError] = await MessageQueuedResource.deleteOne({
+						query: { _id: currentMessage._id }
 					});
+					console.log("CLAIM", { removeError });
+					if (removeError) {
+						// eslint-disable-next-line no-await-in-loop
+						await handleCleanUpOnError({
+							message: currentMessage,
+							batchId: currentMessage.batchId,
+							errorMessage: removeError.message
+						});
+					}
 				}
 			}
 		}
