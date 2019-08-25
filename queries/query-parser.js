@@ -10,7 +10,7 @@ function recursiveFindJoiKeys(joi, prefix = "") {
 		children.forEach((child) => {
 			keys.push(child.key);
 			recursiveFindJoiKeys(child.schema, `${child.key}.`).forEach((k) =>
-				keys.push(k)
+				keys.push(k),
 			);
 		});
 	}
@@ -32,7 +32,7 @@ class Query {
 		this.resultsPerPage = resultsPerPage;
 		this.isPaginated = isPaginated;
 		this.parsedQuery = {
-			$match: { deletedAt: null }
+			$match: { deletedAt: null },
 		};
 
 		const skip = pageNumber * resultsPerPage;
@@ -52,7 +52,7 @@ class Query {
 		this.conversionStagePrior = { $addFields: {} };
 		this.extensions = [
 			{ $skip: parseInt(skip, 10) },
-			{ $limit: parseInt(limit, 10) }
+			{ $limit: parseInt(limit, 10) },
 		];
 		this.numberOrDateKeys = ["$gte", "$gt", "$lt", "$lte"];
 	}
@@ -75,8 +75,8 @@ class Query {
 				this.conversionStagePrior.$addFields[`${fieldName}Converted`] = {
 					$dateFromString: {
 						dateString: `$${fieldName}`,
-						onError: `$${fieldName}`
-					}
+						onError: `$${fieldName}`,
+					},
 				};
 				sortStage.$sort[`${fieldName}Converted`] = parseInt(order, 10);
 			} else {
@@ -89,18 +89,18 @@ class Query {
 	handleRegexQuery({ key, queryItemValue }) {
 		const convertedQueryItemValue = {
 			$regex: queryItemValue.$regex.trim(),
-			$options: "i"
+			$options: "i",
 		};
 		this.parsedQuery["$match"] = {
 			...this.parsedQuery["$match"],
-			[key]: convertedQueryItemValue
+			[key]: convertedQueryItemValue,
 		};
 	}
 
 	handleDefaultQuery({ key, queryItemValue }) {
 		this.parsedQuery["$match"] = {
 			...this.parsedQuery["$match"],
-			[key]: queryItemValue
+			[key]: queryItemValue,
 		};
 	}
 
@@ -117,25 +117,25 @@ class Query {
 			this.conversionStagePrior.$addFields[`${key}Converted`] = {
 				$dateFromString: {
 					dateString: `$${key}`,
-					onError: `$${key}`
-				}
+					onError: `$${key}`,
+				},
 			};
 			// swap all valuues in the current element to be dates - ie {$gte: "100", $lt: "120"} becomes {$gte: 100, $lt: 120}
 			activeNumberOrDateKeys.forEach((relevantDateKey) => {
 				queryItemValue[relevantDateKey] = new Date(
-					queryItemValue[relevantDateKey]
+					queryItemValue[relevantDateKey],
 				);
 			});
 			// for dates and numbers we need to search on the converted key rather than the original
 			this.parsedQuery["$match"] = {
 				...this.parsedQuery["$match"],
-				[`${key}Converted`]: { ...queryItemValue }
+				[`${key}Converted`]: { ...queryItemValue },
 			};
 			// presumably this is a number instead of a date, since we are storing numbers as number types we do not need to convert it or do anything special
 		} else {
 			this.parsedQuery["$match"] = {
 				...this.parsedQuery["$match"],
-				[key]: queryItemValue
+				[key]: queryItemValue,
 			};
 		}
 	}
@@ -152,7 +152,7 @@ class Query {
 				typeof queryItemValue === "object" ? Object.keys(queryItemValue) : [];
 			// filter the currentObjects keys, returning only those keys that are present in the number or date keys array : ["$gte", "$gt", "$lt", "$lte"]
 			const activeNumberOrDateKeys = this.numberOrDateKeys.filter((numKey) =>
-				innerKeys.includes(numKey)
+				innerKeys.includes(numKey),
 			);
 			const hasNumberOrDateKey = !!activeNumberOrDateKeys.length;
 			const hasRegexKey =
@@ -161,7 +161,7 @@ class Query {
 				this.handleNumberOrDateKeyQuery({
 					key,
 					queryItemValue,
-					activeNumberOrDateKeys
+					activeNumberOrDateKeys,
 				});
 			} else if (hasRegexKey) {
 				this.handleRegexQuery({ key, queryItemValue });
@@ -188,22 +188,22 @@ class Query {
 		this.paginationPipeline = [
 			this.parsedQuery,
 			{
-				$count: "count"
+				$count: "count",
 			},
 			{
 				$project: {
 					count: 1,
 					totalPages: {
-						$divide: ["$count", parseInt(this.resultsPerPage, 10)]
-					}
-				}
+						$divide: ["$count", parseInt(this.resultsPerPage, 10)],
+					},
+				},
 			},
 			{
 				$project: {
 					count: 1,
-					totalPages: { $ceil: "$totalPages" }
-				}
-			}
+					totalPages: { $ceil: "$totalPages" },
+				},
+			},
 		];
 		// add the conversion stage ($addFields) to the paginationData peice as well so we have an accurate count
 		if (Object.keys(this.conversionStagePrior.$addFields).length) {
@@ -218,10 +218,10 @@ class Query {
 					{
 						$facet: {
 							data: this.queryPipeline,
-							metaData: this.paginationPipeline
-						}
-					}
-				]
+							metaData: this.paginationPipeline,
+						},
+					},
+				],
 			};
 		}
 		return { queryPipeline: this.queryPipeline };
@@ -240,5 +240,5 @@ class Query {
 }
 
 module.exports = {
-	Query
+	Query,
 };

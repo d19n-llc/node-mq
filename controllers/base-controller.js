@@ -15,7 +15,7 @@ class BaseController {
 		try {
 			const { body } = request;
 			const [error, result] = await this.resourceModule.createOne({
-				object: body
+				object: body,
 			});
 			if (error) {
 				return next(makeError(error));
@@ -30,7 +30,7 @@ class BaseController {
 		try {
 			const { query } = request;
 			const [error, result] = await this.resourceModule.findMany({
-				query
+				query,
 			});
 			if (error) {
 				return next(makeError(error));
@@ -39,7 +39,7 @@ class BaseController {
 			if (result[0] && result[0].metaData) {
 				return response.status(200).json({
 					data: result[0].data,
-					metaData: result[0].metaData[0] || { count: 0, totalPages: 0 } // if there are no documents, metaData array will be empty
+					metaData: result[0].metaData[0] || { count: 0, totalPages: 0 }, // if there are no documents, metaData array will be empty
 				});
 			}
 			return response.status(200).json(result);
@@ -53,7 +53,7 @@ class BaseController {
 			const { params } = request;
 			const { id } = params;
 			const [error, result] = await this.resourceModule.findOne({
-				query: { _id: id }
+				query: { _id: id },
 			});
 			if (error) {
 				return next(makeError(error));
@@ -71,7 +71,7 @@ class BaseController {
 			const { id } = params;
 			const [error, result] = await this.resourceModule.deleteOne({
 				query: { _id: id },
-				object: body
+				object: body,
 			});
 			if (error) {
 				return next(makeError(error));
@@ -88,7 +88,7 @@ class BaseController {
 			const { id } = params;
 			const [error, result] = await this.resourceModule.updateOne({
 				object: body,
-				query: { _id: id }
+				query: { _id: id },
 			});
 			if (error) return next(makeError(error));
 			return response.status(200).json(result);
