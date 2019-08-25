@@ -13,7 +13,7 @@ module.exports.offsetJobStart = ({ addTime = 0 }) => {
 	 * appInstanceId and will be multiplied by 2000ms.
 	 */
 	const randomizeTime = (min, max) => Math.random() * (max - min) + min;
-	const offSetInterval = randomizeTime(0, 500);
+	const offSetInterval = randomizeTime(150, 300);
 	const convertedToMs = Number(addTime) * 100;
 	const delay = offSetInterval + convertedToMs;
 	return new Promise((resolve) => setTimeout(resolve, delay));
@@ -26,9 +26,13 @@ module.exports.offsetJobStart = ({ addTime = 0 }) => {
 module.exports.isPastQueueBuffer = (params) => {
 	const { messageCreatedAt } = params;
 	const currentTime = currentDayIso();
-	const difference = getDiffIndates(currentTime, messageCreatedAt, "seconds");
+	const difference = getDiffIndates(
+		currentTime,
+		messageCreatedAt,
+		"milliseconds"
+	);
 	// Adding a queue buffer of 3 seconds
-	if (difference > 3) {
+	if (difference > 150) {
 		return true;
 	}
 	return false;

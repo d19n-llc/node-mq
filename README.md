@@ -43,7 +43,7 @@ how we merge routers.
 
 Copy & Paste the following express routers to your routes **index.js** file. You
 can see an example of how we export a route file.
-https://github.com/FTruglio/d19n-node-mq/blob/01ee47c4437bcf58654e6a52d61b5046e81b51ef/routes/publisher/index.js
+https://github.com/d19n-llc/d19n-node-mq/blob/01ee47c4437bcf58654e6a52d61b5046e81b51ef/routes/publisher/index.js
 
 ```
 const express = require("express");

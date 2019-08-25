@@ -29,24 +29,27 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`${queueSettings.deduplicateQueueEvery || 0} * * * * *`,
 		() => {
+			console.log("deduplicate_queue", process.env.unique_id);
 			deduplicateQueue({});
-		},
+		}
 	);
 	// Process messages queued
 	schedule.scheduleJob(
-		`${queueSettings.processQueueEvery || 1} * * * * *`,
+		`${queueSettings.processQueueEvery || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ addTime: queueSettings.appInstanceId });
+			console.log("process_queue", process.env.unique_id);
 			processQueuedMessages({});
-		},
+		}
 	);
 	// Retry failed messages
 	schedule.scheduleJob(
-		`${queueSettings.retryFailedEvery || 1} * * * * *`,
+		`${queueSettings.retryFailedEvery || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ addTime: queueSettings.appInstanceId });
+			console.log("process_failed", process.env.unique_id);
 			retryFailedMessages({});
-		},
+		}
 	);
 }
 
