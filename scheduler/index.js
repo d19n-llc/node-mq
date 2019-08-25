@@ -29,7 +29,7 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`${queueSettings.deduplicateQueueEvery || 0} * * * * *`,
 		() => {
-			console.log("deduplicate_queue", process.env.unique_id);
+			// console.log("deduplicate_queue");
 			deduplicateQueue({});
 		}
 	);
@@ -38,7 +38,7 @@ function Scheduler() {
 		`${queueSettings.processQueueEvery || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ addTime: queueSettings.appInstanceId });
-			console.log("process_queue", process.env.unique_id);
+			// console.log("process_queue");
 			processQueuedMessages({});
 		}
 	);
@@ -47,7 +47,7 @@ function Scheduler() {
 		`${queueSettings.retryFailedEvery || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ addTime: queueSettings.appInstanceId });
-			console.log("process_failed", process.env.unique_id);
+			// console.log("process_failed");
 			retryFailedMessages({});
 		}
 	);
