@@ -26,12 +26,12 @@ module.exports = async ({ removeBuffer = false }) => {
 	// Messages to be processed
 	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 		query: {
-			resultsPerPage: 5,
+			resultsPerPage: 10,
 			sort: "1|createTime|",
 			topic: {
-				$in: [...Object.keys(messageHandlers), ...["internal-test"]],
-			},
-		},
+				$in: [...Object.keys(messageHandlers), ...["internal-test"]]
+			}
+		}
 	});
 
 	if (queueError) throw new Error(queueError);
@@ -39,10 +39,10 @@ module.exports = async ({ removeBuffer = false }) => {
 	// Messages to be published out to subscribers
 	const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
 		query: {
-			resultsPerPage: 5,
+			resultsPerPage: 10,
 			sort: "1|createTime|",
-			source: process.env.APP_URL,
-		},
+			source: process.env.APP_URL
+		}
 	});
 
 	if (pubMsgError) throw new Error(pubMsgError);
@@ -54,7 +54,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			const [claimError, claimResult] = await claimMessages({
 				messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
 				batchId,
-				removeBuffer,
+				removeBuffer
 			});
 			if (claimError) throw new Error(claimError);
 			// Process messages claimed
@@ -62,7 +62,7 @@ module.exports = async ({ removeBuffer = false }) => {
 				messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
 				batchId,
 				messageHandlers,
-				removeBuffer,
+				removeBuffer
 			});
 
 			if (processError) throw new Error(processError);
@@ -72,8 +72,8 @@ module.exports = async ({ removeBuffer = false }) => {
 			{
 				status: "messages processed",
 				totalMessages: [...pubMsgResult[0].data, ...queueMessages[0].data]
-					.length,
-			},
+					.length
+			}
 		];
 	} catch (error) {
 		return [error, undefined];
