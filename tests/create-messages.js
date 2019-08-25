@@ -86,7 +86,7 @@ module.exports = async (params = {}) => {
 				const [createError] = await MessageQueuedResource.createOne({
 					object: msg
 				});
-				console.log({ createError });
+
 				if (createError) throw new Error(createError);
 			}
 		);

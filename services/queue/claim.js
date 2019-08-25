@@ -11,12 +11,10 @@ const handleCleanUpOnError = require("./clean-up");
 module.exports = async ({ messages, batchId, removeBuffer }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const InFlightResource = new InFlightResourceClass();
-	console.log("claiming", batchId);
 
 	try {
 		for (let index = 0; index < messages.length; index++) {
 			const message = messages[index];
-			console.log("CLAIM", { message });
 			const currentMessage = Object.assign({}, message, { batchId });
 			if (
 				isPastQueueBuffer({ messageCreatedAt: currentMessage.createTime }) ||
@@ -26,18 +24,16 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 				// eslint-disable-next-line no-await-in-loop
 				const [
 					inflightError,
-					inflightResult
+					inflightResult,
 				] = await InFlightResource.createOne({
-					object: currentMessage
+					object: currentMessage,
 				});
-				console.log({ inflightResult });
-				console.log("CLAIM", { inflightError });
 				if (inflightError) {
 					// eslint-disable-next-line no-await-in-loop
 					await handleCleanUpOnError({
 						message: currentMessage,
 						batchId: currentMessage.batchId,
-						errorMessage: inflightError.message
+						errorMessage: inflightError.message,
 					});
 				}
 				// If we have the result then delete the message from the queue
@@ -45,15 +41,14 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 					// Remove from the queue
 					// eslint-disable-next-line no-await-in-loop
 					const [removeError] = await MessageQueuedResource.deleteOne({
-						query: { _id: currentMessage._id }
+						query: { _id: currentMessage._id },
 					});
-					console.log("CLAIM", { removeError });
 					if (removeError) {
 						// eslint-disable-next-line no-await-in-loop
 						await handleCleanUpOnError({
 							message: currentMessage,
 							batchId: currentMessage.batchId,
-							errorMessage: removeError.message
+							errorMessage: removeError.message,
 						});
 					}
 				}

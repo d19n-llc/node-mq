@@ -27,26 +27,26 @@ function Scheduler() {
 
 	// Deduplicate message queue
 	schedule.scheduleJob(
-		`${queueSettings.deduplicateQueueEvery || 1} * * * * *`,
+		`${queueSettings.deduplicateQueueEvery || 0} * * * * *`,
 		() => {
 			deduplicateQueue({});
-		}
+		},
 	);
 	// Process messages queued
 	schedule.scheduleJob(
-		`${queueSettings.processQueueEvery || 2} * * * * *`,
+		`${queueSettings.processQueueEvery || 1} * * * * *`,
 		async () => {
 			await offsetJobStart({ addTime: queueSettings.appInstanceId });
 			processQueuedMessages({});
-		}
+		},
 	);
 	// Retry failed messages
 	schedule.scheduleJob(
-		`${queueSettings.retryFailedEvery || 8} * * * * *`,
+		`${queueSettings.retryFailedEvery || 1} * * * * *`,
 		async () => {
 			await offsetJobStart({ addTime: queueSettings.appInstanceId });
 			retryFailedMessages({});
-		}
+		},
 	);
 }
 
