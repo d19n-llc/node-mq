@@ -11,9 +11,11 @@ const processMessages = require("./process");
 module.exports = async ({ removeBuffer = false }) => {
 	// Load the queue scripts
 	let messageHandlers = {};
+	let queueSettings = {};
 	try {
 		const config = require(`${process.cwd()}/mq-config`);
 		messageHandlers = config.messageHandlers;
+		queueSettings = config.queueSettings;
 	} catch (err) {
 		// set to default
 		messageHandlers = {};
@@ -26,7 +28,7 @@ module.exports = async ({ removeBuffer = false }) => {
 	// Messages to be processed
 	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 		query: {
-			resultsPerPage: 250,
+			resultsPerPage: queueSettings.batchCount || 250,
 			sort: "1|createTime|",
 			topic: {
 				$in: [...Object.keys(messageHandlers), ...["internal-test"]]

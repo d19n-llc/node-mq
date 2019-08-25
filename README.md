@@ -105,7 +105,8 @@ module.exports.httpHeaders = {
 module.exports.queueSettings = {
 	// Support applications running in clusters
 	// For PM2 this variable is declared in the ecosystem.config.js
-	appInstanceId: process.env.INSTANCE_ID
+	appInstanceId: process.env.INSTANCE_ID,
+  batchCount: 250 // default
 };
 ```
 
