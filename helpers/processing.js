@@ -13,8 +13,8 @@ module.exports.offsetJobStart = ({ addTime = 0 }) => {
 	 * appInstanceId and will be multiplied by 2000ms.
 	 */
 	const randomizeTime = (min, max) => Math.random() * (max - min) + min;
-	const offSetInterval = randomizeTime(50, 100);
-	const convertedToMs = Number(addTime) * 100;
+	const offSetInterval = randomizeTime(25, 50);
+	const convertedToMs = Number(addTime) * 5;
 	const delay = offSetInterval + convertedToMs;
 	return new Promise((resolve) => setTimeout(resolve, delay));
 };
@@ -32,7 +32,7 @@ module.exports.isPastQueueBuffer = (params) => {
 		"milliseconds"
 	);
 	// Adding a queue buffer of 3 seconds
-	if (difference > 100) {
+	if (difference > 25) {
 		return true;
 	}
 	return false;
