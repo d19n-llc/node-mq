@@ -2,7 +2,7 @@ const _ = require("lodash");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const FailedResourceClass = require("../../resources/message-failed");
 
-module.exports = async ({ message, errorMessage }) => {
+module.exports = async ({ message, batchId, errorMessage }) => {
 	const FailedResource = new FailedResourceClass();
 	const MessageQueueResource = new MessageQueuedResourceClass();
 	try {
@@ -21,6 +21,17 @@ module.exports = async ({ message, errorMessage }) => {
 		});
 
 		if (deleteError) throw new Error(deleteError);
+
+		const [
+			updateManyError,
+			updateManyResult
+			// eslint-disable-next-line no-await-in-loop
+		] = await MessageQueueResource.updateMany({
+			query: { batchId },
+			object: { batchId: null, status: "queued" }
+		});
+
+		if (updateManyError) throw new Error(updateManyError);
 
 		return [
 			undefined,

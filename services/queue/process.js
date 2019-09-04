@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const { isPastQueueBuffer } = require("../../helpers/processing");
 const handleCleanUpOnError = require("./clean-up");
-
+const MessageQueuedResourceClass = require("../../resources/message-queued");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
 const PublishMessage = require("../publish/message");
@@ -22,7 +22,7 @@ module.exports = async ({
 	messageHandlers,
 	removeBuffer
 }) => {
-	// const InFlightResource = new InFlightResourceClass();
+	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
 
 	/**
@@ -35,7 +35,12 @@ module.exports = async ({
 		const [moveError, moveResult] = await ProcessedResource.createOne({
 			object: Object.assign({}, message, { status: "processed" })
 		});
-		if (moveError) {
+
+		const [deleteError, deleteResult] = await MessageQueuedResource.deleteOne({
+			query: { _id: message._id }
+		});
+
+		if (moveError || deleteError) {
 			await handleCleanUpOnError({
 				message,
 				batchId,
