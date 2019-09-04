@@ -8,33 +8,66 @@ module.exports = Joi.object()
 			otherwise: Joi.string().required()
 		}),
 		userAccountId: Joi.string()
-			.optional()
-			.allow(""),
+			.allow(null)
+			.optional(),
 		userId: Joi.string()
-			.optional()
-			.allow(""),
+			.allow(null)
+			.optional(),
 		batchId: Joi.string()
-			.optional()
-			.allow(""),
+			.allow(null)
+			.optional(),
 		externalId: Joi.string()
-			.optional()
-			.allow(""),
-		name: Joi.string().required(),
-		source: Joi.string().required(),
-		topic: Joi.string().required(),
-		action: Joi.string().optional(),
-		priority: Joi.number()
-			.valid(0, 1, 2)
-			.required(),
+			.allow(null)
+			.optional(),
+		name: Joi.when("$update", {
+			is: true,
+			then: Joi.string().optional(),
+			otherwise: Joi.string().required()
+		}),
+		status: Joi.string()
+			.allow(null)
+			.optional(),
+		source: Joi.when("$update", {
+			is: true,
+			then: Joi.string().optional(),
+			otherwise: Joi.string().required()
+		}),
+		topic: Joi.when("$update", {
+			is: true,
+			then: Joi.string().optional(),
+			otherwise: Joi.string().required()
+		}),
+		action: Joi.when("$update", {
+			is: true,
+			then: Joi.string().optional(),
+			otherwise: Joi.string().required()
+		}),
+		priority: Joi.when("$update", {
+			is: true,
+			then: Joi.number()
+				.valid(0, 1, 2)
+				.optional(),
+			otherwise: Joi.number()
+				.valid(0, 1, 2)
+				.required()
+		}),
 		maxRetries: Joi.number()
 			.optional()
-			.default(0),
+			.default(2),
 		retriedCount: Joi.number()
 			.optional()
 			.default(0),
-		payload: Joi.object().required(),
+		payload: Joi.when("$update", {
+			is: true,
+			then: Joi.object().optional(),
+			otherwise: Joi.object().required()
+		}),
 		error: Joi.object().optional(),
-		updateTime: Joi.string().required(),
-		createTime: Joi.string().required()
+		updatedAt: Joi.string().required(),
+		createdAt: Joi.when("$update", {
+			is: true,
+			then: Joi.string().optional(),
+			otherwise: Joi.string().required()
+		})
 	})
 	.options({ stripUnknown: true });

@@ -18,7 +18,7 @@ module.exports = Joi.object()
 		lastMessageTime: Joi.string()
 			.allow("")
 			.optional(),
-		updateTime: Joi.string().required(),
-		createTime: Joi.string().required()
+		updatedAt: Joi.string().required(),
+		createdAt: Joi.string().required()
 	})
 	.options({ stripUnknown: true });

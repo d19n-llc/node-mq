@@ -9,14 +9,15 @@ module.exports = (params, options) => {
 		: // isUpdating = false set default values
 		  {
 				_id: ObjectID().toString(),
-				userAccountId: "",
-				userId: "",
-				batchId: "", // added at the time the message is processed from the queue
-				externalId: "", // Id for the topic of the message
-				name: "", // a unique identifier for the message
-				source: "",
-				topic: "", // provides context for the payload
-				action: "", // created, updated, deleted, nofification
+				userAccountId: null,
+				userId: null,
+				batchId: null, // added at the time the message is processed from the queue
+				externalId: null, // Id for the topic of the message
+				name: null, // a unique identifier for the message
+				source: null,
+				status: null,
+				topic: null, // provides context for the payload
+				action: null, // created, updated, deleted, nofification
 				priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high
 				maxRetries: 3,
 				retriedCount: 0,

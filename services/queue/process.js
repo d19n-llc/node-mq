@@ -2,7 +2,6 @@
 const { isPastQueueBuffer } = require("../../helpers/processing");
 const handleCleanUpOnError = require("./clean-up");
 
-const InFlightResourceClass = require("../../resources/message-inflight");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
 const PublishMessage = require("../publish/message");
@@ -23,7 +22,7 @@ module.exports = async ({
 	messageHandlers,
 	removeBuffer
 }) => {
-	const InFlightResource = new InFlightResourceClass();
+	// const InFlightResource = new InFlightResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
 
 	/**
@@ -34,7 +33,7 @@ module.exports = async ({
 	async function handleProcessedMessage({ message }) {
 		// Move message to processed
 		const [moveError, moveResult] = await ProcessedResource.createOne({
-			object: message
+			object: Object.assign({}, message, { status: "processed" })
 		});
 		if (moveError) {
 			await handleCleanUpOnError({
@@ -42,20 +41,6 @@ module.exports = async ({
 				batchId,
 				errorMessage: moveError ? moveError.message : ""
 			});
-		}
-		// If the messages was moved successfully then delete it
-		if (moveResult) {
-			// Remove message from inflight
-			const [removeError] = await InFlightResource.deleteOne({
-				query: { _id: message._id }
-			});
-			if (removeError) {
-				await handleCleanUpOnError({
-					message,
-					batchId,
-					errorMessage: removeError ? removeError.message : ""
-				});
-			}
 		}
 	}
 
@@ -65,7 +50,7 @@ module.exports = async ({
 			const message = messages[index];
 			const currentMessage = Object.assign({}, message, { batchId });
 			if (
-				isPastQueueBuffer({ messageCreatedAt: message.createTime }) ||
+				isPastQueueBuffer({ messageCreatedAt: message.createdAt }) ||
 				removeBuffer
 			) {
 				const { source, topic } = message;

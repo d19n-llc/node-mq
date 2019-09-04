@@ -33,7 +33,7 @@ module.exports.CreateCollections = () => {
 					res.createCollection("mq_messages_queued");
 					res
 						.collection("mq_messages_queued")
-						.createIndex({ createTime: 1, topic: 1, name: 1 });
+						.createIndex({ createdAt: 1, topic: 1, name: 1 });
 				});
 			} catch (error) {
 				// Catch errors

@@ -4,7 +4,8 @@ const {
 	aggregate,
 	deleteOne,
 	insertMany,
-	deleteMany
+	deleteMany,
+	updateMany
 } = require("./mongo-methods");
 const { makeError } = require("../helpers/errors");
 
@@ -202,10 +203,10 @@ class BaseResource {
 				throw new Error("Missing factory or Validator for this model");
 			}
 			// construtor may or may not return promise
-			const project = await this.factory(object, { isUpdating: true });
+			const factoryObject = await this.factory(object, { isUpdating: true });
 			// Validate
 			const [validationError, value] = this.validator(
-				{ data: project },
+				{ data: factoryObject },
 				{ isUpdating: true }
 			);
 			if (validationError) {
@@ -222,6 +223,48 @@ class BaseResource {
 			// End of message queue
 			if (error) return [makeError(error), undefined];
 
+			return [undefined, result];
+		} catch (error) {
+			return [makeError(error), undefined];
+		}
+	}
+
+	/**
+	 *
+	 *
+	 * @param {*} { object, query }
+	 * @returns
+	 * @memberof BaseResource
+	 */
+	async updateMany({ object, query }) {
+		console.log("update many!!!");
+		try {
+			if (!this.factory || !this.validator) {
+				throw new Error("Missing factory or Validator for this model");
+			}
+			// construtor may or may not return promise
+			const factoryObject = await this.factory(object, { isUpdating: true });
+			console.log({ factoryObject });
+			// Validate
+			const [validationError, value] = this.validator(
+				{ data: factoryObject },
+				{ isUpdating: true }
+			);
+
+			if (validationError) {
+				validationError.statusCode = 422;
+				throw new Error(validationError);
+			}
+
+			// Update record
+			const [error, result] = await updateMany({
+				collName: this.collectionName,
+				query,
+				data: value
+			});
+
+			// End of message queue
+			if (error) return [makeError(error), undefined];
 			return [undefined, result];
 		} catch (error) {
 			return [makeError(error), undefined];

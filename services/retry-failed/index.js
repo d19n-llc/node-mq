@@ -19,6 +19,8 @@ module.exports = async (params = {}) => {
 		if (findError) throw new Error(findResult);
 		const failedMessages = findResult ? findResult[0].data : [];
 
+		console.log({ failedMessages });
+
 		if (failedMessages.length > 0) {
 			const messages = failedMessages.filter(
 				(elem) => elem.maxRetries > elem.retriedCount
@@ -29,7 +31,8 @@ module.exports = async (params = {}) => {
 					createResult
 				] = await MessageQueuedResource.createOne({
 					object: Object.assign({}, message, {
-						batchId: "",
+						batchId: null,
+						status: "queued",
 						retriedCount: message.retriedCount + 1
 					})
 				});

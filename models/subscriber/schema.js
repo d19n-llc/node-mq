@@ -22,10 +22,10 @@ module.exports = Joi.object()
 		lastUpdateError: Joi.string()
 			.optional()
 			.allow(""),
-		lastUpdateTime: Joi.string()
+		lastupdatedAt: Joi.string()
 			.optional()
 			.allow(""),
-		updateTime: Joi.string().required(),
-		createTime: Joi.string().required()
+		updatedAt: Joi.string().required(),
+		createdAt: Joi.string().required()
 	})
 	.options({ stripUnknown: true });

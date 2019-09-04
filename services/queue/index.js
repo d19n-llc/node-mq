@@ -21,44 +21,48 @@ module.exports = async ({ removeBuffer = false }) => {
 		messageHandlers = {};
 		// console.error(err);
 	}
-
 	const MessageQueuedResource = new MessageQueuedResourceClass();
+
 	// Set a batchId for the messages being processed
 	const batchId = uuidv1();
-	// Messages to be processed
-	const [queueError, queueMessages] = await MessageQueuedResource.findMany({
-		query: {
-			resultsPerPage: queueSettings.batchCount || 250,
-			sort: "1|createTime|",
-			topic: {
-				$in: [...Object.keys(messageHandlers), ...["internal-test"]]
-			}
-		}
-	});
-
-	if (queueError) throw new Error(queueError);
-
-	// Messages to be published out to subscribers
-	const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
-		query: {
-			resultsPerPage: 250,
-			sort: "1|createTime|",
-			source: process.env.APP_URL
-		}
-	});
-
-	if (pubMsgError) throw new Error(pubMsgError);
 
 	// Handle messages
 	try {
-		if ([...pubMsgResult[0].data, ...queueMessages[0].data].length > 0) {
-			// Claim messages to be processed
-			const [claimError, claimResult] = await claimMessages({
-				messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
+		// if ([...pubMsgResult[0].data, ...queueMessages[0].data].length > 0) {
+		// Claim messages to be processed
+		const [claimError, claimResult] = await claimMessages({
+			// messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
+			batchId,
+			removeBuffer
+		});
+		if (claimError) throw new Error(claimError);
+
+		const [queueError, queueMessages] = await MessageQueuedResource.findMany({
+			query: {
+				resultsPerPage: queueSettings.batchCount || 250,
+				sort: "1|createdAt|",
 				batchId,
-				removeBuffer
-			});
-			if (claimError) throw new Error(claimError);
+				topic: {
+					$in: [...Object.keys(messageHandlers), ...["internal-test"]]
+				}
+			}
+		});
+
+		if (queueError) throw new Error(queueError);
+
+		// Messages to be published out to subscribers
+		const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
+			query: {
+				resultsPerPage: queueSettings.batchCount || 250,
+				batchId,
+				sort: "1|createdAt|",
+				source: process.env.APP_URL
+			}
+		});
+
+		if (pubMsgError) throw new Error(pubMsgError);
+
+		if ([...pubMsgResult[0].data, ...queueMessages[0].data].length > 0) {
 			// Process messages claimed
 			const [processError, processResult] = await processMessages({
 				messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
@@ -73,8 +77,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			undefined,
 			{
 				status: "messages processed",
-				totalMessages: [...pubMsgResult[0].data, ...queueMessages[0].data]
-					.length
+				totalMessages: 100
 			}
 		];
 	} catch (error) {

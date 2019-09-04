@@ -23,8 +23,8 @@ module.exports.RunTests = async () => {
 			retryResponse = retryResult;
 		});
 
-		const [deleteError, deleteResult] = await deleteMessages({});
-		if (deleteError) throw new Error(deleteError);
+		// const [deleteError, deleteResult] = await deleteMessages({});
+		// if (deleteError) throw new Error(deleteError);
 
 		return [
 			undefined,

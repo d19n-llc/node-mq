@@ -41,6 +41,18 @@ module.exports = {
 		}
 	},
 
+	async updateMany({ data, query, collName }) {
+		try {
+			const dbClient = await collection(collName);
+			const result = await dbClient.updateMany(query, {
+				$set: data
+			});
+			return [undefined, result];
+		} catch (error) {
+			return [error, undefined];
+		}
+	},
+
 	async aggregate({ collName, query }) {
 		try {
 			const dbClient = await collection(collName);

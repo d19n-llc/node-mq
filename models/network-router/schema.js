@@ -24,7 +24,7 @@ module.exports = Joi.object()
 			then: Joi.strip(),
 			otherwise: Joi.array().required()
 		}),
-		updateTime: Joi.string().required(),
-		createTime: Joi.string().required()
+		updatedAt: Joi.string().required(),
+		createdAt: Joi.string().required()
 	})
 	.options({ stripUnknown: true });

@@ -61,7 +61,7 @@ module.exports = async ({ message }) => {
 						object: {
 							subscriberUrl: doc.subscriberUrl,
 							lastUpdateError: publishError ? publishError.message : "",
-							lastUpdateTime: utcDate(),
+							lastupdatedAt: utcDate(),
 							lastMessageName: message.name
 						}
 					});
