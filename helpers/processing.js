@@ -11,8 +11,10 @@ module.exports.offsetJobStart = ({ addTime = 0 }) => {
 	 * If the app is running in cluster mode the addTime  represents the
 	 * appInstanceId and will be multiplied by 2000ms.
 	 */
-	const randomizeTime = (min, max) => Math.random() * (max - min) + min;
-	const offSetInterval = randomizeTime(0, 600);
+
+	const randomizeTime = (min, max) =>
+		Math.floor(Math.random() * (max - min + 1) + min);
+	const offSetInterval = randomizeTime(50, 150);
 	const convertedToMs = Number(addTime) * 50;
 	const delay = offSetInterval + convertedToMs;
 
