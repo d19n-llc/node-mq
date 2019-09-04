@@ -1,4 +1,3 @@
-const { currentDayIso, getDiffIndates } = require("./dates");
 /**
  * To handle microservices that will start the job
  * at precisely the same time, this will provide a
@@ -13,27 +12,8 @@ module.exports.offsetJobStart = ({ addTime = 0 }) => {
 	 * appInstanceId and will be multiplied by 2000ms.
 	 */
 	const randomizeTime = (min, max) => Math.random() * (max - min) + min;
-	const offSetInterval = randomizeTime(25, 50);
-	const convertedToMs = Number(addTime) * 5;
+	const offSetInterval = randomizeTime(0, 150);
+	const convertedToMs = Number(addTime) * 25;
 	const delay = offSetInterval + convertedToMs;
 	return new Promise((resolve) => setTimeout(resolve, delay));
-};
-
-/**
- * check if the job is past the 15 second buffer
- * @returns
- */
-module.exports.isPastQueueBuffer = (params) => {
-	const { messageCreatedAt } = params;
-	const currentTime = currentDayIso();
-	const difference = getDiffIndates(
-		currentTime,
-		messageCreatedAt,
-		"milliseconds"
-	);
-	// Adding a queue buffer of 3 seconds
-	if (difference > 25) {
-		return true;
-	}
-	return false;
 };

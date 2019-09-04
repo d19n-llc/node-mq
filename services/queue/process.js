@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-const { isPastQueueBuffer } = require("../../helpers/processing");
 const handleCleanUpOnError = require("./clean-up");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const ProcessedResourceClass = require("../../resources/message-processed");
@@ -12,16 +11,10 @@ const PublishMessage = require("../publish/message");
  * 	messages,
  * 	batchId,
  * 	messageHandlers,
- * 	removeBuffer
  * }
  * @returns
  */
-module.exports = async ({
-	messages,
-	batchId,
-	messageHandlers,
-	removeBuffer
-}) => {
+module.exports = async ({ messages, batchId, messageHandlers }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
 
