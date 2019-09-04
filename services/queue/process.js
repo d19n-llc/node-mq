@@ -21,7 +21,7 @@ module.exports = async ({
 	messages,
 	batchId,
 	messageHandlers,
-	removeBuffer,
+	removeBuffer
 }) => {
 	const InFlightResource = new InFlightResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
@@ -34,26 +34,26 @@ module.exports = async ({
 	async function handleProcessedMessage({ message }) {
 		// Move message to processed
 		const [moveError, moveResult] = await ProcessedResource.createOne({
-			object: message,
+			object: message
 		});
 		if (moveError) {
 			await handleCleanUpOnError({
 				message,
 				batchId,
-				errorMessage: moveError ? moveError.message : "",
+				errorMessage: moveError ? moveError.message : ""
 			});
 		}
 		// If the messages was moved successfully then delete it
 		if (moveResult) {
 			// Remove message from inflight
 			const [removeError] = await InFlightResource.deleteOne({
-				query: { _id: message._id },
+				query: { _id: message._id }
 			});
 			if (removeError) {
 				await handleCleanUpOnError({
 					message,
 					batchId,
-					errorMessage: removeError ? removeError.message : "",
+					errorMessage: removeError ? removeError.message : ""
 				});
 			}
 		}
@@ -72,13 +72,13 @@ module.exports = async ({
 				// Test processing works.
 				if (source === "test-script") {
 					const [error, result] = await ProcessMessageTest({
-						message: currentMessage,
+						message: currentMessage
 					});
 					if (error) {
 						await handleCleanUpOnError({
 							message: currentMessage,
 							batchId,
-							errorMessage: error ? error.message : "",
+							errorMessage: error ? error.message : ""
 						});
 					} else {
 						handleProcessedMessage({ message: currentMessage });
@@ -87,13 +87,13 @@ module.exports = async ({
 					// If the source is the APP_URL that means this message should be published
 					// to all subscribers and not processed internally with the script registry.
 					const [error, result] = await PublishMessage({
-						message: currentMessage,
+						message: currentMessage
 					});
 					if (error) {
 						await handleCleanUpOnError({
 							message: currentMessage,
 							batchId,
-							errorMessage: error ? error.message : "",
+							errorMessage: error ? error.message : ""
 						});
 					} else {
 						handleProcessedMessage({ message: currentMessage });
@@ -105,14 +105,14 @@ module.exports = async ({
 					// If the source is not the current APP and their is a script then
 					// Use the script with the key === to the message topic
 					const [error, result] = await messageHandlers[`${topic}`]({
-						message,
+						message
 					});
 					if (error) {
 						// eslint-disable-next-line no-await-in-loop
 						await handleCleanUpOnError({
 							message: currentMessage,
 							batchId,
-							errorMessage: error ? error.message : "",
+							errorMessage: error ? error.message : ""
 						});
 					} else {
 						handleProcessedMessage({ message: currentMessage });
@@ -123,9 +123,10 @@ module.exports = async ({
 
 		return [
 			undefined,
-			{ status: "processed messages", total: messages.length },
+			{ status: "processed messages", total: messages.length }
 		];
 	} catch (error) {
+		console.error(error);
 		return [error, undefined];
 	}
 };

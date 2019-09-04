@@ -40,6 +40,7 @@ module.exports = async ({ batchId }) => {
 		}
 		return [undefined, { batchCount: findResult.length }];
 	} catch (error) {
+		console.error(error);
 		return [error, undefined];
 	}
 };

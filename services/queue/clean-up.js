@@ -9,13 +9,13 @@ module.exports = async ({ message, batchId, errorMessage }) => {
 		// Move the message that caused an error to failed
 		const [failError] = await FailedResource.createOne({
 			object: Object.assign({}, message, {
-				error: { message: errorMessage },
-			}),
+				error: { message: errorMessage }
+			})
 		});
 		if (failError) throw new Error(failError);
 		// Rollback all messages for this batch from inflight to the queue
 		const [removeError] = await InFlightResource.deleteOne({
-			query: { _id: message._id },
+			query: { _id: message._id }
 		});
 		if (removeError) throw new Error(removeError);
 		// Rolback jobs unprocessed into the queue
@@ -23,6 +23,7 @@ module.exports = async ({ message, batchId, errorMessage }) => {
 		if (rollbackError) throw new Error(rollbackError);
 		return [undefined, { status: "messages inflight clean up complete." }];
 	} catch (error) {
+		console.error(error);
 		return [error, undefined];
 	}
 };

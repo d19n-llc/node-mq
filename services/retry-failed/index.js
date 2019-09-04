@@ -44,6 +44,7 @@ module.exports = async (params = {}) => {
 		}
 		return [undefined, { failedMessages: failedMessages.length }];
 	} catch (error) {
+		console.error(error);
 		return [error, undefined];
 	}
 };

@@ -71,6 +71,7 @@ module.exports = async ({ message }) => {
 
 		return [undefined, { status: "messages published to subscribers" }];
 	} catch (error) {
+		console.error(error);
 		return [error, undefined];
 	}
 };

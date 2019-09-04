@@ -78,6 +78,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			}
 		];
 	} catch (error) {
+		console.error(error);
 		return [error, undefined];
 	}
 };

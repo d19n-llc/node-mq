@@ -24,16 +24,16 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 				// eslint-disable-next-line no-await-in-loop
 				const [
 					inflightError,
-					inflightResult,
+					inflightResult
 				] = await InFlightResource.createOne({
-					object: currentMessage,
+					object: currentMessage
 				});
 				if (inflightError) {
 					// eslint-disable-next-line no-await-in-loop
 					await handleCleanUpOnError({
 						message: currentMessage,
 						batchId: currentMessage.batchId,
-						errorMessage: inflightError.message,
+						errorMessage: inflightError.message
 					});
 				}
 				// If we have the result then delete the message from the queue
@@ -41,14 +41,14 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 					// Remove from the queue
 					// eslint-disable-next-line no-await-in-loop
 					const [removeError] = await MessageQueuedResource.deleteOne({
-						query: { _id: currentMessage._id },
+						query: { _id: currentMessage._id }
 					});
 					if (removeError) {
 						// eslint-disable-next-line no-await-in-loop
 						await handleCleanUpOnError({
 							message: currentMessage,
 							batchId: currentMessage.batchId,
-							errorMessage: removeError.message,
+							errorMessage: removeError.message
 						});
 					}
 				}
@@ -56,6 +56,7 @@ module.exports = async ({ messages, batchId, removeBuffer }) => {
 		}
 		return [undefined, { status: "messages claimed", total: messages.length }];
 	} catch (error) {
+		console.error(error);
 		return [error, undefined];
 	}
 };
