@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-const handleCleanUpOnError = require("./clean-up");
+const handleFailedMessage = require("./clean-up");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
@@ -25,16 +25,16 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 	 */
 	async function handleProcessedMessage({ message }) {
 		// Move message to processed
-		const [moveError, moveResult] = await ProcessedResource.createOne({
+		const [moveError] = await ProcessedResource.createOne({
 			object: Object.assign({}, message, { status: "processed" })
 		});
 
-		const [deleteError, deleteResult] = await MessageQueuedResource.deleteOne({
+		const [deleteError] = await MessageQueuedResource.deleteOne({
 			query: { _id: message._id }
 		});
 
 		if (moveError || deleteError) {
-			await handleCleanUpOnError({
+			await handleFailedMessage({
 				message,
 				batchId,
 				errorMessage: moveError ? moveError.message : ""
@@ -50,11 +50,11 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 			const { source, topic } = message;
 			// Test processing works.
 			if (source === "test-script") {
-				const [error, result] = await ProcessMessageTest({
+				const [error] = await ProcessMessageTest({
 					message: currentMessage
 				});
 				if (error) {
-					await handleCleanUpOnError({
+					await handleFailedMessage({
 						message: currentMessage,
 						batchId,
 						errorMessage: error ? error.message : ""
@@ -65,11 +65,11 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 			} else if (process.env.APP_URL && source === process.env.APP_URL) {
 				// If the source is the APP_URL that means this message should be published
 				// to all subscribers and not processed internally with the script registry.
-				const [error, result] = await PublishMessage({
+				const [error] = await PublishMessage({
 					message: currentMessage
 				});
 				if (error) {
-					await handleCleanUpOnError({
+					await handleFailedMessage({
 						message: currentMessage,
 						batchId,
 						errorMessage: error ? error.message : ""
@@ -83,12 +83,12 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 			) {
 				// If the source is not the current APP and their is a script then
 				// Use the script with the key === to the message topic
-				const [error, result] = await messageHandlers[`${topic}`]({
+				const [error] = await messageHandlers[`${topic}`]({
 					message
 				});
 				if (error) {
 					// eslint-disable-next-line no-await-in-loop
-					await handleCleanUpOnError({
+					await handleFailedMessage({
 						message: currentMessage,
 						batchId,
 						errorMessage: error ? error.message : ""

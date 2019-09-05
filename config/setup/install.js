@@ -80,10 +80,9 @@ module.exports.CreateCollections = () => {
 	// Invoke our async function to process the script
 	asyncFunctions()
 		.then((result) => {
-			console.log(result);
 			process.exit();
 		})
 		.catch((err) => {
-			console.log(err);
+			console.error(err);
 		});
 };

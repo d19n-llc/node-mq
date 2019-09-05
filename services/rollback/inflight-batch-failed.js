@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const MessageInflightResourceClass = require("../../resources/message-inflight");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const { seriesLoop } = require("../../helpers/functions");
@@ -17,7 +18,7 @@ module.exports = async ({ batchId }) => {
 		});
 		if (findError) throw new Error(findError);
 
-		const failedMessages = findResult ? findResult[0].data : [];
+		const failedMessages = _.get(findResult, "data");
 
 		if (failedMessages.length > 0) {
 			await seriesLoop(failedMessages, async (job, index) => {

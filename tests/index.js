@@ -23,14 +23,15 @@ module.exports.RunTests = async () => {
 			retryResponse = retryResult;
 		});
 
-		// const [deleteError, deleteResult] = await deleteMessages({});
-		// if (deleteError) throw new Error(deleteError);
+		const [deleteError, deleteResult] = await deleteMessages({});
+		if (deleteError) throw new Error(deleteError);
 
 		return [
 			undefined,
 			{ seedResult, processResponse, retryResponse, deleteResult }
 		];
 	} catch (error) {
+		console.error(error);
 		return [error, undefined];
 	}
 };

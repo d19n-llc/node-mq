@@ -149,18 +149,30 @@ class BaseResource {
 	 * @returns
 	 * @memberof BaseResource
 	 */
-	async findMany({ query }) {
+	async findMany({ query, isPaginated = true }) {
 		const { queryPipeline } = new this.QueryBuilder({
 			query,
-			isPaginated: true
+			queryExtension: this.queryExtensionFindMany,
+			isPaginated
 		}).processAndReturnQuery();
+
 		try {
 			const [error, result] = await aggregate({
 				collName: this.collectionName,
-				query: [...this.queryExtensionFindMany, ...queryPipeline]
+				// You cannot have multiple $facet pipelines in a single query
+				query: queryPipeline
 			});
-			if (error) return [makeError(error), undefined];
-			return [undefined, result];
+
+			if (error) return [error, undefined];
+
+			if (isPaginated) {
+				const sanitizedResult = Object.assign({}, result[0], {
+					metaData: result[0].metaData[0] || {}
+				});
+
+				return [undefined, sanitizedResult];
+			}
+			return [undefined, result[0]];
 		} catch (error) {
 			return [makeError(error), undefined];
 		}
@@ -176,15 +188,18 @@ class BaseResource {
 	async findOne({ query }) {
 		const { queryPipeline } = new this.QueryBuilder({
 			query,
+			queryExtension: this.queryExtensionFindOne,
 			isPaginated: false
 		}).processAndReturnQuery();
+
 		try {
 			const [error, result] = await aggregate({
 				collName: this.collectionName,
-				query: [...this.queryExtensionFindOne, ...queryPipeline]
+				query: queryPipeline
 			});
-			if (error) return [makeError(error), undefined];
-			return [undefined, result[0] || {}];
+
+			if (error) return [error, undefined];
+			return [undefined, result[0] ? result[0].data[0] : {}];
 		} catch (error) {
 			return [makeError(error), undefined];
 		}
@@ -237,14 +252,13 @@ class BaseResource {
 	 * @memberof BaseResource
 	 */
 	async updateMany({ object, query }) {
-		console.log("update many!!!");
 		try {
 			if (!this.factory || !this.validator) {
 				throw new Error("Missing factory or Validator for this model");
 			}
 			// construtor may or may not return promise
 			const factoryObject = await this.factory(object, { isUpdating: true });
-			console.log({ factoryObject });
+
 			// Validate
 			const [validationError, value] = this.validator(
 				{ data: factoryObject },

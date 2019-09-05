@@ -1,5 +1,6 @@
 const schedule = require("node-schedule");
 const deduplicateQueue = require("../services/deduplicate");
+const clearMessageLocks = require("../services/workers/clear-message-locks");
 const processQueuedMessages = require("../services/queue");
 const retryFailedMessages = require("../services/retry-failed");
 const { offsetJobStart } = require("../helpers/processing");
@@ -25,11 +26,17 @@ function Scheduler() {
 		queueSettings = {};
 	}
 
+	// Releases locked messages in the queue
+	schedule.scheduleJob(
+		`${queueSettings.clearMessageLocks || 0} * * * * *`,
+		() => {
+			clearMessageLocks({});
+		}
+	);
 	// Deduplicate message queue
 	schedule.scheduleJob(
 		`${queueSettings.deduplicateQueueEvery || 0} * * * * *`,
 		() => {
-			// console.log("deduplicate_queue");
 			deduplicateQueue({});
 		}
 	);
@@ -38,7 +45,7 @@ function Scheduler() {
 		`${queueSettings.processQueueEvery || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			// console.log("process_queue");
+
 			processQueuedMessages({});
 		}
 	);
@@ -47,7 +54,7 @@ function Scheduler() {
 		`${queueSettings.retryFailedEvery || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			// console.log("process_failed");
+
 			retryFailedMessages({});
 		}
 	);

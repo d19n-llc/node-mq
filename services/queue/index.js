@@ -1,4 +1,5 @@
 const uuidv1 = require("uuid/v1");
+const _ = require("lodash");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const claimMessages = require("./claim");
 const processMessages = require("./process");
@@ -28,13 +29,13 @@ module.exports = async ({ removeBuffer = false }) => {
 
 	// Handle messages
 	try {
-		// if ([...pubMsgResult[0].data, ...queueMessages[0].data].length > 0) {
+		// if ([...messagesToPublish, ...messagesToProcess].length > 0) {
 		// Claim messages to be processed
-		const [claimError, claimResult] = await claimMessages({
-			// messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
+		const [claimError] = await claimMessages({
 			batchId,
 			removeBuffer
 		});
+
 		if (claimError) throw new Error(claimError);
 
 		const [queueError, queueMessages] = await MessageQueuedResource.findMany({
@@ -62,10 +63,14 @@ module.exports = async ({ removeBuffer = false }) => {
 
 		if (pubMsgError) throw new Error(pubMsgError);
 
-		if ([...pubMsgResult[0].data, ...queueMessages[0].data].length > 0) {
+		// Get the data from both categories of messages
+		const messagesToProcess = _.get(queueMessages, "data");
+		const messagesToPublish = _.get(pubMsgResult, "data");
+		// Check that we have messages before processing
+		if ([...messagesToPublish, ...messagesToProcess].length > 0) {
 			// Process messages claimed
-			const [processError, processResult] = await processMessages({
-				messages: [...pubMsgResult[0].data, ...queueMessages[0].data],
+			const [processError] = await processMessages({
+				messages: [...messagesToPublish, ...messagesToProcess],
 				batchId,
 				messageHandlers,
 				removeBuffer

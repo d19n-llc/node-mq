@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const internalHttp = require("../../http/requests");
 const { seriesLoop } = require("../../helpers/functions");
 const { utcDate } = require("../../helpers/dates");
@@ -44,19 +45,18 @@ module.exports = async ({ message }) => {
 		});
 		if (findError) throw new Error(findError);
 
-		const subscribers = findResult ? findResult[0].data : [];
+		// Find subscribers
+		const subscribers = _.get(findResult, "data");
 
 		if (subscribers.length > 0)
+			// Send messages to subscribers
 			await seriesLoop(subscribers, async (doc, index) => {
 				if (doc) {
-					const [publishError, publishResult] = await sendMessageToSubscriber({
+					const [publishError] = await sendMessageToSubscriber({
 						subscriberUrl: doc.subscriberUrl
 					});
 
-					const [
-						updateError,
-						updateResult
-					] = await SubscriberResource.updateOne({
+					const [updateError] = await SubscriberResource.updateOne({
 						query: { _id: doc._id },
 						object: {
 							subscriberUrl: doc.subscriberUrl,

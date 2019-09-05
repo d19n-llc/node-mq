@@ -16,7 +16,7 @@ try {
 	console.error(error);
 }
 
-console.log("@d19n/node-mq is running");
+console.log("message queu is running");
 
 module.exports = {
 	PublisherFactory,

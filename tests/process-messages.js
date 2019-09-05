@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const processQueuedMessages = require("../services/queue");
 const MessageQueuedResourceClass = require("../resources/message-queued");
 const { asyncForLoop } = require("../helpers/functions");
@@ -11,16 +12,15 @@ module.exports = async (params = {}) => {
 		});
 		if (findError) throw new Error(findError);
 
-		if (findResult.length > 0) {
-			await asyncForLoop(
-				{ total: findResult.length, incrementBy: 25 },
-				async () => {
-					const [processError] = await processQueuedMessages({
-						removeBuffer: true
-					});
-					if (processError) throw new Error(processError);
-				}
-			);
+		const data = _.get(findResult, "data");
+
+		if (data.length > 0) {
+			await asyncForLoop({ total: data.length, incrementBy: 25 }, async () => {
+				const [processError] = await processQueuedMessages({
+					removeBuffer: true
+				});
+				if (processError) throw new Error(processError);
+			});
 		}
 		return [
 			undefined,

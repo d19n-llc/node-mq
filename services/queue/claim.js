@@ -1,5 +1,4 @@
 const _ = require("lodash");
-
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 
 /**
@@ -12,40 +11,37 @@ module.exports = async ({ batchId }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 
 	try {
-		console.log({ batchId });
-
+		// Find the first message that does not have a batchId
 		const [findError, findResult] = await MessageQueuedResource.findMany({
 			query: {
-				batchId: { $in: [null, ""] },
+				batchId: null,
 				resultsPerPage: 1,
 				pageNumber: 0
 			}
 		});
 
 		if (findError) throw new Error(findError);
+		// Get the topic of that message
 
-		console.log({ findError, findResult });
-		const data = _.get(findResult[0], "data");
+		const data = _.get(findResult, "data");
 		const topic = _.get(data[0], "topic");
 
 		if (topic) {
+			// Add the "batchId" and change the status to "in_flight" which locks the
+			// messages with that topic
 			const [
 				claimError,
 				claimResult
 				// eslint-disable-next-line no-await-in-loop
 			] = await MessageQueuedResource.updateMany({
-				query: { topic, batchId: { $in: [null, ""] } },
+				query: { topic, batchId: null },
 				object: { batchId, status: "in_flight" }
 			});
 
-			// If there is an error remove the batchId and change the status to Queued
+			// If there is an error clear the "batchId" and change the status to "queued"
 			if (claimError) {
 				// eslint-disable-next-line no-await-in-loop
-				const [
-					updateManyError,
-					updateManyResult
-					// eslint-disable-next-line no-await-in-loop
-				] = await MessageQueuedResource.updateMany({
+				const [updateManyError] = await MessageQueuedResource.updateMany({
 					query: { batchId },
 					object: { batchId: null, status: "queued" }
 				});
@@ -65,7 +61,7 @@ module.exports = async ({ batchId }) => {
 		return [
 			undefined,
 			{
-				status: "Nothing to claim",
+				status: "no messages to claim",
 				modifiedCount: 0,
 				upsertedCount: 0,
 				matchedCount: 0

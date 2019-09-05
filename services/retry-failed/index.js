@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const FailedResourceClass = require("../../resources/message-failed");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const { seriesLoop } = require("../../helpers/functions");
@@ -12,24 +13,26 @@ module.exports = async (params = {}) => {
 	const FailedResource = new FailedResourceClass();
 
 	try {
+		// Find retriable messages
 		const [findError, findResult] = await FailedResource.findMany({
 			query: { maxRetries: { $gt: 0 } }
 		});
 
 		if (findError) throw new Error(findResult);
-		const failedMessages = findResult ? findResult[0].data : [];
+		// Get the topic of that message
 
-		console.log({ failedMessages });
+		const data = _.get(findResult, "data");
 
-		if (failedMessages.length > 0) {
-			const messages = failedMessages.filter(
-				(elem) => elem.maxRetries > elem.retriedCount
+		if (data.length > 0) {
+			// Do not process any failed messages that have been retried for the max
+			// amount of retries.
+			const messages = data.filter(
+				(elem) => elem.maxRetries !== elem.retriedCount
 			);
+
+			// Create the failed message in the queue to be processed
 			await seriesLoop(messages, async (message, index) => {
-				const [
-					createError,
-					createResult
-				] = await MessageQueuedResource.createOne({
+				const [createError] = await MessageQueuedResource.createOne({
 					object: Object.assign({}, message, {
 						batchId: null,
 						status: "queued",
@@ -38,14 +41,14 @@ module.exports = async (params = {}) => {
 				});
 
 				if (createError) throw new Error(createError);
-
-				const [failedError, failedResult] = await FailedResource.deleteOne({
+				// Delete the message from the failed message collection
+				const [failedError] = await FailedResource.deleteOne({
 					query: { _id: message._id }
 				});
 				if (failedError) throw new Error(failedError);
 			});
 		}
-		return [undefined, { failedMessages: failedMessages.length }];
+		return [undefined, { failedMessages: data.length }];
 	} catch (error) {
 		console.error(error);
 		return [error, undefined];
