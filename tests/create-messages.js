@@ -78,8 +78,8 @@ module.exports = async (params = {}) => {
 
 		await seriesLoop(
 			[
-				...messagesNoRetry,
-				...failedMessagesNoRetry,
+				// ...messagesNoRetry,
+				// ...failedMessagesNoRetry,
 				...failedMessagesRetriable
 			],
 			async (msg) => {

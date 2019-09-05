@@ -47,12 +47,14 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 		for (let index = 0; index < messages.length; index++) {
 			const message = messages[index];
 			const currentMessage = Object.assign({}, message, { batchId });
+
 			const { source, topic } = message;
 			// Test processing works.
 			if (source === "test-script") {
 				const [error] = await ProcessMessageTest({
 					message: currentMessage
 				});
+
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,

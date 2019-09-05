@@ -13,7 +13,7 @@ module.exports.RunTests = async () => {
 		let processResponse;
 		let retryResponse;
 		// test that the failed messages are retried for the total maxRetries count
-		await asyncForLoop({ total: 4, incrementBy: 1 }, async (doc, index) => {
+		await asyncForLoop({ total: 30, incrementBy: 1 }, async (doc, index) => {
 			const [processError, processResult] = await processMessages({});
 			if (processError) throw new Error(processError);
 			processResponse = processResult;

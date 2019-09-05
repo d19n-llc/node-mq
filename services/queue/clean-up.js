@@ -7,7 +7,7 @@ module.exports = async ({ message, errorMessage }) => {
 	const MessageQueueResource = new MessageQueuedResourceClass();
 	try {
 		// Move the message that caused an error to failed
-		const [failError] = await FailedResource.createOne({
+		const [failError, failResult] = await FailedResource.createOne({
 			object: Object.assign({}, message, {
 				status: "failed",
 				error: { message: errorMessage }

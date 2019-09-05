@@ -32,6 +32,7 @@ module.exports = (params, options) => {
 		params,
 		addTimestamps({ isUpdating })
 	);
+
 	// Freeze the object
 	return Object.freeze({
 		...merged

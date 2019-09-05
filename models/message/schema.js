@@ -54,9 +54,7 @@ module.exports = Joi.object()
 		maxRetries: Joi.number()
 			.optional()
 			.default(2),
-		retriedCount: Joi.number()
-			.optional()
-			.default(0),
+		retriedCount: Joi.number().optional(),
 		payload: Joi.when("$update", {
 			is: true,
 			then: Joi.object().optional(),

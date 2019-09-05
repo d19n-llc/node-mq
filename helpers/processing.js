@@ -14,7 +14,7 @@ module.exports.offsetJobStart = ({ addTime = 0 }) => {
 
 	const randomizeTime = (min, max) =>
 		Math.floor(Math.random() * (max - min + 1) + min);
-	const offSetInterval = randomizeTime(25, 135);
+	const offSetInterval = randomizeTime(5, 100);
 	const convertedToMs = Number(addTime) * 15;
 	const delay = offSetInterval + convertedToMs;
 
