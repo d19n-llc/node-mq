@@ -25,7 +25,7 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 	 */
 	async function handleProcessedMessage({ message }) {
 		// Move message to processed
-		const [moveError] = await ProcessedResource.createOne({
+		const [moveError] = await ProcessedResource.createOneNonIdempotent({
 			object: Object.assign({}, message, { status: "processed" })
 		});
 

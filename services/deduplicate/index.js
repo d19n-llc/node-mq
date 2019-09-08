@@ -8,7 +8,7 @@ module.exports = async (params = {}) => {
 			query: [
 				{
 					$group: {
-						_id: { name: "$name" },
+						_id: { payload: "$payload" },
 						documentIds: { $push: { _id: "$_id" } },
 						count: { $sum: 1 }
 					}
