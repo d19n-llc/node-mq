@@ -104,8 +104,8 @@ class Query {
 			if (conversion) {
 				this.conversionStagePrior.$addFields[`${fieldName}Converted`] = {
 					$dateFromString: {
-						dateString: `$${fieldName}`,
-						onError: `$${fieldName}`
+						dateString: `$${fieldName}`
+						// onError: `$${fieldName}` // MDB version 4.0 or later
 					}
 				};
 				sortStage.$sort[`${fieldName}Converted`] = parseInt(order, 10);
@@ -177,8 +177,8 @@ class Query {
 		if (isDate) {
 			this.conversionStagePrior.$addFields[`${key}Converted`] = {
 				$dateFromString: {
-					dateString: `$${key}`,
-					onError: `$${key}`
+					dateString: `$${key}`
+					// onError: `$${key}` // MDB version 4.0 or later
 				}
 			};
 

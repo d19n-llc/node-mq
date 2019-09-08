@@ -21,6 +21,7 @@ module.exports = async (params = {}) => {
 				pageNumber: 0
 			}
 		});
+
 		if (findError) throw new Error(findError);
 		const data = _.get(findResult, "data");
 

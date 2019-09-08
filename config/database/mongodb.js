@@ -16,12 +16,13 @@ function mongoDb(params) {
 	if (dbName in databaseConnections) {
 		return databaseConnections[dbName];
 	}
-	return MongoClient.connect(dbUri, { useNewUrlParser: true }).then(
-		(client) => {
-			databaseConnections[dbName] = client.db(dbName);
-			databaseClients[dbName] = client;
-		}
-	);
+	return MongoClient.connect(dbUri, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	}).then((client) => {
+		databaseConnections[dbName] = client.db(dbName);
+		databaseClients[dbName] = client;
+	});
 }
 
 module.exports = {
