@@ -35,10 +35,7 @@ class MessageQueuedResource extends BaseResource {
 		try {
 			const [createError, createResult] = await super.createOne({
 				object,
-				query: {
-					source: object.source,
-					name: object.name
-				}
+				query: { payload: object.payload }
 			});
 
 			if (createError) return [createError, undefined];

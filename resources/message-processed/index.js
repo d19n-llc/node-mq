@@ -33,12 +33,8 @@ class MessageProcessedResource extends BaseResource {
 	async createOne(params) {
 		try {
 			const { object } = params;
-			const [createError, createResult] = await super.createOne({
-				object,
-				query: {
-					source: object.source,
-					name: object.name
-				}
+			const [createError, createResult] = await super.createOneNonIdempotent({
+				object
 			});
 			if (createError) return [createError, undefined];
 			return [undefined, createResult];
