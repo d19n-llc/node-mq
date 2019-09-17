@@ -7,7 +7,7 @@ module.exports = async ({ message, errorMessage }) => {
 	const MessageQueueResource = new MessageQueuedResourceClass();
 	try {
 		// Move the message that caused an error to failed
-		const [failError, failResult] = await FailedResource.createOne({
+		const [failError] = await FailedResource.createOneNonIdempotent({
 			object: Object.assign({}, message, {
 				status: "failed",
 				error: { message: errorMessage }
@@ -17,7 +17,7 @@ module.exports = async ({ message, errorMessage }) => {
 		if (failError) throw new Error(failError);
 
 		// Delete the message from the queue
-		const [deleteError, updateResult] = await MessageQueueResource.deleteOne({
+		const [deleteError, deleteResult] = await MessageQueueResource.deleteOne({
 			query: { _id: message._id }
 		});
 
@@ -27,9 +27,9 @@ module.exports = async ({ message, errorMessage }) => {
 			undefined,
 			{
 				status: "messages inflight clean up complete.",
-				modifiedCount: _.get(updateResult, "modifiedCount"),
-				upsertedCount: _.get(updateResult, "upsertedCount"),
-				matchedCount: _.get(updateResult, "matchedCount")
+				modifiedCount: _.get(deleteResult, "modifiedCount"),
+				upsertedCount: _.get(deleteResult, "upsertedCount"),
+				matchedCount: _.get(deleteResult, "matchedCount")
 			}
 		];
 	} catch (error) {
