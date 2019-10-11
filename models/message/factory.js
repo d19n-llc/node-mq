@@ -19,7 +19,7 @@ module.exports = (params, options) => {
 				topic: null, // provides context for the payload
 				action: null, // created, updated, deleted, nofification
 				priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high
-				maxRetries: 3,
+				maxRetries: 0,
 				retriedCount: 0,
 				payload: {}, // The data being processed
 				error: {}
