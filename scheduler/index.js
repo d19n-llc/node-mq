@@ -49,15 +49,14 @@ function Scheduler() {
 			processQueuedMessages({});
 		}
 	);
-	// Retry failed messages
-	schedule.scheduleJob(
-		`${queueSettings.retryFailedEvery || 0} * * * * *`,
-		async () => {
-			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-
-			retryFailedMessages({});
-		}
-	);
+	// // Retry failed messages
+	// schedule.scheduleJob(
+	// 	`${queueSettings.retryFailedEvery || 0} * * * * *`,
+	// 	async () => {
+	// 		await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+	// 		retryFailedMessages({});
+	// 	}
+	// );
 }
 
 Scheduler();
