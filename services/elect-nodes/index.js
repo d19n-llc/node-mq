@@ -20,7 +20,8 @@ module.exports = async () => {
 		});
 		if (findError) throw new Error(findError);
 		// Increment partition
-		const partition = findResult.length;
+		console.log({ findResult });
+		const partition = findResult.data.length;
 		console.log({ partition });
 		const [createError, createResult] = await NodeResource.createOne({
 			object: {
