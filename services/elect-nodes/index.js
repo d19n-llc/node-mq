@@ -11,22 +11,9 @@ module.exports = async () => {
 
 		const NodeResource = new NodeResourceClass();
 		// Find all nodes
-		const [findError, findResult] = await NodeResource.findMany({
-			query: {
-				nodeId: { $ne: null },
-				resultsPerPage: 1000,
-				pageNumber: 0
-			}
-		});
-		if (findError) throw new Error(findError);
-		// Increment partition
-		console.log({ findResult });
-		const partition = findResult.data.length;
-		console.log({ partition });
 		const [createError, createResult] = await NodeResource.createOne({
 			object: {
 				nodeId,
-				partition,
 				lastActive: utcDate()
 			}
 		});

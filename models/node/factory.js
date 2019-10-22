@@ -10,9 +10,7 @@ module.exports = (params, options) => {
 		: // isUpdating = false set default values
 		  {
 				_id: ObjectID().toString(),
-				nodeId: null,
-				partition: 0,
-				lastActive: null
+				nodeId: null
 		  };
 
 	// Merge values being passed in the params object with the defaults
