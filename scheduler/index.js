@@ -28,9 +28,13 @@ function Scheduler() {
 		queueSettings = {};
 	}
 	// Deduplicate message queue
-	schedule.scheduleJob(`${queueSettings.electNodes || 0} * * * * *`, () => {
-		electNodes({});
-	});
+	schedule.scheduleJob(
+		`${queueSettings.electNodes || 0} * * * * *`,
+		async () => {
+			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			electNodes({});
+		}
+	);
 
 	schedule.scheduleJob(`${queueSettings.assignNodes || 0} * * * * *`, () => {
 		assignNodes({});

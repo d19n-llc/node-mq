@@ -32,10 +32,9 @@ module.exports = async ({ removeBuffer = false }) => {
 	try {
 		const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 			query: {
-				resultsPerPage:
-					queueSettings.batchCount || 1000 > 5000
-						? 5000 // limit per batch
-						: queueSettings.batchCount || 1000,
+				resultsPerPage: queueSettings.batchCount
+					? 1000 // limit per batch
+					: queueSettings.batchCount || 1000,
 				sort: "1|createdAt|",
 				nodeId,
 				topic: {
@@ -49,10 +48,9 @@ module.exports = async ({ removeBuffer = false }) => {
 		// Messages to be published out to subscribers
 		const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
 			query: {
-				resultsPerPage:
-					queueSettings.batchCount || 1000 > 5000
-						? 5000 // limit per batch
-						: queueSettings.batchCount || 1000,
+				resultsPerPage: queueSettings.batchCount
+					? 1000 // limit per batch
+					: queueSettings.batchCount || 1000,
 				nodeId,
 				sort: "1|createdAt|",
 				source: os.hostname
