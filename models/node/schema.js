@@ -8,7 +8,7 @@ module.exports = Joi.object()
 			otherwise: Joi.string().required()
 		}),
 		nodeId: Joi.string().required(),
-		partition: Joi.string().required(),
+		partition: Joi.number().required(),
 		lastActive: Joi.string()
 			.optional()
 			.allow(null),
