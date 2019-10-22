@@ -36,7 +36,7 @@ class NodeResource extends BaseResource {
 			const [createError, createResult] = await super.createOne({
 				object,
 				query: {
-					dockerId: object.dockerId
+					nodeId: object.nodeId
 				}
 			});
 			if (createError) return [createError, undefined];
