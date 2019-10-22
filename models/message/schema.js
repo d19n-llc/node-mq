@@ -56,16 +56,26 @@ module.exports = Joi.object()
 			otherwise: Joi.object().required()
 		}),
 		error: Joi.object().optional(),
-		nodeId: Joi.string().optional(),
+		nodeId: Joi.string()
+			.allow(null)
+			.optional(),
 		assignedAt: Joi.when("$update", {
 			is: true,
-			then: Joi.string().optional(),
-			otherwise: Joi.string().required()
+			then: Joi.string()
+				.allow(null)
+				.optional(),
+			otherwise: Joi.string()
+				.allow(null)
+				.required()
 		}),
 		processedAt: Joi.when("$update", {
 			is: true,
-			then: Joi.string().optional(),
-			otherwise: Joi.string().required()
+			then: Joi.string()
+				.allow(null)
+				.optional(),
+			otherwise: Joi.string()
+				.allow(null)
+				.required()
 		}),
 		updatedAt: Joi.string().required(),
 		createdAt: Joi.when("$update", {
