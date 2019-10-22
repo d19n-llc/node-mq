@@ -3,12 +3,15 @@ const createMessages = require("./create-messages");
 const processMessages = require("./process-messages");
 const retryMessages = require("./retry-messages");
 const deleteMessages = require("./delete-messages");
+const electNodes = require("../services/elect-nodes");
 
 // node -e 'require("./tests").RunTests()'
 
 module.exports.RunTests = async () => {
 	try {
 		const [seedError, seedResult] = await createMessages();
+		await electNodes();
+
 		if (seedError) throw new Error(seedError);
 		let processResponse;
 		let retryResponse;

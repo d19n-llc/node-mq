@@ -4,6 +4,7 @@ require("./scheduler");
 const { RunTests } = require("./tests");
 const { CreateCollections } = require("./config/setup/install");
 const { RemoveCollections } = require("./config/setup/uninstall");
+const NodeResourceClass = require("./resources/node");
 const PublisherResourceClass = require("./resources/publisher");
 const MessageQueuedResourceClass = require("./resources/message-queued");
 const PublisherFactory = require("./models/publisher/factory");
@@ -24,6 +25,7 @@ module.exports = {
 	MessageFactory,
 	MessageQueuedResourceClass,
 	PublisherResourceClass,
+	NodeResourceClass,
 	CreateCollections,
 	RemoveCollections,
 	RunTests

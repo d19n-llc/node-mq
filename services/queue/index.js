@@ -1,7 +1,7 @@
-const uuidv1 = require("uuid/v1");
+const os = require("os");
 const _ = require("lodash");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
-const claimMessages = require("./claim");
+// const claimMessages = require("./claim");
 const processMessages = require("./process");
 /**
  *
@@ -25,19 +25,11 @@ module.exports = async ({ removeBuffer = false }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 
 	// Set a batchId for the messages being processed
-	const batchId = uuidv1();
+	// const batchId = uuidv1();
+	const nodeId = os.hostname;
 
 	// Handle messages
 	try {
-		// if ([...messagesToPublish, ...messagesToProcess].length > 0) {
-		// Claim messages to be processed
-		const [claimError] = await claimMessages({
-			batchId,
-			removeBuffer
-		});
-
-		if (claimError) throw new Error(claimError);
-
 		const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 			query: {
 				resultsPerPage:
@@ -45,7 +37,7 @@ module.exports = async ({ removeBuffer = false }) => {
 						? 5000 // limit per batch
 						: queueSettings.batchCount || 1000,
 				sort: "1|createdAt|",
-				batchId,
+				nodeId,
 				topic: {
 					$in: [...Object.keys(messageHandlers), ...["internal-test"]]
 				}
@@ -61,9 +53,9 @@ module.exports = async ({ removeBuffer = false }) => {
 					queueSettings.batchCount || 1000 > 5000
 						? 5000 // limit per batch
 						: queueSettings.batchCount || 1000,
-				batchId,
+				nodeId,
 				sort: "1|createdAt|",
-				source: process.env.APP_URL
+				source: os.hostname
 			}
 		});
 
@@ -77,7 +69,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			// Process messages claimed
 			const [processError] = await processMessages({
 				messages: [...messagesToPublish, ...messagesToProcess],
-				batchId,
+				nodeId,
 				messageHandlers,
 				removeBuffer
 			});

@@ -1,22 +1,24 @@
 const _ = require("lodash");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
+const { utcDate } = require("../../helpers/dates");
 
 /**
  *
  *
- * @param {*} { messages, batchId, removeBuffer }
+ * @param {*} { messages, nodeId, removeBuffer }
  * @returns
  */
-module.exports = async ({ batchId }) => {
+module.exports = async ({ nodeId }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 
 	try {
-		// Find the first message that does not have a batchId
+		// Find the first message that does not have a noded
 		const [findError, findResult] = await MessageQueuedResource.findMany({
 			query: {
-				batchId: null,
-				resultsPerPage: 1,
-				pageNumber: 0
+				nodeId: null,
+				resultsPerPage: 1000,
+				pageNumber: 0,
+				sort: "1|createdAt|"
 			}
 		});
 
@@ -27,27 +29,32 @@ module.exports = async ({ batchId }) => {
 		const topic = _.get(data[0], "topic");
 
 		if (topic) {
-			// Add the "batchId" and change the status to "in_flight" which locks the
+			// Add the "nodeId" and change the status to "in_flight" which locks the
 			// messages with that topic
 			const [
 				claimError,
 				claimResult
 				// eslint-disable-next-line no-await-in-loop
 			] = await MessageQueuedResource.updateMany({
-				query: { topic, batchId: null },
-				object: { batchId, status: "in_flight" }
+				query: { topic, nodeId: null },
+				object: { nodeId, status: "in_flight" }
 			});
 
-			// If there is an error clear the "batchId" and change the status to "queued"
+			// If there is an error clear the "nodeId" and change the status to "queued"
 			if (claimError) {
 				// eslint-disable-next-line no-await-in-loop
 				const [updateManyError] = await MessageQueuedResource.updateMany({
-					query: { batchId },
-					object: { batchId: null, status: "queued" }
+					query: { nodeId },
+					object: { nodeId: null, status: "queued", assignedAt: utcDate() }
 				});
 				if (updateManyError) throw new Error(updateManyError);
 			}
-
+			console.log({
+				status: "messages claimed",
+				modifiedCount: _.get(claimResult, "modifiedCount"),
+				upsertedCount: _.get(claimResult, "upsertedCount"),
+				matchedCount: _.get(claimResult, "matchedCount")
+			});
 			return [
 				undefined,
 				{
@@ -58,6 +65,13 @@ module.exports = async ({ batchId }) => {
 				}
 			];
 		}
+		console.log({
+			status: "no messages to claim",
+			modifiedCount: 0,
+			upsertedCount: 0,
+			matchedCount: 0
+		});
+
 		return [
 			undefined,
 			{

@@ -1,4 +1,6 @@
 const schedule = require("node-schedule");
+const electNodes = require("../services/elect-nodes");
+const assignNodes = require("../services/assign-nodes");
 const deduplicateQueue = require("../services/deduplicate");
 const clearMessageLocks = require("../services/workers/clear-message-locks");
 const processQueuedMessages = require("../services/queue");
@@ -25,7 +27,14 @@ function Scheduler() {
 		// set to default
 		queueSettings = {};
 	}
+	// Deduplicate message queue
+	schedule.scheduleJob(`${queueSettings.electNodes || 0} * * * * *`, () => {
+		electNodes({});
+	});
 
+	schedule.scheduleJob(`${queueSettings.assignNodes || 0} * * * * *`, () => {
+		assignNodes({});
+	});
 	// Releases locked messages in the queue
 	schedule.scheduleJob(
 		`${queueSettings.clearMessageLocks || 0} * * * * *`,
@@ -49,14 +58,14 @@ function Scheduler() {
 			processQueuedMessages({});
 		}
 	);
-	// // Retry failed messages
-	// schedule.scheduleJob(
-	// 	`${queueSettings.retryFailedEvery || 0} * * * * *`,
-	// 	async () => {
-	// 		await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-	// 		retryFailedMessages({});
-	// 	}
-	// );
+	// Retry failed messages
+	schedule.scheduleJob(
+		`${queueSettings.retryFailedEvery || 0} * * * * *`,
+		async () => {
+			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			retryFailedMessages({});
+		}
+	);
 }
 
 Scheduler();

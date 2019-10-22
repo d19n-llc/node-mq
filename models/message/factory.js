@@ -11,7 +11,6 @@ module.exports = (params, options) => {
 				_id: ObjectID().toString(),
 				userAccountId: null,
 				userId: null,
-				batchId: null, // added at the time the message is processed from the queue
 				externalId: null, // Id for the topic of the message
 				name: null, // a unique identifier for the message
 				source: null,
@@ -22,7 +21,11 @@ module.exports = (params, options) => {
 				maxRetries: 0,
 				retriedCount: 0,
 				payload: {}, // The data being processed
-				error: {}
+				error: {},
+				nodeId: null,
+				assignedAt: null,
+				processedAt: null,
+				failedAt: null
 		  };
 
 	// Merge values being passed in the params object with the defaults

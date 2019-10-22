@@ -13,9 +13,6 @@ module.exports = Joi.object()
 		userId: Joi.string()
 			.allow(null)
 			.optional(),
-		batchId: Joi.string()
-			.allow(null)
-			.optional(),
 		externalId: Joi.string()
 			.allow(null)
 			.optional(),
@@ -59,6 +56,17 @@ module.exports = Joi.object()
 			otherwise: Joi.object().required()
 		}),
 		error: Joi.object().optional(),
+		nodeId: Joi.string().optional(),
+		assignedAt: Joi.when("$update", {
+			is: true,
+			then: Joi.string().optional(),
+			otherwise: Joi.string().required()
+		}),
+		processedAt: Joi.when("$update", {
+			is: true,
+			then: Joi.string().optional(),
+			otherwise: Joi.string().required()
+		}),
 		updatedAt: Joi.string().required(),
 		createdAt: Joi.when("$update", {
 			is: true,

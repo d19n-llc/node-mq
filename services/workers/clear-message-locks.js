@@ -26,10 +26,10 @@ module.exports = async (params = {}) => {
 		const data = _.get(findResult, "data");
 
 		if (data.length > 0) {
-			// Clear the "batchId" to release these messages
+			// Clear the "nodeId" to release these messages
 			const [updateManyError] = await MessageQueuedResource.updateMany({
-				query: { batchId: data[0].batchId },
-				object: { batchId: null, status: "queued" }
+				query: { nodeId: data[0].nodeId },
+				object: { nodeId: null, status: "queued" }
 			});
 			if (updateManyError) throw new Error(updateManyError);
 		}

@@ -4,17 +4,19 @@ const MessageQueuedResourceClass = require("../../resources/message-queued");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
 const PublishMessage = require("../publish/message");
+const { utcDate } = require("../../helpers/dates");
+
 /**
  *
  *
  * @param {*} {
  * 	messages,
- * 	batchId,
+ * 	nodeId,
  * 	messageHandlers,
  * }
  * @returns
  */
-module.exports = async ({ messages, batchId, messageHandlers }) => {
+module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
 
@@ -26,7 +28,10 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 	async function handleProcessedMessage({ message }) {
 		// Move message to processed
 		const [moveError] = await ProcessedResource.createOneNonIdempotent({
-			object: Object.assign({}, message, { status: "processed" })
+			object: Object.assign({}, message, {
+				status: "processed",
+				processedAt: utcDate()
+			})
 		});
 
 		const [deleteError] = await MessageQueuedResource.deleteOne({
@@ -36,7 +41,7 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 		if (moveError || deleteError) {
 			await handleFailedMessage({
 				message,
-				batchId,
+				nodeId,
 				errorMessage: moveError ? moveError.message : ""
 			});
 		}
@@ -46,7 +51,7 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 		// process jobs
 		for (let index = 0; index < messages.length; index++) {
 			const message = messages[index];
-			const currentMessage = Object.assign({}, message, { batchId });
+			const currentMessage = Object.assign({}, message, { nodeId });
 
 			const { source, topic } = message;
 			// Test processing works.
@@ -58,13 +63,13 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,
-						batchId,
+						nodeId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
 					handleProcessedMessage({ message: currentMessage });
 				}
-			} else if (process.env.APP_URL && source === process.env.APP_URL) {
+			} else if (nodeId && source === nodeId) {
 				// If the source is the APP_URL that means this message should be published
 				// to all subscribers and not processed internally with the script registry.
 				const [error] = await PublishMessage({
@@ -73,16 +78,13 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,
-						batchId,
+						nodeId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
 					handleProcessedMessage({ message: currentMessage });
 				}
-			} else if (
-				source !== process.env.APP_URL &&
-				messageHandlers[`${topic}`]
-			) {
+			} else if (source !== nodeId && messageHandlers[`${topic}`]) {
 				// If the source is not the current APP and their is a script then
 				// Use the script with the key === to the message topic
 				const [error] = await messageHandlers[`${topic}`]({
@@ -92,7 +94,7 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 					// eslint-disable-next-line no-await-in-loop
 					await handleFailedMessage({
 						message: currentMessage,
-						batchId,
+						nodeId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
