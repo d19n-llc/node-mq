@@ -15,11 +15,11 @@ module.exports = async () => {
 			query: { sort: "1|partition|", resultsPerPage: 1000, pageNumber: 0 }
 		});
 		if (findError) throw new Error(findError);
-		// Assign dockerId to messages in batches of 1000
+		// Assign nodeId to messages in batches of 1000
 		for (let index = 0; index < findResult.length; index++) {
 			const node = findResult[index];
 			const [claimError] = await claimMessages({
-				nodeId: node.dockerId
+				nodeId: node.nodeId
 			});
 
 			if (claimError) throw new Error(claimError);

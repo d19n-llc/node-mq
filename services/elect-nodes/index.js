@@ -6,11 +6,14 @@ module.exports = async () => {
 	// Store the hostname, partition number an
 	try {
 		const dockerId = os.hostname;
+		const appInstanceId = process.env.INSTANCE_ID || 0;
+		const nodeId = `${dockerId}-${appInstanceId}`;
+
 		const NodeResource = new NodeResourceClass();
 		// Find all nodes
 		const [findError, findResult] = await NodeResource.findMany({
 			query: {
-				dockerId: { $ne: null },
+				nodeId: { $ne: null },
 				resultsPerPage: 1000,
 				pageNumber: 0
 			}
@@ -20,7 +23,11 @@ module.exports = async () => {
 		const partition = findResult.length;
 		console.log({ partition });
 		const [createError, createResult] = await NodeResource.createOne({
-			object: { dockerId, partition, lastActive: utcDate() }
+			object: {
+				nodeId,
+				partition,
+				lastActive: utcDate()
+			}
 		});
 		console.log({ createError, createResult });
 	} catch (error) {

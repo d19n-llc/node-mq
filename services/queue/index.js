@@ -26,7 +26,9 @@ module.exports = async ({ removeBuffer = false }) => {
 
 	// Set a batchId for the messages being processed
 	// const batchId = uuidv1();
-	const nodeId = os.hostname;
+	const dockerId = os.hostname;
+	const appInstanceId = process.env.INSTANCE_ID || 0;
+	const nodeId = `${dockerId}-${appInstanceId}`;
 
 	// Handle messages
 	try {

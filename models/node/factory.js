@@ -10,7 +10,7 @@ module.exports = (params, options) => {
 		: // isUpdating = false set default values
 		  {
 				_id: ObjectID().toString(),
-				dockerId: null,
+				nodeId: null,
 				partition: 0,
 				lastActive: null
 		  };
