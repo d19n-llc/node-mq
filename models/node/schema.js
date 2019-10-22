@@ -7,7 +7,7 @@ module.exports = Joi.object()
 			then: Joi.strip(),
 			otherwise: Joi.string().required()
 		}),
-		dockerId: Joi.string().required(),
+		dockerId: Joi.number().required(),
 		partition: Joi.string().required(),
 		lastActive: Joi.string()
 			.optional()

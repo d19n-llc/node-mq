@@ -56,7 +56,7 @@ module.exports = Joi.object()
 			otherwise: Joi.object().required()
 		}),
 		error: Joi.object().optional(),
-		nodeId: Joi.string()
+		nodeId: Joi.number()
 			.allow(null)
 			.optional(),
 		assignedAt: Joi.when("$update", {
