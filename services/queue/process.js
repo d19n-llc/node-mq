@@ -54,6 +54,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 		for (let index = 0; index < messages.length; index++) {
 			const message = messages[index];
 			const currentMessage = Object.assign({}, message, { nodeId });
+			console.log({ currentMessage });
 
 			const { source, topic } = message;
 			// Test processing works.
@@ -71,6 +72,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 					handleProcessedMessage({ message: currentMessage });
 				}
 			} else if (nodeId && source === nodeId) {
+				console.log("process the message nodeId === source");
 				// If the source is the APP_URL that means this message should be published
 				// to all subscribers and not processed internally with the script registry.
 				const [error] = await PublishMessage({

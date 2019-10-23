@@ -70,6 +70,7 @@ function Scheduler() {
 		`${queueSettings.processQueueEvery || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			console.log("process messages in queue");
 			processQueuedMessages({});
 		}
 	);
