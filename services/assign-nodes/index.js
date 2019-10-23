@@ -35,7 +35,10 @@ module.exports = async () => {
 				}
 			}
 		}
+		return;
 	} catch (error) {
 		console.error(error);
+
+		return "error assigning nodes";
 	}
 };

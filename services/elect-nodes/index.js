@@ -18,7 +18,9 @@ module.exports = async () => {
 			}
 		});
 		if (createError) throw new Error();
+		return;
 	} catch (error) {
 		console.error(error);
+		return "error electing nodes";
 	}
 };
