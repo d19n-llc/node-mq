@@ -36,9 +36,13 @@ function Scheduler() {
 		}
 	);
 
-	schedule.scheduleJob(`${queueSettings.assignNodes || 0} * * * * *`, () => {
-		assignNodes({});
-	});
+	schedule.scheduleJob(
+		`${queueSettings.assignNodes || 0} * * * * *`,
+		async () => {
+			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			assignNodes({});
+		}
+	);
 	// Releases locked messages in the queue
 	schedule.scheduleJob(
 		`${queueSettings.clearMessageLocks || 0} * * * * *`,
@@ -58,7 +62,6 @@ function Scheduler() {
 		`${queueSettings.processQueueEvery || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-
 			processQueuedMessages({});
 		}
 	);

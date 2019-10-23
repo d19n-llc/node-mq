@@ -19,24 +19,20 @@ module.exports = {
 	 * @param {Object} params
 	 */
 	async findOneAndUpdate({ collName, query, upsert, data }) {
-		console.log({ collName, query, upsert, data });
 		try {
 			const dbClient = await collection(collName);
 			const docs = await dbClient.findOne(query);
-			console.log({ docs });
 			const fields = data;
 			if (docs) {
 				// delete the _id from the fields if the document exists to avoid
 				// an error updating an immutable field.
 				delete fields._id;
 			}
-			console.log({ fields });
 			const { lastErrorObject, value } = await dbClient.findOneAndUpdate(
 				query,
 				{ $set: fields },
 				{ upsert, returnOriginal: false }
 			);
-			console.log({ lastErrorObject, value });
 			if (value) {
 				return [undefined, value];
 			}

@@ -23,7 +23,7 @@ module.exports = async (params = {}) => {
 
 		const data = _.get(findResult, "data");
 
-		if (data.length > 0) {
+		if (data && data.length > 0) {
 			// Do not process any failed messages that have been retried for the max
 			// amount of retries.
 			const messages = data.filter(
