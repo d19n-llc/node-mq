@@ -48,7 +48,7 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.deleteUnhealthyNodes || 1} * * * * *`,
 		async () => {
-			await deleteUnhealthyNodes({});
+			deleteUnhealthyNodes({});
 		}
 	);
 	// Releases locked messages in the queue

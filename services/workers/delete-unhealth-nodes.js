@@ -9,7 +9,7 @@ module.exports = async (params = {}) => {
 	const currentDate = formatDate(utcDate(), "YYYY-MM-DD");
 
 	const dateToCheck = formatDate(
-		setDateInPast(currentDate, 5, "minutes"),
+		setDateInPast(currentDate, 1, "minutes"),
 		"YYYY-MM-DD"
 	);
 
