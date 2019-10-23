@@ -25,7 +25,6 @@ module.exports = async (params = {}) => {
 
 		if (findError) throw new Error(findError);
 		const data = _.get(findResult, "data");
-		console.log({ data });
 		if (data.length > 0) {
 			// Delete unhealthy node
 			const [updateError] = await NodeResource.deleteOne({

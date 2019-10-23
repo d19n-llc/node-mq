@@ -33,7 +33,7 @@ function Scheduler() {
 		`*/${queueSettings.electNodes || 5} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			await electNodes({});
+			electNodes({});
 		}
 	);
 	// Assign messages to nodes
@@ -41,7 +41,7 @@ function Scheduler() {
 		`*/${queueSettings.assignNodes || 2} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			await assignNodes({});
+			assignNodes({});
 		}
 	);
 	// Delet Unhealthy nodes
@@ -55,21 +55,21 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
 		async () => {
-			await clearMessageLocks({});
+			clearMessageLocks({});
 		}
 	);
 	// Deduplicate message queue
 	schedule.scheduleJob(
 		`*/${queueSettings.deduplicateQueueEvery || 1} * * * * *`,
 		async () => {
-			await deduplicateQueue({});
+			deduplicateQueue({});
 		}
 	);
 	// Process messages queued
 	schedule.scheduleJob(
 		`*/${queueSettings.processQueueEvery || 3} * * * * *`,
 		async () => {
-			await processQueuedMessages({});
+			processQueuedMessages({});
 		}
 	);
 	// Retry failed messages
