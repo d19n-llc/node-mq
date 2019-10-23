@@ -22,9 +22,18 @@ module.exports = {
 		console.log({ collName, query, upsert, data });
 		try {
 			const dbClient = await collection(collName);
+			const docs = await dbClient.findOne(query);
+			console.log({ docs });
+			const fields = data;
+			if (docs[0] && docs[0].data.length > 0) {
+				// delete the _id from the fields if the document exists to avoid
+				// an error updating an immutable field.
+				delete fields._id;
+			}
+			console.log({ fields });
 			const { lastErrorObject, value } = await dbClient.findOneAndUpdate(
 				query,
-				{ $set: data },
+				{ $set: fields },
 				{ upsert, returnOriginal: false }
 			);
 			console.log({ lastErrorObject, value });
@@ -44,16 +53,6 @@ module.exports = {
 			return [new Error("Could not process find one and update"), undefined];
 		} catch (error) {
 			console.log({ error });
-			// if (error.code === 66) {
-			// 	// Duplicate document based on query
-			// 	const errorMessage = new Error(
-			// 		`There is already a record matching this query ${JSON.stringify(
-			// 			query
-			// 		)}, It should be unique.`
-			// 	);
-			// 	return [errorMessage, undefined];
-			// }
-
 			return [error, undefined];
 		}
 	},
