@@ -9,7 +9,6 @@ module.exports = async (params = {}) => {
 
 	const dateToCheck = setDateInPast(currentDate, 1, "minutes");
 
-	console.log({ dateToCheck });
 	try {
 		const [findGtError, findGtResult] = await MessageQueuedResource.findMany({
 			query: {

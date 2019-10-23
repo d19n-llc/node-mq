@@ -169,12 +169,39 @@ class Query {
 	handleNumberOrDateKeyQuery({ key, queryItemValue, activeNumberOrDateKeys }) {
 		// take the first value of the number or date key fields, this should allow you to deduce whether it is a date, or number
 		const operatorKey = activeNumberOrDateKeys[0];
-		// numbers often pass moment date validation - instead we create date object and convert it back, if it was a proper date it should match the original
-		// convert to number
-		this.parsedQuery["$match"] = {
-			...this.parsedQuery["$match"],
-			[key]: { [operatorKey]: parseInt(queryItemValue[operatorKey], 10) }
-		};
+		const isDate =
+			moment(queryItemValue[operatorKey], "YYYY-MM-DD").format("YYYY-MM-DD") ===
+			queryItemValue[operatorKey];
+
+		// convert to number or date depending on type
+		if (isDate) {
+			this.conversionStagePrior.$addFields[`${key}Converted`] = {
+				$dateFromString: {
+					dateString: `$${key}`
+					// onError: `$${key}` // MDB 4.0 only
+				}
+			};
+
+			// swap all valuues in the current element to be dates - ie {$gte: "100", $lt: "120"} becomes {$gte: 100, $lt: 120}
+			activeNumberOrDateKeys.forEach((relevantDateKey) => {
+				queryItemValue[relevantDateKey] = new Date(
+					queryItemValue[relevantDateKey]
+				);
+			});
+
+			// for dates and numbers we need to search on the converted key rather than the original
+			this.parsedQuery["$match"] = {
+				...this.parsedQuery["$match"],
+				[`${key}Converted`]: { ...queryItemValue }
+			};
+
+			// presumably this is a number instead of a date, since we are storing numbers as number types we do not need to convert it or do anything special
+		} else {
+			this.parsedQuery["$match"] = {
+				...this.parsedQuery["$match"],
+				[key]: { [operatorKey]: parseInt(queryItemValue[operatorKey], 10) }
+			};
+		}
 	}
 
 	buildParsedQueryStage() {
