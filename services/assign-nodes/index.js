@@ -17,7 +17,11 @@ module.exports = async () => {
 		// Consider how we should filter the findMany nodes to ensure we are only
 		// Fetching healthy node that are active..
 		const [findError, findResult] = await NodeResource.findMany({
-			query: { sort: "-1|updatedAt|", resultsPerPage: 1000, pageNumber: 0 }
+			query: {
+				sort: "-1|updatedAtConverted|",
+				resultsPerPage: 1000,
+				pageNumber: 0
+			}
 		});
 		if (findError) throw new Error(findError);
 

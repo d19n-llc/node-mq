@@ -18,7 +18,7 @@ module.exports = async ({ nodeId }) => {
 				nodeId: null,
 				resultsPerPage: 1000,
 				pageNumber: 0,
-				sort: "1|createdAt|"
+				sort: "1|createdAtConverted|"
 			}
 		});
 

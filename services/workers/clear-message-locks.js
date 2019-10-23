@@ -16,7 +16,7 @@ module.exports = async (params = {}) => {
 		// Find the first message that is older than the dateToCheck
 		const [findError, findResult] = await MessageQueuedResource.findMany({
 			query: {
-				updatedAt: { $gte: dateToCheck },
+				updatedAtConverted: { $gte: dateToCheck },
 				resultsPerPage: 1,
 				pageNumber: 0
 			}

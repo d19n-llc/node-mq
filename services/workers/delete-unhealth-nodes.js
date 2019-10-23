@@ -9,7 +9,7 @@ module.exports = async (params = {}) => {
 	const currentDate = formatDate(utcDate(), "YYYY-MM-DD");
 
 	const dateToCheck = formatDate(
-		setDateInPast(currentDate, 1, "minutes"),
+		setDateInPast(currentDate, 5, "minutes"),
 		"YYYY-MM-DD"
 	);
 
@@ -17,7 +17,7 @@ module.exports = async (params = {}) => {
 		// Find the first message that is older than the dateToCheck
 		const [findError, findResult] = await NodeResource.findMany({
 			query: {
-				updatedAt: { $gte: dateToCheck },
+				updatedAtConverted: { $gte: dateToCheck },
 				resultsPerPage: 1,
 				pageNumber: 0
 			}
@@ -25,12 +25,11 @@ module.exports = async (params = {}) => {
 
 		if (findError) throw new Error(findError);
 		const data = _.get(findResult, "data");
-
+		console.log({ data });
 		if (data.length > 0) {
 			// Delete unhealthy node
 			const [updateError] = await NodeResource.deleteOne({
-				query: { nodeId: data[0].nodeId },
-				object: { nodeId: null, status: "queued" }
+				query: { nodeId: data[0].nodeId }
 			});
 			if (updateError) throw new Error(updateError);
 		}

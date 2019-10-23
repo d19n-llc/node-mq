@@ -82,6 +82,12 @@ module.exports = Joi.object()
 			is: true,
 			then: Joi.string().optional(),
 			otherwise: Joi.string().required()
+		}),
+		updatedAtConverted: Joi.object().required(),
+		createdAtConverted: Joi.when("$update", {
+			is: true,
+			then: Joi.object().optional(),
+			otherwise: Joi.object().required()
 		})
 	})
 	.options({ stripUnknown: true });

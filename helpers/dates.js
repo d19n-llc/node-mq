@@ -13,12 +13,15 @@ exports.addTimestamps = (params) => {
 	const timestamp = moment.utc().toISOString();
 	if (isUpdating) {
 		return {
-			updatedAt: timestamp
+			updatedAt: timestamp,
+			updatedAtConverted: new Date()
 		};
 	}
 	return {
 		createdAt: timestamp,
-		updatedAt: timestamp
+		updatedAt: timestamp,
+		updatedAtConverted: new Date(),
+		createdAtConverted: new Date()
 	};
 };
 

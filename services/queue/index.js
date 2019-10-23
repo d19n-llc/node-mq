@@ -36,7 +36,7 @@ module.exports = async ({ removeBuffer = false }) => {
 				resultsPerPage: queueSettings.batchCount
 					? 1000 // limit per batch
 					: queueSettings.batchCount || 1000,
-				sort: "1|createdAt|",
+				sort: "1|createdAtConverted|",
 				nodeId,
 				topic: {
 					$in: [...Object.keys(messageHandlers), ...["internal-test"]]
@@ -53,7 +53,7 @@ module.exports = async ({ removeBuffer = false }) => {
 					? 1000 // limit per batch
 					: queueSettings.batchCount || 1000,
 				nodeId,
-				sort: "1|createdAt|",
+				sort: "1|createdAtConverted|",
 				source: os.hostname
 			}
 		});
