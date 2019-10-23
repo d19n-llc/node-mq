@@ -14,16 +14,15 @@ module.exports = async (params = {}) => {
 		// Find the first message that is older than the dateToCheck
 		const [findError, findResult] = await NodeResource.findMany({
 			query: {
-				updatedAtConverted: { $lte: new Date(dateToCheck) },
+				updatedAtConverted: { $gte: new Date(dateToCheck) },
 				resultsPerPage: 1,
 				pageNumber: 0
 			}
 		});
 
-		console.log({ findError, findResult });
 		if (findError) throw new Error(findError);
 		const data = _.get(findResult, "data");
-		console.log({ data });
+
 		if (data.length > 0) {
 			// Delete unhealthy node
 			const [updateError] = await NodeResource.deleteOne({
