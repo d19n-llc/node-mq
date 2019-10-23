@@ -14,7 +14,7 @@ module.exports = async (params = {}) => {
 		// Find the first message that is older than the dateToCheck
 		const [findError, findResult] = await NodeResource.findMany({
 			query: {
-				updatedAtConverted: { $gte: new Date(dateToCheck) },
+				updatedAtConverted: { $lte: new Date(dateToCheck) },
 				resultsPerPage: 1,
 				pageNumber: 0
 			}

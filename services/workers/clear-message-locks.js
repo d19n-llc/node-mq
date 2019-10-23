@@ -11,7 +11,7 @@ module.exports = async (params = {}) => {
 	try {
 		const [findError, findResult] = await MessageQueuedResource.findMany({
 			query: {
-				updatedAtConverted: { $gte: new Date(dateToCheck) },
+				updatedAtConverted: { $lte: new Date(dateToCheck) },
 				resultsPerPage: 1,
 				pageNumber: 0
 			}
