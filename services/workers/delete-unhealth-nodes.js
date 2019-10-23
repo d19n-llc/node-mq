@@ -1,14 +1,13 @@
 const _ = require("lodash");
 
 const NodeResourceClass = require("../../resources/node");
-const { utcDate, formatDate, setDateInPast } = require("../../helpers/dates");
+const { utcDate, setDateInPast } = require("../../helpers/dates");
 
 module.exports = async (params = {}) => {
 	const NodeResource = new NodeResourceClass();
 
-	const currentDate = formatDate(utcDate(), "YYYY-MM-DD");
-
-	const dateToCheck = setDateInPast(currentDate, 1, "minutes");
+	const dateToCheck = setDateInPast(utcDate(), 1, "minutes");
+	console.log("unhealthy nodes", { dateToCheck });
 
 	try {
 		// Find the first message that is older than the dateToCheck

@@ -1,12 +1,11 @@
 const _ = require("lodash");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
-const { utcDate, formatDate, setDateInPast } = require("../../helpers/dates");
+const { utcDate, setDateInPast } = require("../../helpers/dates");
 
 module.exports = async (params = {}) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 
-	const currentDate = formatDate(utcDate(), "YYYY-MM-DD");
-	const dateToCheck = setDateInPast(currentDate, 1, "minutes");
+	const dateToCheck = setDateInPast(utcDate(), 1, "minutes");
 
 	try {
 		const [findError, findResult] = await MessageQueuedResource.findMany({
@@ -16,6 +15,7 @@ module.exports = async (params = {}) => {
 				pageNumber: 0
 			}
 		});
+
 		const data = _.get(findResult, "data");
 
 		if (data.length > 0) {
