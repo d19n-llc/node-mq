@@ -11,8 +11,16 @@ module.exports = async (params = {}) => {
 		setDateInPast(currentDate, 1, "minutes"),
 		"YYYY-MM-DD"
 	);
-
+	console.log({ dateToCheck });
 	try {
+		const [findGtError, findGtResult] = await MessageQueuedResource.findMany({
+			query: {
+				updatedAtConverted: { $gte: dateToCheck },
+				resultsPerPage: 1,
+				pageNumber: 0
+			}
+		});
+		console.log({ findGtResult });
 		// Find the first message that is older than the dateToCheck
 		const [findError, findResult] = await MessageQueuedResource.findMany({
 			query: {
@@ -22,15 +30,18 @@ module.exports = async (params = {}) => {
 			}
 		});
 
+		console.log({ findResult });
+
 		if (findError) throw new Error(findError);
 		const data = _.get(findResult, "data");
-
+		console.log({ data });
 		if (data.length > 0) {
 			// Clear the "nodeId" to release these messages
 			const [updateManyError] = await MessageQueuedResource.updateMany({
 				query: { nodeId: data[0].nodeId },
 				object: { nodeId: null, status: "queued" }
 			});
+			console.log({ updateManyError });
 			if (updateManyError) throw new Error(updateManyError);
 		}
 		return [undefined, {}];
