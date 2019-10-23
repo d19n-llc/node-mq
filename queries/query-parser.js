@@ -196,6 +196,11 @@ class Query {
 			};
 
 			// presumably this is a number instead of a date, since we are storing numbers as number types we do not need to convert it or do anything special
+		} else if (["createdAtConverted", "updatedAtConverted"].includes(key)) {
+			this.parsedQuery["$match"] = {
+				...this.parsedQuery["$match"],
+				[key]: { [operatorKey]: queryItemValue[operatorKey] }
+			};
 		} else {
 			this.parsedQuery["$match"] = {
 				...this.parsedQuery["$match"],
