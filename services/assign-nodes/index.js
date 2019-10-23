@@ -25,7 +25,6 @@ module.exports = async () => {
 		if (findResult.data && findResult.data.length > 0) {
 			// if the node is the master assign messages to all nodes
 			if (findResult.data[0].nodeId === nodeId) {
-				// console.log({ resultNode: findResult.data[0].nodeId, nodeId });
 				// Assign nodeId to messages in batches of 1000
 				for (let index = 0; index < findResult.data.length; index++) {
 					const node = findResult.data[index];

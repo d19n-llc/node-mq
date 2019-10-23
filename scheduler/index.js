@@ -46,7 +46,7 @@ function Scheduler() {
 	);
 	// Delet Unhealthy nodes
 	schedule.scheduleJob(
-		`${queueSettings.clearMessageLocks || 0} * * * * *`,
+		`${queueSettings.deleteUnhealthyNodes || 0} * * * * *`,
 		() => {
 			deleteUnhealthyNodes({});
 		}

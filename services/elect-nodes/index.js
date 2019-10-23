@@ -18,7 +18,6 @@ module.exports = async () => {
 			}
 		});
 		if (createError) throw new Error();
-		// console.log({ createError, createResult });
 	} catch (error) {
 		console.error(error);
 	}
