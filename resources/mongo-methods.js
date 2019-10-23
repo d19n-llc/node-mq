@@ -20,9 +20,8 @@ module.exports = {
 	 */
 	async findOneAndUpdate({ collName, query, upsert, data }) {
 		try {
-			const { lastErrorObject, value } = await collection(
-				collName
-			).findOneAndUpdate(
+			const dbClient = await collection(collName);
+			const { lastErrorObject, value } = await dbClient.findOneAndUpdate(
 				query,
 				{ $set: data },
 				{ upsert, returnOriginal: true }
