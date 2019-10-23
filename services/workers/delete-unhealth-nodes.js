@@ -8,16 +8,13 @@ module.exports = async (params = {}) => {
 
 	const currentDate = formatDate(utcDate(), "YYYY-MM-DD");
 
-	const dateToCheck = formatDate(
-		setDateInPast(currentDate, 1, "minutes"),
-		"YYYY-MM-DD"
-	);
+	const dateToCheck = setDateInPast(currentDate, 1, "minutes");
 
 	try {
 		// Find the first message that is older than the dateToCheck
 		const [findError, findResult] = await NodeResource.findMany({
 			query: {
-				updatedAtConverted: { $lte: dateToCheck },
+				updatedAtConverted: { $lte: new Date(dateToCheck) },
 				resultsPerPage: 1,
 				pageNumber: 0
 			}

@@ -7,15 +7,13 @@ module.exports = async (params = {}) => {
 
 	const currentDate = formatDate(utcDate(), "YYYY-MM-DD");
 
-	const dateToCheck = formatDate(
-		setDateInPast(currentDate, 1, "minutes"),
-		"YYYY-MM-DD"
-	);
+	const dateToCheck = setDateInPast(currentDate, 1, "minutes");
+
 	console.log({ dateToCheck });
 	try {
 		const [findGtError, findGtResult] = await MessageQueuedResource.findMany({
 			query: {
-				updatedAtConverted: { $gte: dateToCheck },
+				updatedAtConverted: { $gte: new Date(dateToCheck) },
 				resultsPerPage: 1,
 				pageNumber: 0
 			}
@@ -24,7 +22,7 @@ module.exports = async (params = {}) => {
 		// Find the first message that is older than the dateToCheck
 		const [findError, findResult] = await MessageQueuedResource.findMany({
 			query: {
-				updatedAtConverted: { $lte: dateToCheck },
+				updatedAtConverted: { $lte: new Date(dateToCheck) },
 				resultsPerPage: 1,
 				pageNumber: 0
 			}
