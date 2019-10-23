@@ -30,47 +30,46 @@ function Scheduler() {
 	}
 	// Eelect master and slave nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.electNodes || 0} * * * * *`,
+		`*/${queueSettings.electNodes || 5} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			electNodes({});
+			await electNodes({});
 		}
 	);
 	// Assign messages to nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.assignNodes || 0} * * * * *`,
+		`*/${queueSettings.assignNodes || 2} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			assignNodes({});
+			await assignNodes({});
 		}
 	);
 	// Delet Unhealthy nodes
 	schedule.scheduleJob(
 		`*/${queueSettings.deleteUnhealthyNodes || 1} * * * * *`,
-		() => {
-			deleteUnhealthyNodes({});
+		async () => {
+			await deleteUnhealthyNodes({});
 		}
 	);
 	// Releases locked messages in the queue
 	schedule.scheduleJob(
 		`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
-		() => {
-			clearMessageLocks({});
+		async () => {
+			await clearMessageLocks({});
 		}
 	);
 	// Deduplicate message queue
 	schedule.scheduleJob(
 		`*/${queueSettings.deduplicateQueueEvery || 1} * * * * *`,
-		() => {
-			deduplicateQueue({});
+		async () => {
+			await deduplicateQueue({});
 		}
 	);
 	// Process messages queued
 	schedule.scheduleJob(
-		`*/${queueSettings.processQueueEvery || 2} * * * * *`,
+		`*/${queueSettings.processQueueEvery || 3} * * * * *`,
 		async () => {
-			console.log("process messages in queue");
-			processQueuedMessages({});
+			await processQueuedMessages({});
 		}
 	);
 	// Retry failed messages
