@@ -19,14 +19,15 @@ module.exports = {
 	 * @param {Object} params
 	 */
 	async findOneAndUpdate({ collName, query, upsert, data }) {
+		console.log({ collName, query, upsert, data });
 		try {
 			const dbClient = await collection(collName);
 			const { lastErrorObject, value } = await dbClient.findOneAndUpdate(
 				query,
 				{ $set: data },
-				{ upsert, returnOriginal: true }
+				{ upsert, returnOriginal: false }
 			);
-
+			console.log({ lastErrorObject, value });
 			if (value) {
 				return [undefined, value];
 			}
@@ -42,15 +43,16 @@ module.exports = {
 			}
 			return [new Error("Could not process find one and update"), undefined];
 		} catch (error) {
-			if (error.code === 66) {
-				// Duplicate document based on query
-				const errorMessage = new Error(
-					`There is already a record matching this query ${JSON.stringify(
-						query
-					)}, It should be unique.`
-				);
-				return [errorMessage, undefined];
-			}
+			console.log({ error });
+			// if (error.code === 66) {
+			// 	// Duplicate document based on query
+			// 	const errorMessage = new Error(
+			// 		`There is already a record matching this query ${JSON.stringify(
+			// 			query
+			// 		)}, It should be unique.`
+			// 	);
+			// 	return [errorMessage, undefined];
+			// }
 
 			return [error, undefined];
 		}
