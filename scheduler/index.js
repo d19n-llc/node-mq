@@ -69,7 +69,6 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`${queueSettings.processQueueEvery || 0} * * * * *`,
 		async () => {
-			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			console.log("process messages in queue");
 			processQueuedMessages({});
 		}
@@ -78,7 +77,6 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`${queueSettings.retryFailedEvery || 0} * * * * *`,
 		async () => {
-			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			retryFailedMessages({});
 		}
 	);

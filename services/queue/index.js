@@ -69,8 +69,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			const [processError] = await processMessages({
 				messages: [...messagesToPublish, ...messagesToProcess],
 				nodeId,
-				messageHandlers,
-				removeBuffer
+				messageHandlers
 			});
 
 			if (processError) throw new Error(processError);
