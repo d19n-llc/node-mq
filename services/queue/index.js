@@ -1,7 +1,6 @@
 const os = require("os");
 const _ = require("lodash");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
-// const claimMessages = require("./claim");
 const processMessages = require("./process");
 /**
  *

@@ -2,9 +2,10 @@ const schedule = require("node-schedule");
 const electNodes = require("../services/elect-nodes");
 const assignNodes = require("../services/assign-nodes");
 const deduplicateQueue = require("../services/deduplicate");
-const clearMessageLocks = require("../services/workers/clear-message-locks");
 const processQueuedMessages = require("../services/queue");
 const retryFailedMessages = require("../services/retry-failed");
+const clearMessageLocks = require("../services/workers/clear-message-locks");
+const deleteUnhealthyNodes = require("../services/workers/delete-unhealth-nodes");
 const { offsetJobStart } = require("../helpers/processing");
 
 // *    *    *    *    *    *
@@ -27,7 +28,7 @@ function Scheduler() {
 		// set to default
 		queueSettings = {};
 	}
-	// Deduplicate message queue
+	// Eelect master and slave nodes
 	schedule.scheduleJob(
 		`${queueSettings.electNodes || 0} * * * * *`,
 		async () => {
@@ -35,12 +36,19 @@ function Scheduler() {
 			electNodes({});
 		}
 	);
-
+	// Assign messages to nodes
 	schedule.scheduleJob(
 		`${queueSettings.assignNodes || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			assignNodes({});
+		}
+	);
+	// Delet Unhealthy nodes
+	schedule.scheduleJob(
+		`${queueSettings.clearMessageLocks || 0} * * * * *`,
+		() => {
+			deleteUnhealthyNodes({});
 		}
 	);
 	// Releases locked messages in the queue

@@ -49,12 +49,7 @@ module.exports = async ({ nodeId }) => {
 				});
 				if (updateManyError) throw new Error(updateManyError);
 			}
-			console.log({
-				status: "messages claimed",
-				modifiedCount: _.get(claimResult, "modifiedCount"),
-				upsertedCount: _.get(claimResult, "upsertedCount"),
-				matchedCount: _.get(claimResult, "matchedCount")
-			});
+
 			return [
 				undefined,
 				{
@@ -65,12 +60,6 @@ module.exports = async ({ nodeId }) => {
 				}
 			];
 		}
-		console.log({
-			status: "no messages to claim",
-			modifiedCount: 0,
-			upsertedCount: 0,
-			matchedCount: 0
-		});
 
 		return [
 			undefined,
