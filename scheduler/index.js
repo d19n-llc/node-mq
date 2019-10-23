@@ -30,7 +30,7 @@ function Scheduler() {
 	}
 	// Eelect master and slave nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.electNodes || 3} * * * * *`,
+		`*/${queueSettings.electNodes || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			electNodes({});
@@ -38,7 +38,7 @@ function Scheduler() {
 	);
 	// Assign messages to nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.assignNodes || 5} * * * * *`,
+		`*/${queueSettings.assignNodes || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			assignNodes({});
