@@ -3,6 +3,27 @@ const { addTimestamps } = require("../../helpers/dates");
 
 module.exports = (params, options) => {
 	const { isUpdating } = options;
+
+	let preProcessedData = {};
+
+	if (params.externalId) {
+		preProcessedData = Object.assign({}, preProcessedData, {
+			externalId: params.externalId.toString()
+		});
+	}
+
+	if (params.userAccountId) {
+		preProcessedData = Object.assign({}, preProcessedData, {
+			userAccountId: params.userAccountId.toString()
+		});
+	}
+
+	if (params.userId) {
+		preProcessedData = Object.assign({}, preProcessedData, {
+			userId: params.userId.toString()
+		});
+	}
+
 	const defaults = isUpdating
 		? // isUpdating = true do not set default values
 		  {}
@@ -33,6 +54,7 @@ module.exports = (params, options) => {
 		{},
 		defaults,
 		params,
+		preProcessedData,
 		addTimestamps({ isUpdating })
 	);
 
