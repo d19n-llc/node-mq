@@ -37,7 +37,7 @@ module.exports = async ({ nodeId }) => {
 				// eslint-disable-next-line no-await-in-loop
 			] = await MessageQueuedResource.updateMany({
 				query: { topic, nodeId: null },
-				object: { nodeId, status: "in_flight" }
+				object: { nodeId, status: "in_flight", assignedAt: utcDate() }
 			});
 
 			// If there is an error clear the "nodeId" and change the status to "queued"
@@ -45,7 +45,7 @@ module.exports = async ({ nodeId }) => {
 				// eslint-disable-next-line no-await-in-loop
 				const [updateManyError] = await MessageQueuedResource.updateMany({
 					query: { nodeId },
-					object: { nodeId: null, status: "queued", assignedAt: utcDate() }
+					object: { nodeId: null, status: "queued", assignedAt: null }
 				});
 				if (updateManyError) throw new Error(updateManyError);
 			}

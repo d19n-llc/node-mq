@@ -26,6 +26,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	 *
 	 */
 	async function handleProcessedMessage({ message }) {
+		console.log("handle processed message", message);
 		// Move message to processed
 		const [moveError] = await ProcessedResource.createOneNonIdempotent({
 			object: Object.assign({}, message, {
@@ -38,10 +39,11 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 			query: { _id: message._id }
 		});
 
+		console.log({ moveError, deleteError });
+
 		if (moveError || deleteError) {
 			await handleFailedMessage({
 				message,
-				nodeId,
 				errorMessage: moveError ? moveError.message : ""
 			});
 		}
@@ -63,7 +65,6 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,
-						nodeId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
@@ -78,7 +79,6 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,
-						nodeId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
@@ -94,7 +94,6 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 					// eslint-disable-next-line no-await-in-loop
 					await handleFailedMessage({
 						message: currentMessage,
-						nodeId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
