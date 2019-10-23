@@ -19,14 +19,29 @@ module.exports = {
 	 * @param {Object} params
 	 */
 	async findOneAndUpdate({ collName, query, upsert, data }) {
-		const dbClient = await collection(collName);
 		try {
-			const { lastErrorObject, value } = await dbClient.findOneAndUpdate(
+			const { lastErrorObject, value } = await collection(
+				collName
+			).findOneAndUpdate(
 				query,
 				{ $set: data },
-				{ upsert, returnOriginal: false }
+				{ upsert, returnOriginal: true }
 			);
-			return [undefined, value];
+
+			if (value) {
+				return [undefined, value];
+			}
+			if (lastErrorObject) {
+				// No documents were updated
+				if (!lastErrorObject.updatedExisting) {
+					throw new Error(
+						`No documents where updated with your query: ${JSON.stringify(
+							query
+						)}`
+					);
+				}
+			}
+			return [new Error("Could not process find one and update"), undefined];
 		} catch (error) {
 			if (error.code === 66) {
 				// Duplicate document based on query
@@ -37,6 +52,7 @@ module.exports = {
 				);
 				return [errorMessage, undefined];
 			}
+
 			return [error, undefined];
 		}
 	},

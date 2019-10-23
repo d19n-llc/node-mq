@@ -28,7 +28,7 @@ class NodeResource extends BaseResource {
 	 * @param {*} response
 	 * @param {*} next
 	 * @returns
-	 * @memberof PublisherResource
+	 * @memberof NodeResource
 	 */
 	async createOne(params) {
 		try {
