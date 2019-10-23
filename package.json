@@ -1,6 +1,6 @@
 {
 	"name": "@d19n/node-mq",
-	"version": "1.9.40",
+	"version": "1.9.41",
 	"description": "A message queue for nodejs apps, pub / sub and job queue for handling events recieved from webhooks.",
 	"main": "index.js",
 	"repository": {

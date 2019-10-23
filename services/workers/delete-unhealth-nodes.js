@@ -7,7 +7,6 @@ module.exports = async (params = {}) => {
 	const NodeResource = new NodeResourceClass();
 
 	const dateToCheck = setDateInPast(utcDate(), 1, "minutes");
-	console.log("unhealthy nodes", { dateToCheck });
 
 	try {
 		// Find the first message that is older than the dateToCheck
