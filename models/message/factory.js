@@ -46,7 +46,8 @@ module.exports = (params, options) => {
 				nodeId: null,
 				assignedAt: null,
 				processedAt: null,
-				failedAt: null
+				failedAt: null,
+				isPublishable: false
 		  };
 
 	// Merge values being passed in the params object with the defaults

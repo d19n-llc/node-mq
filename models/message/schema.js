@@ -21,6 +21,7 @@ module.exports = Joi.object()
 			then: Joi.string().optional(),
 			otherwise: Joi.string().required()
 		}),
+		isPublishable: Joi.boolean().required(),
 		status: Joi.string()
 			.allow(null)
 			.optional(),

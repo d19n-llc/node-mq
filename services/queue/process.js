@@ -70,7 +70,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 				} else {
 					handleProcessedMessage({ message: currentMessage });
 				}
-			} else if (nodeId && source === nodeId) {
+			} else if (message.isPublishable) {
 				// If the source is the APP_URL that means this message should be published
 				// to all subscribers and not processed internally with the script registry.
 				const [error] = await PublishMessage({
@@ -84,7 +84,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 				} else {
 					handleProcessedMessage({ message: currentMessage });
 				}
-			} else if (source !== nodeId && messageHandlers[`${topic}`]) {
+			} else if (!message.isPublishable && messageHandlers[`${topic}`]) {
 				// If the source is not the current APP and their is a script then
 				// Use the script with the key === to the message topic
 				const [error] = await messageHandlers[`${topic}`]({
