@@ -39,7 +39,6 @@ module.exports = async ({ message }) => {
 	try {
 		const [findError, findResult] = await SubscriberResource.findMany({
 			query: {
-				userAccountId: message.userAccountId,
 				topics: { $in: [message.topic] }
 			}
 		});
