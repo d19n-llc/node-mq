@@ -18,11 +18,10 @@ module.exports = async ({ message }) => {
 	 * @returns
 	 */
 	async function sendMessageToSubscriber({ subscriberUrl }) {
-		// custom logic here
 		try {
 			const [error, result] = await internalHttp.POST({
 				url: `${subscriberUrl}`,
-				payload: message
+				payload: Object.assign({}, message, { isPublishable: false })
 			});
 
 			if (error) throw new Error(error);
