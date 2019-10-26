@@ -69,14 +69,14 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.processQueueEvery || 3} * * * * *`,
 		async () => {
-			processQueuedMessages({});
+			await processQueuedMessages({});
 		}
 	);
 	// Retry failed messages
 	schedule.scheduleJob(
 		`*/${queueSettings.retryFailedEvery || 5} * * * * *`,
 		async () => {
-			retryFailedMessages({});
+			await retryFailedMessages({});
 		}
 	);
 }

@@ -39,8 +39,6 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 			query: { _id: message._id }
 		});
 
-		console.log({ moveError, deleteError });
-
 		if (moveError || deleteError) {
 			await handleFailedMessage({
 				message,
@@ -108,6 +106,10 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 		];
 	} catch (error) {
 		console.error(error);
+		await handleFailedMessage({
+			message,
+			errorMessage: error ? error.message : ""
+		});
 		return [error, undefined];
 	}
 };
