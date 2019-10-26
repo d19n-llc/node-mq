@@ -5,7 +5,7 @@ const { utcDate, setDateInPast } = require("../../helpers/dates");
 module.exports = async (params = {}) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 
-	const dateToCheck = setDateInPast(utcDate(), 1, "minutes");
+	const dateToCheck = setDateInPast(utcDate(), 2, "minutes");
 
 	try {
 		const [findError, findResult] = await MessageQueuedResource.findMany({

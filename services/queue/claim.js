@@ -29,7 +29,7 @@ module.exports = async ({ nodeId }) => {
 		const topic = _.get(data[0], "topic");
 
 		if (topic) {
-			// Add the "nodeId" and change the status to "in_flight" which locks the
+			// Add the "nodeId" and change the status to "queued" which locks the
 			// messages with that topic
 			const [
 				claimError,
@@ -37,7 +37,7 @@ module.exports = async ({ nodeId }) => {
 				// eslint-disable-next-line no-await-in-loop
 			] = await MessageQueuedResource.updateMany({
 				query: { topic, nodeId: null },
-				object: { nodeId, status: "in_flight", assignedAt: utcDate() }
+				object: { nodeId, status: "queued", assignedAt: utcDate() }
 			});
 
 			// If there is an error clear the "nodeId" and change the status to "queued"

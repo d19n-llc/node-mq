@@ -38,6 +38,7 @@ module.exports = async ({ removeBuffer = false }) => {
 					: queueSettings.batchCount || 1000,
 				sort: "1|createdAtConverted|",
 				nodeId,
+				status: "queued",
 				topic: {
 					$in: [...Object.keys(messageHandlers), ...["internal-test"]]
 				}
@@ -53,6 +54,7 @@ module.exports = async ({ removeBuffer = false }) => {
 					? 1000 // limit per batch
 					: queueSettings.batchCount || 1000,
 				nodeId,
+				status: "queued",
 				sort: "1|createdAtConverted|",
 				source: os.hostname
 			}
@@ -65,6 +67,13 @@ module.exports = async ({ removeBuffer = false }) => {
 		const messagesToPublish = _.get(pubMsgResult, "data");
 		// Check that we have messages before processing
 		if ([...messagesToPublish, ...messagesToProcess].length > 0) {
+			// Update message status to in_flight
+			const [updateManyError] = await MessageQueuedResource.updateMany({
+				query: { nodeId },
+				object: { nodeId: null, status: "in_flight", assignedAt: null }
+			});
+			if (updateManyError) throw new Error(updateManyError);
+
 			// Process messages claimed
 			const [processError] = await processMessages({
 				messages: [...messagesToPublish, ...messagesToProcess],
