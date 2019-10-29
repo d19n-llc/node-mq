@@ -39,9 +39,9 @@ function Scheduler() {
 			console.log("elect nodes");
 			await electNodes({});
 			console.log("clear message locks");
-			await clearMessageLocks({});
+			clearMessageLocks({});
 			console.log("assign nodes");
-			await assignNodes({});
+			assignNodes({});
 		}
 	);
 

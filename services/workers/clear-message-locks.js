@@ -18,7 +18,7 @@ module.exports = async (params = {}) => {
 
 		const data = _.get(findResult, "data");
 
-		if (data.length > 0) {
+		if (data && data.length > 0) {
 			// Clear the "nodeId" to release these messages
 			const [updateManyError] = await MessageQueuedResource.updateMany({
 				query: { nodeId: data[0].nodeId },
