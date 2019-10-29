@@ -38,6 +38,8 @@ function Scheduler() {
 			await deleteUnhealthyNodes({});
 			console.log("elect nodes");
 			await electNodes({});
+			console.log("clear message locks");
+			await clearMessageLocks({});
 			console.log("assign nodes");
 			await assignNodes({});
 		}
@@ -47,9 +49,6 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.processQueueEvery || 1} * * * * *`,
 		async () => {
-			console.log("delete unhealthy nodes");
-			console.log("clear message locks");
-			await clearMessageLocks({});
 			console.log("deduplicate");
 			await deduplicateQueue({});
 			console.log("process queue");
