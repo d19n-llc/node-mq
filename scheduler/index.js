@@ -35,9 +35,9 @@ function Scheduler() {
 		async () => {
 			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			console.log("delete unhealthy nodes");
-			await deleteUnhealthyNodes({});
+			deleteUnhealthyNodes({});
 			console.log("elect nodes");
-			await electNodes({});
+			electNodes({});
 			console.log("clear message locks");
 			clearMessageLocks({});
 			console.log("assign nodes");
@@ -50,9 +50,9 @@ function Scheduler() {
 		`*/${queueSettings.processQueueEvery || 1} * * * * *`,
 		async () => {
 			console.log("deduplicate");
-			await deduplicateQueue({});
+			deduplicateQueue({});
 			console.log("process queue");
-			await processQueuedMessages({});
+			processQueuedMessages({});
 			console.log("complete");
 		}
 	);

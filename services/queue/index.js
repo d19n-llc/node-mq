@@ -9,6 +9,7 @@ const processMessages = require("./process");
  * @returns
  */
 module.exports = async ({ removeBuffer = false }) => {
+	console.log("Process Queue");
 	// Load the queue scripts
 	let messageHandlers = {};
 	let queueSettings = {};
@@ -65,6 +66,7 @@ module.exports = async ({ removeBuffer = false }) => {
 		// Get the data from both categories of messages
 		const messagesToProcess = _.get(queueMessages, "data");
 		const messagesToPublish = _.get(pubMsgResult, "data");
+		console.log([...messagesToPublish, ...messagesToProcess].length);
 		// Check that we have messages before processing
 		if ([...messagesToPublish, ...messagesToProcess].length > 0) {
 			// Process messages claimed
