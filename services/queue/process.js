@@ -33,13 +33,12 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 			})
 		});
 
-}
 		// Move message to processed
 		const [deleteError] = await MessageQueuedResource.deleteOne({
 			query: { _id: message._id }
 		});
 
-		if (moveErro || deleteError) {
+		if (moveError || deleteError) {
 			await handleFailedMessage({
 				message,
 				errorMessage: deleteError ? deleteError.message : ""
