@@ -20,16 +20,14 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
 
-	let message = {};
-
 	/**
 	 * When a message is successfully processed, we want to remove it from
 	 * inflight and move it to processed.
 	 *
 	 */
-	async function handleProcessedMessage() {
+	async function handleProcessedMessage({ message }) {
 		// Move message to processed
-
+		console.log("handle processed message");
 		const [deleteError] = await MessageQueuedResource.deleteOne({
 			query: { _id: message._id }
 		});
@@ -60,7 +58,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	try {
 		// process jobs
 		for (let index = 0; index < messages.length; index++) {
-			message = messages[index];
+			const message = messages[index];
 			const currentMessage = Object.assign({}, message, { nodeId });
 
 			const { source, topic } = message;
@@ -118,10 +116,6 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 		];
 	} catch (error) {
 		console.error("process error", error);
-		await handleFailedMessage({
-			message,
-			errorMessage: error ? error.message : ""
-		});
 		return [error, undefined];
 	}
 };

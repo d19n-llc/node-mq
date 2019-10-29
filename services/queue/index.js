@@ -48,30 +48,13 @@ module.exports = async ({ removeBuffer = false }) => {
 
 		if (queueError) throw new Error(queueError);
 
-		// Messages to be published out to subscribers
-		const [pubMsgError, pubMsgResult] = await MessageQueuedResource.findMany({
-			query: {
-				resultsPerPage: queueSettings.batchCount
-					? 1000 // limit per batch
-					: queueSettings.batchCount || 1000,
-				nodeId,
-				status: "in_flight",
-				sort: "1|createdAtConverted|",
-				source: os.hostname
-			}
-		});
-
-		if (pubMsgError) throw new Error(pubMsgError);
-
 		// Get the data from both categories of messages
 		const messagesToProcess = _.get(queueMessages, "data");
-		const messagesToPublish = _.get(pubMsgResult, "data");
-		console.log([...messagesToPublish, ...messagesToProcess].length);
 		// Check that we have messages before processing
-		if ([...messagesToPublish, ...messagesToProcess].length > 0) {
+		if ([...messagesToProcess].length > 0) {
 			// Process messages claimed
 			const [processError] = await processMessages({
-				messages: [...messagesToPublish, ...messagesToProcess],
+				messages: [...messagesToProcess],
 				nodeId,
 				messageHandlers
 			});
@@ -82,7 +65,7 @@ module.exports = async ({ removeBuffer = false }) => {
 			undefined,
 			{
 				status: "messages processed",
-				totalMessages: 100
+				totalMessages: [...messagesToProcess].length
 			}
 		];
 	} catch (error) {
