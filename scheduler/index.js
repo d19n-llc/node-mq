@@ -31,54 +31,23 @@ function Scheduler() {
 	console.log({ queueSettings });
 	// Eelect master and slave nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.electNodes || 5} * * * * *`,
+		`*/${queueSettings.electNodes || 1} * * * * *`,
 		async () => {
 			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			console.log("elect");
-			electNodes({});
+			console.log("delete unhealthy nodes");
+			await deleteUnhealthyNodes({});
+			console.log("elect nodes");
+			await electNodes({});
+			console.log("assign nodes");
+			await assignNodes({});
 		}
 	);
-	// // Assign messages to nodes
-	// schedule.scheduleJob(
-	// 	`*/${queueSettings.assignNodes || 1} * * * * *`,
-	// 	async () => {
-	// 		// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-	// 		console.log("assign");
-	// 		assignNodes({});
-	// 	}
-	// );
-	// // Delet Unhealthy nodes
-	// schedule.scheduleJob(
-	// 	`*/${queueSettings.deleteUnhealthyNodes || 1} * * * * *`,
-	// 	async () => {
-	// 		// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-	// 		console.log("delete unhealthy");
-	// 		deleteUnhealthyNodes({});
-	// 	}
-	// );
-	// // Releases locked messages in the queue
-	// schedule.scheduleJob(
-	// 	`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
-	// 	async () => {
-	// 		// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-	// 		console.log("clear locks");
-	// 		clearMessageLocks({});
-	// 	}
-	// );
-	// // Deduplicate message queue
-	// schedule.scheduleJob(
-	// 	`*/${queueSettings.deduplicateQueueEvery || 1} * * * * *`,
-	// 	async () => {
-	// 		console.log("deduplicate");
-	// 		await deduplicateQueue({});
-	// 	}
-	// );
+
 	// Process messages queued
 	schedule.scheduleJob(
 		`*/${queueSettings.processQueueEvery || 1} * * * * *`,
 		async () => {
 			console.log("delete unhealthy nodes");
-			await deleteUnhealthyNodes({});
 			console.log("clear message locks");
 			await clearMessageLocks({});
 			console.log("deduplicate");
