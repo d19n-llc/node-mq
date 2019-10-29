@@ -50,7 +50,7 @@ module.exports = async ({ removeBuffer = false }) => {
 
 		const [updateManyError] = await MessageQueuedResource.updateMany({
 			query: { nodeId },
-			object: { nodeId: null, status: "locked", assignedAt: null }
+			object: { nodeId, status: "locked", assignedAt: null }
 		});
 
 		if (updateManyError) throw new Error(updateManyError);
