@@ -28,37 +28,39 @@ function Scheduler() {
 		// set to default
 		queueSettings = {};
 	}
-	console.log({ queueSettings });
 	// Eelect master and slave nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.electNodes || 1} * * * * *`,
+		`*/${queueSettings.deleteUnhealthyNodes || 1} * * * * *`,
 		async () => {
 			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			console.log("delete unhealthy nodes");
 			deleteUnhealthyNodes({});
 		}
 	);
 	schedule.scheduleJob(
 		`*/${queueSettings.electNodes || 1} * * * * *`,
 		async () => {
-			console.log("elect nodes");
 			electNodes({});
 		}
 	);
 
 	schedule.scheduleJob(
-		`*/${queueSettings.electNodes || 1} * * * * *`,
+		`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
 		async () => {
-			console.log("clear message locks");
 			clearMessageLocks({});
 		}
 	);
 
 	schedule.scheduleJob(
-		`*/${queueSettings.electNodes || 1} * * * * *`,
+		`*/${queueSettings.assignNodes || 1} * * * * *`,
 		async () => {
-			console.log("assign nodes");
 			assignNodes({});
+		}
+	);
+	// Process messages queued
+	schedule.scheduleJob(
+		`*/${queueSettings.deduplicateQueue || 1} * * * * *`,
+		async () => {
+			deduplicateQueue({});
 		}
 	);
 
@@ -66,9 +68,7 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.processQueueEvery || 1} * * * * *`,
 		async () => {
-			console.log("process queue");
 			processQueuedMessages({});
-			console.log("complete");
 		}
 	);
 	// Retry failed messages

@@ -27,12 +27,10 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	 */
 	async function handleProcessedMessage({ message }) {
 		// Move message to processed
-		console.log("handle processed message");
 		const [deleteError] = await MessageQueuedResource.deleteOne({
 			query: { _id: message._id }
 		});
 
-		console.log("delete error", deleteError);
 		if (deleteError) {
 			await handleFailedMessage({
 				message,
@@ -46,7 +44,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 				processedAt: utcDate()
 			})
 		});
-		console.log("move error", moveError);
+
 		if (moveError) {
 			await handleFailedMessage({
 				message,
@@ -106,8 +104,6 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 					handleProcessedMessage({ message: currentMessage });
 				}
 			}
-
-			console.log("Processing message", { message, nodeId });
 		}
 
 		return [
