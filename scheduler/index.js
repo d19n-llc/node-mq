@@ -38,7 +38,7 @@ function Scheduler() {
 	);
 	// Assign messages to nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.assignNodes || 2} * * * * *`,
+		`*/${queueSettings.assignNodes || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			assignNodes({});
@@ -53,7 +53,7 @@ function Scheduler() {
 	);
 	// Releases locked messages in the queue
 	schedule.scheduleJob(
-		`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
+		`*/${queueSettings.clearMessageLocks || 5} * * * * *`,
 		async () => {
 			clearMessageLocks({});
 		}

@@ -20,6 +20,8 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
 
+	let message = {};
+
 	/**
 	 * When a message is successfully processed, we want to remove it from
 	 * inflight and move it to processed.
@@ -28,6 +30,17 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	async function handleProcessedMessage({ message }) {
 		console.log("handle processed message", message);
 		// Move message to processed
+
+		const [deleteError] = await MessageQueuedResource.deleteOne({
+			query: { _id: message._id }
+		});
+		if (deleteError) {
+			await handleFailedMessage({
+				message,
+				errorMessage: deleteError ? deleteError.message : ""
+			});
+		}
+
 		const [moveError] = await ProcessedResource.createOneNonIdempotent({
 			object: Object.assign({}, message, {
 				status: "processed",
@@ -35,11 +48,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 			})
 		});
 
-		const [deleteError] = await MessageQueuedResource.deleteOne({
-			query: { _id: message._id }
-		});
-
-		if (moveError || deleteError) {
+		if (moveError) {
 			await handleFailedMessage({
 				message,
 				errorMessage: moveError ? moveError.message : ""
@@ -50,7 +59,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	try {
 		// process jobs
 		for (let index = 0; index < messages.length; index++) {
-			const message = messages[index];
+			message = messages[index];
 			const currentMessage = Object.assign({}, message, { nodeId });
 
 			const { source, topic } = message;
@@ -98,6 +107,8 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 					handleProcessedMessage({ message: currentMessage });
 				}
 			}
+
+			console.log("Processing message", { message, nodeId });
 		}
 
 		return [
