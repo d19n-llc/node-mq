@@ -32,9 +32,13 @@ module.exports = async (params = {}) => {
 
 			// Create the failed message in the queue to be processed
 			await seriesLoop(messages, async (message, index) => {
-				const [createError] = await MessageQueuedResource.createOne({
-					object: Object.assign({}, message, {
-						batchId: null,
+				const editedMessage = _.omit(message, ["_id"]);
+
+				const [
+					createError
+				] = await MessageQueuedResource.createOneNonIdempotent({
+					object: Object.assign({}, editedMessage, {
+						nodeId: null,
 						status: "queued",
 						retriedCount: message.retriedCount + 1
 					})

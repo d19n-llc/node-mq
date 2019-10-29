@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+const _ = require("lodash");
 const handleFailedMessage = require("./clean-up");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const ProcessedResourceClass = require("../../resources/message-processed");
@@ -26,14 +27,15 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	 *
 	 */
 	async function handleProcessedMessage({ message }) {
+		const editedMessage = _.omit(message, ["_id"]);
+		// Move message to processed
 		const [moveError] = await ProcessedResource.createOneNonIdempotent({
-			object: Object.assign({}, message, {
+			object: Object.assign({}, editedMessage, {
 				status: "processed",
 				processedAt: utcDate()
 			})
 		});
 
-		// Move message to processed
 		const [deleteError] = await MessageQueuedResource.deleteOne({
 			query: { _id: message._id }
 		});

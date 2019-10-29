@@ -5,10 +5,11 @@ const FailedResourceClass = require("../../resources/message-failed");
 module.exports = async ({ message, errorMessage }) => {
 	const FailedResource = new FailedResourceClass();
 	const MessageQueueResource = new MessageQueuedResourceClass();
+	const editedMessage = _.omit(message, ["_id"]);
 	try {
 		// Move the message that caused an error to failed
 		const [failError] = await FailedResource.createOneNonIdempotent({
-			object: Object.assign({}, message, {
+			object: Object.assign({}, editedMessage, {
 				status: "failed",
 				error: { message: errorMessage }
 			})

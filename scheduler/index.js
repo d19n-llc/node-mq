@@ -75,7 +75,6 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.retryFailedEvery || 5} * * * * *`,
 		async () => {
-			console.log("retry failed");
 			retryFailedMessages({});
 		}
 	);
