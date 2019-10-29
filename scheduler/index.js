@@ -28,11 +28,13 @@ function Scheduler() {
 		// set to default
 		queueSettings = {};
 	}
+	console.log({ queueSettings });
 	// Eelect master and slave nodes
 	schedule.scheduleJob(
 		`*/${queueSettings.electNodes || 5} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			console.log("elect");
 			electNodes({});
 		}
 	);
@@ -41,6 +43,7 @@ function Scheduler() {
 		`*/${queueSettings.assignNodes || 0} * * * * *`,
 		async () => {
 			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			console.log("assign");
 			assignNodes({});
 		}
 	);
@@ -48,6 +51,8 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.deleteUnhealthyNodes || 1} * * * * *`,
 		async () => {
+			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			console.log("delete unhealthy");
 			deleteUnhealthyNodes({});
 		}
 	);
@@ -55,6 +60,8 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.clearMessageLocks || 5} * * * * *`,
 		async () => {
+			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			console.log("clear locks");
 			clearMessageLocks({});
 		}
 	);
@@ -62,13 +69,15 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.deduplicateQueueEvery || 1} * * * * *`,
 		async () => {
+			console.log("deduplicate");
 			deduplicateQueue({});
 		}
 	);
 	// Process messages queued
 	schedule.scheduleJob(
-		`*/${queueSettings.processQueueEvery || 3} * * * * *`,
+		`*/${queueSettings.processQueueEvery || 0} * * * * *`,
 		async () => {
+			console.log("process queue");
 			processQueuedMessages({});
 		}
 	);
@@ -76,6 +85,7 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.retryFailedEvery || 5} * * * * *`,
 		async () => {
+			console.log("retry failed");
 			retryFailedMessages({});
 		}
 	);
