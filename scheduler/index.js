@@ -36,10 +36,27 @@ function Scheduler() {
 			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			console.log("delete unhealthy nodes");
 			deleteUnhealthyNodes({});
+		}
+	);
+	schedule.scheduleJob(
+		`*/${queueSettings.electNodes || 1} * * * * *`,
+		async () => {
 			console.log("elect nodes");
 			electNodes({});
+		}
+	);
+
+	schedule.scheduleJob(
+		`*/${queueSettings.electNodes || 1} * * * * *`,
+		async () => {
 			console.log("clear message locks");
 			clearMessageLocks({});
+		}
+	);
+
+	schedule.scheduleJob(
+		`*/${queueSettings.electNodes || 1} * * * * *`,
+		async () => {
 			console.log("assign nodes");
 			assignNodes({});
 		}
@@ -49,8 +66,6 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.processQueueEvery || 1} * * * * *`,
 		async () => {
-			console.log("deduplicate");
-			deduplicateQueue({});
 			console.log("process queue");
 			processQueuedMessages({});
 			console.log("complete");
