@@ -26,29 +26,23 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	 *
 	 */
 	async function handleProcessedMessage({ message }) {
-		// Move message to processed
-		const [deleteError] = await MessageQueuedResource.deleteOne({
-			query: { _id: message._id }
-		});
-
-		if (deleteError) {
-			await handleFailedMessage({
-				message,
-				errorMessage: deleteError ? deleteError.message : ""
-			});
-		}
-
-		const [moveError] = await ProcessedResource.createOne({
+		const [moveError] = await ProcessedResource.createOneNonIdempotent({
 			object: Object.assign({}, message, {
 				status: "processed",
 				processedAt: utcDate()
 			})
 		});
 
-		if (moveError) {
+}
+		// Move message to processed
+		const [deleteError] = await MessageQueuedResource.deleteOne({
+			query: { _id: message._id }
+		});
+
+		if (moveErro || deleteError) {
 			await handleFailedMessage({
 				message,
-				errorMessage: moveError ? moveError.message : ""
+				errorMessage: deleteError ? deleteError.message : ""
 			});
 		}
 	}

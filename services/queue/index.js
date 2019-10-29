@@ -2,6 +2,8 @@ const os = require("os");
 const _ = require("lodash");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const processMessages = require("./process");
+const { utcDate } = require("../../helpers/dates");
+
 /**
  *
  *
@@ -9,7 +11,6 @@ const processMessages = require("./process");
  * @returns
  */
 module.exports = async ({ removeBuffer = false }) => {
-	console.log("Process Queue");
 	// Load the queue scripts
 	let messageHandlers = {};
 	let queueSettings = {};
@@ -50,7 +51,7 @@ module.exports = async ({ removeBuffer = false }) => {
 
 		const [updateManyError] = await MessageQueuedResource.updateMany({
 			query: { nodeId },
-			object: { nodeId, status: "locked", assignedAt: null }
+			object: { status: "locked", assignedAt: utcDate() }
 		});
 
 		if (updateManyError) throw new Error(updateManyError);
