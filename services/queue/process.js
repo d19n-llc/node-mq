@@ -27,13 +27,14 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	 * inflight and move it to processed.
 	 *
 	 */
-	async function handleProcessedMessage({ message }) {
-		console.log("handle processed message", message);
+	async function handleProcessedMessage() {
 		// Move message to processed
 
 		const [deleteError] = await MessageQueuedResource.deleteOne({
 			query: { _id: message._id }
 		});
+
+		console.log("delete error", deleteError);
 		if (deleteError) {
 			await handleFailedMessage({
 				message,
@@ -41,13 +42,13 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 			});
 		}
 
-		const [moveError] = await ProcessedResource.createOneNonIdempotent({
+		const [moveError] = await ProcessedResource.createOne({
 			object: Object.assign({}, message, {
 				status: "processed",
 				processedAt: utcDate()
 			})
 		});
-
+		console.log("move error", moveError);
 		if (moveError) {
 			await handleFailedMessage({
 				message,
@@ -116,7 +117,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 			{ status: "processed messages", total: messages.length }
 		];
 	} catch (error) {
-		console.error(error);
+		console.error("process error", error);
 		await handleFailedMessage({
 			message,
 			errorMessage: error ? error.message : ""
