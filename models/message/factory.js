@@ -35,7 +35,7 @@ module.exports = (params, options) => {
 				externalId: null, // Id for the topic of the message
 				name: null, // a unique identifier for the message
 				source: null,
-				status: null,
+				status: "queued",
 				topic: null, // provides context for the payload
 				action: null, // created, updated, deleted, nofification
 				priority: 0, // 0,1,2 messages are prioritised descending 0-low, 1-med, 2-high

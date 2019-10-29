@@ -16,6 +16,7 @@ module.exports = async ({ nodeId }) => {
 		const [findError, findResult] = await MessageQueuedResource.findMany({
 			query: {
 				nodeId: null,
+				status: "queued",
 				resultsPerPage: 1000,
 				pageNumber: 0,
 				sort: "1|createdAtConverted|"
@@ -37,7 +38,7 @@ module.exports = async ({ nodeId }) => {
 				// eslint-disable-next-line no-await-in-loop
 			] = await MessageQueuedResource.updateMany({
 				query: { topic, nodeId: null },
-				object: { nodeId, status: "queued", assignedAt: utcDate() }
+				object: { nodeId, status: "in_flight", assignedAt: utcDate() }
 			});
 
 			// If there is an error clear the "nodeId" and change the status to "queued"

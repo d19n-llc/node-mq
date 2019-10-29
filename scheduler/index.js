@@ -33,16 +33,16 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.electNodes || 5} * * * * *`,
 		async () => {
-			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			console.log("elect");
 			electNodes({});
 		}
 	);
 	// Assign messages to nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.assignNodes || 0} * * * * *`,
+		`*/${queueSettings.assignNodes || 1} * * * * *`,
 		async () => {
-			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			console.log("assign");
 			assignNodes({});
 		}
@@ -51,34 +51,36 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.deleteUnhealthyNodes || 1} * * * * *`,
 		async () => {
-			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			console.log("delete unhealthy");
 			deleteUnhealthyNodes({});
 		}
 	);
 	// Releases locked messages in the queue
 	schedule.scheduleJob(
-		`*/${queueSettings.clearMessageLocks || 5} * * * * *`,
+		`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
 		async () => {
-			await offsetJobStart({ appInstance: queueSettings.appInstanceId });
+			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
 			console.log("clear locks");
 			clearMessageLocks({});
 		}
 	);
-	// Deduplicate message queue
-	schedule.scheduleJob(
-		`*/${queueSettings.deduplicateQueueEvery || 1} * * * * *`,
-		async () => {
-			console.log("deduplicate");
-			deduplicateQueue({});
-		}
-	);
+	// // Deduplicate message queue
+	// schedule.scheduleJob(
+	// 	`*/${queueSettings.deduplicateQueueEvery || 1} * * * * *`,
+	// 	async () => {
+	// 		console.log("deduplicate");
+	// 		await deduplicateQueue({});
+	// 	}
+	// );
 	// Process messages queued
 	schedule.scheduleJob(
-		`*/${queueSettings.processQueueEvery || 0} * * * * *`,
+		`*/${queueSettings.processQueueEvery || 1} * * * * *`,
 		async () => {
+			console.log("deduplicate");
+			await deduplicateQueue({});
 			console.log("process queue");
-			processQueuedMessages({});
+			await processQueuedMessages({});
 		}
 	);
 	// Retry failed messages
