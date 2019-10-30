@@ -42,7 +42,6 @@ module.exports = async ({ removeBuffer = false }) => {
 				status: "in_flight"
 			}
 		});
-		console.log("messages", queueMessages);
 
 		if (queueError) throw new Error(queueError);
 

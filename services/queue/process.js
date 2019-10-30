@@ -20,7 +20,6 @@ const { utcDate } = require("../../helpers/dates");
 module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
-	console.log("process messages", messages);
 
 	/**
 	 * When a message is successfully processed, we want to remove it from
@@ -76,7 +75,6 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 				const [error] = await PublishMessage({
 					message: currentMessage
 				});
-				console.log("78", { error });
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,
