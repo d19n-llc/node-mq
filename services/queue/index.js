@@ -45,6 +45,7 @@ module.exports = async ({ removeBuffer = false }) => {
 				}
 			}
 		});
+		console.log("messages", queueMessages);
 
 		if (queueError) throw new Error(queueError);
 

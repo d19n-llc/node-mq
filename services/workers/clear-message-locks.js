@@ -22,7 +22,7 @@ module.exports = async (params = {}) => {
 			// Clear the "nodeId" to release these messages
 			const [updateManyError] = await MessageQueuedResource.updateMany({
 				query: { nodeId: data[0].nodeId },
-				object: { nodeId: null, status: "queued" }
+				object: { nodeId: null, status: "queued", assignedAt: null }
 			});
 			if (updateManyError) throw new Error(updateManyError);
 		}

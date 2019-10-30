@@ -44,7 +44,7 @@ function Scheduler() {
 	);
 
 	schedule.scheduleJob(
-		`*/${queueSettings.clearMessageLocks || 5} * * * * *`,
+		`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
 		async () => {
 			clearMessageLocks({});
 		}
