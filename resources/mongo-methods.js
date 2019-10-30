@@ -23,14 +23,11 @@ module.exports = {
 			const dbClient = await collection(collName);
 			const docs = await dbClient.findOne(query);
 			const fields = data;
-			console.log("docs", docs, query);
 			if (docs) {
-				console.log("has matching doc");
 				// delete the _id from the fields if the document exists to avoid
 				// an error updating an immutable field.
 				delete fields._id;
 			}
-			console.log("deleted  fields", fields);
 			const { lastErrorObject, value } = await dbClient.findOneAndUpdate(
 				query,
 				{ $set: fields },
