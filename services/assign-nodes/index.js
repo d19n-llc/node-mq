@@ -16,27 +16,14 @@ module.exports = async () => {
 		// Find all nodes
 		// Consider how we should filter the findMany nodes to ensure we are only
 		// Fetching healthy node that are active..
-		const [findTestError, findTestResult] = await NodeResource.findMany({
-			query: {
-				sort: "-1|updatedAtConverted|",
-				resultsPerPage: 1000,
-				pageNumber: 0
-			}
-		});
-
-		console.log("TEST", findTestResult);
 		const [findError, findResult] = await NodeResource.findMany({
 			query: {
 				sort: "-1|updatedAtConverted|",
-				nodeId: null,
-				status: "queued",
 				resultsPerPage: 1000,
 				pageNumber: 0
 			}
 		});
 		if (findError) throw new Error(findError);
-
-		console.log("assign", findResult);
 
 		// If there are nodes
 		if (findResult.data && findResult.data.length > 0) {
