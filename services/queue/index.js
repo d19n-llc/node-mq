@@ -51,22 +51,23 @@ module.exports = async ({ removeBuffer = false }) => {
 
 		const [updateManyError] = await MessageQueuedResource.updateMany({
 			query: { nodeId },
-			object: { status: "locked", assignedAt: utcDate() }
+			object: { status: "locked" }
 		});
 
 		if (updateManyError) throw new Error(updateManyError);
 
 		// Get the data from both categories of messages
 		const messagesToProcess = _.get(queueMessages, "data");
+		console.log("messagesToProcess.length", messagesToProcess.length);
 		// Check that we have messages before processing
 		if ([...messagesToProcess].length > 0) {
 			// Process messages claimed
-			const [processError] = await processMessages({
+			const [processError, processResult] = await processMessages({
 				messages: [...messagesToProcess],
 				nodeId,
 				messageHandlers
 			});
-
+			console.log({ processError, processResult });
 			if (processError) throw new Error(processError);
 		}
 		return [
