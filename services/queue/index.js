@@ -45,6 +45,13 @@ module.exports = async ({ removeBuffer = false }) => {
 
 		if (queueError) throw new Error(queueError);
 
+		// Add a message lock once the node has put the messages in memory
+		const [updateManyError] = await MessageQueuedResource.updateMany({
+			query: { nodeId },
+			object: { status: "locked" }
+		});
+		if (updateManyError) throw new Error(updateManyError);
+
 		// Get the data from both categories of messages
 		const messagesToProcess = _.get(queueMessages, "data");
 		// Check that we have messages before processing
