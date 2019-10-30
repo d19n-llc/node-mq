@@ -36,7 +36,6 @@ function Scheduler() {
 			deleteUnhealthyNodes({});
 		}
 	);
-
 	schedule.scheduleJob(
 		`*/${queueSettings.electNodes || 1} * * * * *`,
 		async () => {
@@ -44,18 +43,16 @@ function Scheduler() {
 		}
 	);
 
-	// schedule.scheduleJob(
-	// 	`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
-	// 	async () => {
-	// 	}
-	// 	);
+	schedule.scheduleJob(
+		`*/${queueSettings.clearMessageLocks || 5} * * * * *`,
+		async () => {
+			clearMessageLocks({});
+		}
+	);
 
 	schedule.scheduleJob(
-		`*/${queueSettings.assignNodes || 1} * * * * *`,
+		`*/${queueSettings.assignNodes || 2} * * * * *`,
 		async () => {
-			console.log("clear locks");
-			await clearMessageLocks({});
-			console.log("assign nodes");
 			assignNodes({});
 		}
 	);
@@ -63,7 +60,6 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.deduplicateQueue || 1} * * * * *`,
 		async () => {
-			console.log("deduplicate");
 			deduplicateQueue({});
 		}
 	);
@@ -72,7 +68,6 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/${queueSettings.processQueueEvery || 1} * * * * *`,
 		async () => {
-			console.log("process queue");
 			processQueuedMessages({});
 		}
 	);
