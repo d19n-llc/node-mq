@@ -39,10 +39,7 @@ module.exports = async ({ removeBuffer = false }) => {
 					: queueSettings.batchCount || 1000,
 				sort: "1|createdAtConverted|",
 				nodeId,
-				status: "in_flight",
-				topic: {
-					$in: [...Object.keys(messageHandlers), ...["internal-test"]]
-				}
+				status: "in_flight"
 			}
 		});
 		console.log("messages", queueMessages);
