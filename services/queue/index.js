@@ -2,7 +2,6 @@ const os = require("os");
 const _ = require("lodash");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const processMessages = require("./process");
-const { utcDate } = require("../../helpers/dates");
 
 /**
  *
@@ -49,16 +48,8 @@ module.exports = async ({ removeBuffer = false }) => {
 
 		if (queueError) throw new Error(queueError);
 
-		const [updateManyError] = await MessageQueuedResource.updateMany({
-			query: { nodeId },
-			object: { status: "locked" }
-		});
-
-		if (updateManyError) throw new Error(updateManyError);
-
 		// Get the data from both categories of messages
 		const messagesToProcess = _.get(queueMessages, "data");
-		console.log("messagesToProcess.length", messagesToProcess.length);
 		// Check that we have messages before processing
 		if ([...messagesToProcess].length > 0) {
 			// Process messages claimed
@@ -67,7 +58,6 @@ module.exports = async ({ removeBuffer = false }) => {
 				nodeId,
 				messageHandlers
 			});
-			console.log({ processError, processResult });
 			if (processError) throw new Error(processError);
 		}
 		return [
@@ -79,6 +69,7 @@ module.exports = async ({ removeBuffer = false }) => {
 		];
 	} catch (error) {
 		console.error(error);
+
 		return [error, undefined];
 	}
 };
