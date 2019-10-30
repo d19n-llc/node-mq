@@ -19,7 +19,7 @@ module.exports = async () => {
 		const [findError, findResult] = await NodeResource.findMany({
 			query: {
 				sort: "-1|updatedAtConverted|",
-				status: "queued",
+				nodeId: null,
 				resultsPerPage: 1000,
 				pageNumber: 0
 			}
