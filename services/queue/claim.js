@@ -28,6 +28,7 @@ module.exports = async ({ nodeId }) => {
 
 		const data = _.get(findResult, "data");
 		const topic = _.get(data[0], "topic");
+		console.log("Claim messages", nodeId, data);
 
 		if (topic) {
 			// Add the "nodeId" and change the status to "queued" which locks the
@@ -40,7 +41,7 @@ module.exports = async ({ nodeId }) => {
 				query: { topic, nodeId: null },
 				object: { nodeId, status: "in_flight", assignedAt: utcDate() }
 			});
-
+			console.log({ claimError, claimResult });
 			// If there is an error clear the "nodeId" and change the status to "queued"
 			if (claimError) {
 				// eslint-disable-next-line no-await-in-loop

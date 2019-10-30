@@ -26,6 +26,8 @@ module.exports = async () => {
 		});
 		if (findError) throw new Error(findError);
 
+		console.log("assign", findResult);
+
 		// If there are nodes
 		if (findResult.data && findResult.data.length > 0) {
 			// if the node is the master assign messages to all nodes

@@ -75,6 +75,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 				const [error] = await PublishMessage({
 					message: currentMessage
 				});
+				console.log("78", { error });
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,
