@@ -12,6 +12,7 @@ const PublisherFactory = require("./models/publisher/factory");
 const MessageFactory = require("./models/message/factory");
 const SubscriberFactory = require("./models/subscriber/factory");
 const isMasterNode = require("./helpers/is-master-node");
+const ProcessJob = require("./services/process-job");
 
 try {
 	const config = require(`${appRoot}/mq-config`);
@@ -29,5 +30,6 @@ module.exports = {
 	CreateCollections,
 	RemoveCollections,
 	isMasterNode,
+	ProcessJob,
 	RunTests
 };
