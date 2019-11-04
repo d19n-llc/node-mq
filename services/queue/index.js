@@ -1,5 +1,6 @@
 const os = require("os");
 const _ = require("lodash");
+const appRoot = require("app-root-path");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const processMessages = require("./process");
 
@@ -13,8 +14,9 @@ module.exports = async ({ removeBuffer = false }) => {
 	// Load the queue scripts
 	let messageHandlers = {};
 	let queueSettings = {};
+
 	try {
-		const config = require(`${process.cwd()}/mq-config`);
+		const config = require(`${appRoot}/mq-config`);
 		messageHandlers = config.messageHandlers;
 		queueSettings = config.queueSettings;
 	} catch (err) {
@@ -35,8 +37,8 @@ module.exports = async ({ removeBuffer = false }) => {
 		const [queueError, queueMessages] = await MessageQueuedResource.findMany({
 			query: {
 				resultsPerPage: queueSettings.batchCount
-					? 1000 // limit per batch
-					: queueSettings.batchCount || 1000,
+					? 100 // limit per batch
+					: queueSettings.batchCount || 100,
 				sort: "1|createdAtConverted|",
 				nodeId,
 				status: "in_flight"
@@ -44,13 +46,6 @@ module.exports = async ({ removeBuffer = false }) => {
 		});
 
 		if (queueError) throw new Error(queueError);
-
-		// Add a message lock once the node has put the messages in memory
-		const [updateManyError] = await MessageQueuedResource.updateMany({
-			query: { nodeId },
-			object: { status: "locked" }
-		});
-		if (updateManyError) throw new Error(updateManyError);
 
 		// Get the data from both categories of messages
 		const messagesToProcess = _.get(queueMessages, "data");

@@ -1,3 +1,4 @@
+const ObjectID = require("mongodb").ObjectID;
 const _ = require("lodash");
 const internalHttp = require("../../http/requests");
 const { seriesLoop } = require("../../helpers/functions");
@@ -55,7 +56,7 @@ module.exports = async ({ message }) => {
 					});
 
 					const [updateError] = await SubscriberResource.updateOne({
-						query: { _id: doc._id },
+						query: { _id: ObjectID(doc._id) },
 						object: {
 							subscriberUrl: doc.subscriberUrl,
 							lastUpdateError: publishError ? publishError.message : "",

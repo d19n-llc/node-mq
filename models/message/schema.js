@@ -5,7 +5,7 @@ module.exports = Joi.object()
 		_id: Joi.when("$update", {
 			is: true,
 			then: Joi.strip(),
-			otherwise: Joi.string().required()
+			otherwise: Joi.object().required()
 		}),
 		userAccountId: Joi.string()
 			.allow(null)

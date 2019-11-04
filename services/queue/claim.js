@@ -17,7 +17,7 @@ module.exports = async ({ nodeId }) => {
 			query: {
 				nodeId: null,
 				status: "queued",
-				resultsPerPage: 1000,
+				resultsPerPage: 100,
 				pageNumber: 0,
 				sort: "1|createdAtConverted|"
 			}

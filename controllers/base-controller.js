@@ -1,3 +1,4 @@
+const ObjectID = require("mongodb").ObjectID;
 const { makeError, clientErrorHandler } = require("../helpers/errors");
 
 class BaseController {
@@ -53,7 +54,7 @@ class BaseController {
 			const { params } = request;
 			const { id } = params;
 			const [error, result] = await this.resourceModule.findOne({
-				query: { _id: id }
+				query: { _id: ObjectID(id) }
 			});
 			if (error) {
 				return clientErrorHandler(makeError(error), response);
@@ -71,7 +72,7 @@ class BaseController {
 			const { params } = request;
 			const { id } = params;
 			const [error, result] = await this.resourceModule.deleteOne({
-				query: { _id: id },
+				query: { _id: ObjectID(id) },
 				object: body
 			});
 			if (error) {
@@ -89,7 +90,7 @@ class BaseController {
 			const { id } = params;
 			const [error, result] = await this.resourceModule.updateOne({
 				object: body,
-				query: { _id: id }
+				query: { _id: ObjectID(id) }
 			});
 			if (error) return next(makeError(error));
 			return response.status(200).json(result);

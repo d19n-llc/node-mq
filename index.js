@@ -1,6 +1,7 @@
 // Starts the node scheduler
 require("./scheduler");
 
+const appRoot = require("app-root-path");
 const { RunTests } = require("./tests");
 const { CreateCollections } = require("./config/setup/install");
 const { RemoveCollections } = require("./config/setup/uninstall");
@@ -10,14 +11,13 @@ const MessageQueuedResourceClass = require("./resources/message-queued");
 const PublisherFactory = require("./models/publisher/factory");
 const MessageFactory = require("./models/message/factory");
 const SubscriberFactory = require("./models/subscriber/factory");
+const isMasterNode = require("./helpers/is-master-node");
 
 try {
-	const config = require(`${process.cwd()}/mq-config`);
+	const config = require(`${appRoot}/mq-config`);
 } catch (error) {
 	console.error(error);
 }
-
-console.log("message queu is running");
 
 module.exports = {
 	PublisherFactory,
@@ -28,5 +28,6 @@ module.exports = {
 	NodeResourceClass,
 	CreateCollections,
 	RemoveCollections,
+	isMasterNode,
 	RunTests
 };

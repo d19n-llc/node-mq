@@ -1,4 +1,5 @@
 const schedule = require("node-schedule");
+const appRoot = require("app-root-path");
 const electNodes = require("../services/elect-nodes");
 const assignNodes = require("../services/assign-nodes");
 const deduplicateQueue = require("../services/deduplicate");
@@ -22,7 +23,9 @@ function Scheduler() {
 	let queueSettings = {};
 	try {
 		// eslint-disable-next-line global-require
-		const config = require(`${process.cwd()}/mq-config`);
+
+		const config = require(`${appRoot}/mq-config`);
+
 		queueSettings = config.queueSettings;
 	} catch (err) {
 		// set to default
@@ -58,7 +61,7 @@ function Scheduler() {
 	);
 	// Process messages queued
 	schedule.scheduleJob(
-		`*/${queueSettings.deduplicateQueue || 1} * * * * *`,
+		`*/${queueSettings.deduplicateQueue || 2} * * * * *`,
 		async () => {
 			deduplicateQueue({});
 		}

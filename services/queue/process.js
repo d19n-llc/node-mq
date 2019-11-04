@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+const ObjectID = require("mongodb").ObjectID;
 const _ = require("lodash");
 const handleFailedMessage = require("./clean-up");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
@@ -37,7 +38,7 @@ module.exports = async ({ messages, nodeId, messageHandlers }) => {
 		});
 
 		const [deleteError] = await MessageQueuedResource.deleteOne({
-			query: { _id: message._id }
+			query: { _id: ObjectID(message._id) }
 		});
 
 		if (moveError || deleteError) {

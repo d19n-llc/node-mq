@@ -1,3 +1,4 @@
+const ObjectID = require("mongodb").ObjectID;
 const _ = require("lodash");
 const FailedResourceClass = require("../../resources/message-failed");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
@@ -47,7 +48,7 @@ module.exports = async (params = {}) => {
 				if (createError) throw new Error(createError);
 				// Delete the message from the failed message collection
 				const [failedError] = await FailedResource.deleteOne({
-					query: { _id: message._id }
+					query: { _id: ObjectID(message._id) }
 				});
 				if (failedError) throw new Error(failedError);
 			});

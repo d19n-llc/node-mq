@@ -1,4 +1,3 @@
-const ObjectID = require("mongodb").ObjectID;
 const { addTimestamps } = require("../../helpers/dates");
 
 module.exports = (params, options) => {
@@ -29,7 +28,6 @@ module.exports = (params, options) => {
 		  {}
 		: // isUpdating = false set default values
 		  {
-				_id: ObjectID().toString(),
 				userAccountId: null,
 				userId: null,
 				externalId: null, // Id for the topic of the message
