@@ -17,7 +17,7 @@ module.exports = async () => {
 				lastActive: utcDate()
 			}
 		});
-		if (createError) throw new Error();
+		if (createError) throw new Error(createError);
 		return;
 	} catch (error) {
 		console.error(error);
