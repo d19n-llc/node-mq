@@ -19,24 +19,36 @@ module.exports = {
 	 * @param {Object} params
 	 */
 	async findOneAndUpdate({ collName, query, upsert, data }) {
-		const dbClient = await collection(collName);
 		try {
+			const dbClient = await collection(collName);
+			const docs = await dbClient.findOne(query);
+			const fields = data;
+			if (docs) {
+				// delete the _id from the fields if the document exists to avoid
+				// an error updating an immutable field.
+				delete fields._id;
+			}
 			const { lastErrorObject, value } = await dbClient.findOneAndUpdate(
 				query,
-				{ $set: data },
+				{ $set: fields },
 				{ upsert, returnOriginal: false }
 			);
-			return [undefined, value];
-		} catch (error) {
-			if (error.code === 66) {
-				// Duplicate document based on query
-				const errorMessage = new Error(
-					`There is already a record matching this query ${JSON.stringify(
-						query
-					)}, It should be unique.`
-				);
-				return [errorMessage, undefined];
+			if (value) {
+				return [undefined, value];
 			}
+			if (lastErrorObject) {
+				// No documents were updated
+				if (!lastErrorObject.updatedExisting) {
+					throw new Error(
+						`No documents where updated with your query: ${JSON.stringify(
+							query
+						)}`
+					);
+				}
+			}
+			return [new Error("Could not process find one and update"), undefined];
+		} catch (error) {
+			console.log({ error });
 			return [error, undefined];
 		}
 	},

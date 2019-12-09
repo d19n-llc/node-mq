@@ -292,7 +292,7 @@ class BaseResource {
 	 * @returns
 	 * @memberof BaseResource
 	 */
-	async deleteOne({ query, object }) {
+	async deleteOne({ query }) {
 		try {
 			const [error, result] = await deleteOne({
 				collName: this.collectionName,

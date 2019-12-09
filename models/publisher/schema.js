@@ -2,11 +2,6 @@ const Joi = require("@hapi/joi");
 
 module.exports = Joi.object()
 	.keys({
-		_id: Joi.when("$update", {
-			is: true,
-			then: Joi.strip(),
-			otherwise: Joi.string().required()
-		}),
 		userAccountId: Joi.string()
 			.optional()
 			.allow(""),
@@ -19,6 +14,12 @@ module.exports = Joi.object()
 			.allow("")
 			.optional(),
 		updatedAt: Joi.string().required(),
-		createdAt: Joi.string().required()
+		createdAt: Joi.string().required(),
+		updatedAtConverted: Joi.object().required(),
+		createdAtConverted: Joi.when("$update", {
+			is: true,
+			then: Joi.object().optional(),
+			otherwise: Joi.object().required()
+		})
 	})
 	.options({ stripUnknown: true });

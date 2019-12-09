@@ -1,20 +1,24 @@
 /* eslint-disable no-await-in-loop */
+const ObjectID = require("mongodb").ObjectID;
+const _ = require("lodash");
 const handleFailedMessage = require("./clean-up");
 const MessageQueuedResourceClass = require("../../resources/message-queued");
 const ProcessedResourceClass = require("../../resources/message-processed");
 const ProcessMessageTest = require("../../scripts/test/process-a-message");
 const PublishMessage = require("../publish/message");
+const { utcDate } = require("../../helpers/dates");
+
 /**
  *
  *
  * @param {*} {
  * 	messages,
- * 	batchId,
+ * 	nodeId,
  * 	messageHandlers,
  * }
  * @returns
  */
-module.exports = async ({ messages, batchId, messageHandlers }) => {
+module.exports = async ({ messages, nodeId, messageHandlers }) => {
 	const MessageQueuedResource = new MessageQueuedResourceClass();
 	const ProcessedResource = new ProcessedResourceClass();
 
@@ -24,20 +28,23 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 	 *
 	 */
 	async function handleProcessedMessage({ message }) {
+		const editedMessage = _.omit(message, ["_id"]);
 		// Move message to processed
-		const [moveError] = await ProcessedResource.createOne({
-			object: Object.assign({}, message, { status: "processed" })
+		const [moveError] = await ProcessedResource.createOneNonIdempotent({
+			object: Object.assign({}, editedMessage, {
+				status: "processed",
+				processedAt: utcDate()
+			})
 		});
 
 		const [deleteError] = await MessageQueuedResource.deleteOne({
-			query: { _id: message._id }
+			query: { _id: ObjectID(message._id) }
 		});
 
 		if (moveError || deleteError) {
 			await handleFailedMessage({
 				message,
-				batchId,
-				errorMessage: moveError ? moveError.message : ""
+				errorMessage: deleteError ? deleteError.message : ""
 			});
 		}
 	}
@@ -46,7 +53,7 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 		// process jobs
 		for (let index = 0; index < messages.length; index++) {
 			const message = messages[index];
-			const currentMessage = Object.assign({}, message, { batchId });
+			const currentMessage = Object.assign({}, message, { nodeId });
 
 			const { source, topic } = message;
 			// Test processing works.
@@ -58,13 +65,12 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,
-						batchId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
 					handleProcessedMessage({ message: currentMessage });
 				}
-			} else if (process.env.APP_URL && source === process.env.APP_URL) {
+			} else if (message.isPublishable) {
 				// If the source is the APP_URL that means this message should be published
 				// to all subscribers and not processed internally with the script registry.
 				const [error] = await PublishMessage({
@@ -73,16 +79,12 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 				if (error) {
 					await handleFailedMessage({
 						message: currentMessage,
-						batchId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
 					handleProcessedMessage({ message: currentMessage });
 				}
-			} else if (
-				source !== process.env.APP_URL &&
-				messageHandlers[`${topic}`]
-			) {
+			} else if (!message.isPublishable && messageHandlers[`${topic}`]) {
 				// If the source is not the current APP and their is a script then
 				// Use the script with the key === to the message topic
 				const [error] = await messageHandlers[`${topic}`]({
@@ -92,7 +94,6 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 					// eslint-disable-next-line no-await-in-loop
 					await handleFailedMessage({
 						message: currentMessage,
-						batchId,
 						errorMessage: error ? error.message : ""
 					});
 				} else {
@@ -106,7 +107,7 @@ module.exports = async ({ messages, batchId, messageHandlers }) => {
 			{ status: "processed messages", total: messages.length }
 		];
 	} catch (error) {
-		console.error(error);
+		console.error("process error", error);
 		return [error, undefined];
 	}
 };

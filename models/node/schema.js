@@ -2,23 +2,7 @@ const Joi = require("@hapi/joi");
 
 module.exports = Joi.object()
 	.keys({
-		userAccountId: Joi.string()
-			.optional()
-			.allow(""),
-		userId: Joi.string()
-			.optional()
-			.allow(""),
-		subscriberUrl: Joi.string()
-			.required()
-			.allow(""),
-		publisherUrl: Joi.string()
-			.required()
-			.allow(""),
-		topics: Joi.when("$update", {
-			is: true,
-			then: Joi.strip(),
-			otherwise: Joi.array().required()
-		}),
+		nodeId: Joi.string().required(),
 		updatedAt: Joi.string().required(),
 		createdAt: Joi.string().required(),
 		updatedAtConverted: Joi.object().required(),

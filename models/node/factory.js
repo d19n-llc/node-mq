@@ -8,11 +8,7 @@ module.exports = (params, options) => {
 		  {}
 		: // isUpdating = false set default values
 		  {
-				userAccountId: "",
-				userId: "",
-				subscriberUrl: "",
-				publisherUrl: "",
-				topics: []
+				nodeId: null
 		  };
 
 	// Merge values being passed in the params object with the defaults

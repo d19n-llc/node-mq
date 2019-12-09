@@ -1,9 +1,12 @@
 const axios = require("axios");
 
+const appRoot = require("app-root-path");
+
 let httpHeaders = {};
 
 try {
-	const config = require(`${process.cwd()}/mq-config`);
+	const config = require(`${appRoot}/mq-config`);
+
 	httpHeaders = config.httpHeaders;
 } catch (err) {
 	// set to default

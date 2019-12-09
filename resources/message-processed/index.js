@@ -18,7 +18,7 @@ class MessageProcessedResource extends BaseResource {
 			validator: MessageValidator,
 			factory: MessageFactory
 		});
-		this.createOne = this.createOne.bind(this);
+		this.createOneNonIdempotent = this.createOneNonIdempotent.bind(this);
 	}
 
 	/**
@@ -30,7 +30,7 @@ class MessageProcessedResource extends BaseResource {
 	 * @returns
 	 * @memberof MessageProcessedResource
 	 */
-	async createOne(params) {
+	async createOneNonIdempotent(params) {
 		try {
 			const { object } = params;
 			const [createError, createResult] = await super.createOneNonIdempotent({

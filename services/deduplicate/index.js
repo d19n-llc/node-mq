@@ -1,3 +1,4 @@
+const ObjectID = require("mongodb").ObjectID;
 const { aggregate, deleteOne } = require("../../resources/mongo-methods");
 const { seriesLoop } = require("../../helpers/functions");
 
@@ -8,7 +9,7 @@ module.exports = async (params = {}) => {
 			query: [
 				{
 					$group: {
-						_id: { name: "$name" },
+						_id: { payload: "$payload" },
 						documentIds: { $push: { _id: "$_id" } },
 						count: { $sum: 1 }
 					}
@@ -34,7 +35,7 @@ module.exports = async (params = {}) => {
 					await seriesLoop(duplicatesToRemove, async (duplicate, index) => {
 						const [removeError] = await deleteOne({
 							collName: "mq_messages_queued",
-							query: { _id: duplicate._id }
+							query: { _id: ObjectID(duplicate._id) }
 						});
 						if (removeError) throw new Error(removeError);
 					});

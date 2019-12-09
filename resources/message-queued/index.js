@@ -33,11 +33,10 @@ class MessageQueuedResource extends BaseResource {
 	async createOne(params) {
 		const { object } = params;
 		try {
-			const [createError, createResult] = await super.createOne({
-				object,
-				query: { payload: object.payload }
+			// Record the new pub sub route in the database
+			const [createError, createResult] = await super.createOneNonIdempotent({
+				object
 			});
-
 			if (createError) return [createError, undefined];
 			return [undefined, createResult];
 		} catch (error) {
