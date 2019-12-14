@@ -1,13 +1,6 @@
 const schedule = require("node-schedule");
-const appRoot = require("app-root-path");
-const electNodes = require("../services/elect-nodes");
-const assignNodes = require("../services/assign-nodes");
-const deduplicateQueue = require("../services/deduplicate");
-const processQueuedMessages = require("../services/queue");
-const retryFailedMessages = require("../services/retry-failed");
-const clearMessageLocks = require("../services/workers/clear-message-locks");
-const deleteUnhealthyNodes = require("../services/workers/delete-unhealth-nodes");
-const { offsetJobStart } = require("../helpers/processing");
+const registerNodes = require("../services/register-nodes");
+const deleteUnhealthyNodes = require("../services/nodes/delete-unhealthy");
 
 // *    *    *    *    *    *
 // ┬    ┬    ┬    ┬    ┬    ┬
@@ -19,68 +12,32 @@ const { offsetJobStart } = require("../helpers/processing");
 // │    └──────────────────── minute (0 - 59)
 // └───────────────────────── second (0 - 59, OPTIONAL)
 
+
+/**
+ *  Background jobs that manage registering new nodes (docker container running out application with the package installed)
+ *  And cleaning up unhealthy nodes (docker containers that are no longer running and apps that are unhealthy).
+ * @constructor
+ */
 function Scheduler() {
-	let queueSettings = {};
-	try {
-		// eslint-disable-next-line global-require
 
-		const config = require(`${appRoot}/mq-config`);
-
-		queueSettings = config.queueSettings;
-	} catch (err) {
-		// set to default
-		queueSettings = {};
-	}
-	// Eelect master and slave nodes
+	// Register all healthy nodes
 	schedule.scheduleJob(
-		`*/${queueSettings.deleteUnhealthyNodes || 1} * * * * *`,
+		`*/1 * * * * *`,
 		async () => {
-			// await offsetJobStart({ appInstance: queueSettings.appInstanceId });
-			deleteUnhealthyNodes({});
-		}
-	);
-	schedule.scheduleJob(
-		`*/${queueSettings.electNodes || 1} * * * * *`,
-		async () => {
-			electNodes({});
+			registerNodes({});
 		}
 	);
 
-	schedule.scheduleJob(
-		`*/${queueSettings.clearMessageLocks || 1} * * * * *`,
-		async () => {
-			clearMessageLocks({});
-		}
-	);
+		// Delete any unhealthy nodes
+		schedule.scheduleJob(
+				`*/1 * * * * *`,
+				async () => {
+						deleteUnhealthyNodes({});
+				}
+		);
 
-	schedule.scheduleJob(
-		`*/${queueSettings.assignNodes || 2} * * * * *`,
-		async () => {
-			assignNodes({});
-		}
-	);
-	// Process messages queued
-	schedule.scheduleJob(
-		`*/${queueSettings.deduplicateQueue || 2} * * * * *`,
-		async () => {
-			deduplicateQueue({});
-		}
-	);
 
-	// Process messages queued
-	schedule.scheduleJob(
-		`*/${queueSettings.processQueueEvery || 1} * * * * *`,
-		async () => {
-			processQueuedMessages({});
-		}
-	);
-	// Retry failed messages
-	schedule.scheduleJob(
-		`*/${queueSettings.retryFailedEvery || 5} * * * * *`,
-		async () => {
-			retryFailedMessages({});
-		}
-	);
+
 }
 
 Scheduler();

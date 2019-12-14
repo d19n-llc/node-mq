@@ -3,7 +3,7 @@ const createMessages = require("./create-messages");
 const processMessages = require("./process-messages");
 const retryMessages = require("./retry-messages");
 const deleteMessages = require("./delete-messages");
-const electNodes = require("../services/elect-nodes");
+const electNodes = require("../services/nodes/register");
 
 // node -e 'require("./tests").RunTests()'
 
