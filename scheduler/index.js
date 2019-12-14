@@ -24,6 +24,7 @@ function Scheduler() {
 	schedule.scheduleJob(
 		`*/1 * * * * *`,
 		async () => {
+				console.log("register node");
 			registerNodes({});
 		}
 	);
@@ -32,6 +33,7 @@ function Scheduler() {
 		schedule.scheduleJob(
 				`*/1 * * * * *`,
 				async () => {
+						console.log("delete node");
 						deleteUnhealthyNodes({});
 				}
 		);
