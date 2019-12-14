@@ -1,6 +1,6 @@
 {
 	"name": "@d19n/node-mq",
-	"version": "1.10.6",
+	"version": "1.10.7",
 	"description": "Distributed micro service master / slave election manager ",
 	"main": "index.js",
 	"repository": {
@@ -8,7 +8,7 @@
 		"url": "https://github.com/d19n-llc/d19n-node-mq"
 	},
 	"keywords": [
-		"master slave election manager",
+		"master slave election manager"
 	],
 	"author": "D19N <open-source@d19n.io>",
 	"license": "ISC",

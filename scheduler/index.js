@@ -1,5 +1,5 @@
 const schedule = require("node-schedule");
-const registerNodes = require("../services/register-nodes");
+const registerNodes = require("../services/nodes/register");
 const deleteUnhealthyNodes = require("../services/nodes/delete-unhealthy");
 
 // *    *    *    *    *    *
