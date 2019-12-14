@@ -1,18 +1,14 @@
 {
 	"name": "@d19n/node-mq",
-	"version": "1.10.5",
-	"description": "A message queue for nodejs apps, pub / sub and job queue for handling events recieved from webhooks.",
+	"version": "1.10.6",
+	"description": "Distributed micro service master / slave election manager ",
 	"main": "index.js",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/d19n-llc/d19n-node-mq"
 	},
 	"keywords": [
-		"pub/sub",
-		"job queue",
-		"nodejs",
-		"message queue",
-		"queue"
+		"master slave election manager",
 	],
 	"author": "D19N <open-source@d19n.io>",
 	"license": "ISC",
@@ -21,8 +17,6 @@
 	},
 	"dependencies": {
 		"@hapi/joi": "^15.0.3",
-		"app-root-path": "^3.0.0",
-		"axios": "^0.19.0",
 		"dotenv": "^8.0.0",
 		"express": "^4.17.1",
 		"lodash": "^4.17.15",
