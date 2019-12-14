@@ -1,6 +1,6 @@
 {
 	"name": "@d19n/node-mq",
-	"version": "1.10.10",
+	"version": "1.10.11",
 	"description": "Distributed micro service master / slave election manager ",
 	"main": "index.js",
 	"repository": {

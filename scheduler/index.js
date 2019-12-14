@@ -22,14 +22,12 @@ function Scheduler() {
 
 	// Register all healthy nodes
 	schedule.scheduleJob(`*/1 * * * * *`, async () => {
-				console.log("register node");
 			registerNodes({});
 		}
 	);
 
 		// Delete any unhealthy nodes
 		schedule.scheduleJob(`*/1 * * * * *`, async () => {
-						console.log("delete node");
 						deleteUnhealthyNodes({});
 				}
 		);

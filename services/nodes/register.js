@@ -9,8 +9,6 @@ module.exports = async () => {
 		const appInstanceId = process.env.INSTANCE_ID || 0;
 		const nodeId = `${dockerId}-${appInstanceId}`;
 
-		console.log("register", dockerId, appInstanceId, nodeId);
-
 		const NodeResource = new NodeResourceClass();
 		//
 		const [createError ] = await NodeResource.createOne({
