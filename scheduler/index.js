@@ -21,18 +21,16 @@ const deleteUnhealthyNodes = require("../services/nodes/delete-unhealthy");
 function Scheduler() {
 
 	// Register all healthy nodes
-	schedule.scheduleJob(`*/1 * * * * *`, async () => {
+	schedule.scheduleJob(`*/5 * * * * *`, async () => {
 			registerNodes({});
 		}
 	);
 
 		// Delete any unhealthy nodes
-		schedule.scheduleJob(`*/1 * * * * *`, async () => {
+		schedule.scheduleJob(`*/30 * * * * *`, async () => {
 						deleteUnhealthyNodes({});
 				}
 		);
-
-
 
 }
 
