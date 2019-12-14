@@ -1,8 +1,5 @@
 const moment = require("moment");
-const messageSchema = require("../models/message/schema");
 const nodeSchema = require("../models/node/schema");
-const publisherSchema = require("../models/publisher/schema");
-const subscribersSchema = require("../models/subscriber/schema");
 
 function recursiveFindJoiKeys(joi) {
 	const keys = [];
@@ -37,10 +34,7 @@ function recursiveFindJoiKeys(joi) {
 	return keys;
 }
 
-const allowedKeys = recursiveFindJoiKeys(messageSchema)
-	.concat(recursiveFindJoiKeys(publisherSchema))
-	.concat(recursiveFindJoiKeys(nodeSchema))
-	.concat(recursiveFindJoiKeys(subscribersSchema));
+const allowedKeys = (recursiveFindJoiKeys(nodeSchema));
 
 const distinctAllowedKeys = [...new Set(allowedKeys)];
 
